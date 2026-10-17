@@ -41,7 +41,7 @@ struct type_info_asset_handle_t: public type_info_struct_t {
 	type_info_t *dynamic_render_font;
 };
 
-struct type_info_material_archetype: public type_info_struct_t {
+struct type_info_material_instance_t: public type_info_struct_t {
 	type_info_t *ID;
 	type_info_t *version;
 	type_info_t *name;
@@ -51,7 +51,7 @@ struct type_info_material_archetype: public type_info_struct_t {
 	type_info_t *archetype;
 };
 
-struct type_info_stored_material_type: public type_info_struct_t {
+struct type_info_material_archetype_t: public type_info_struct_t {
 	type_info_t *ID;
 	type_info_t *version;
 	type_info_t *name;

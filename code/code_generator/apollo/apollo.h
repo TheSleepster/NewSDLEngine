@@ -53,8 +53,6 @@ fnv1a_hash(void *data, u32 count)
     return(result);
 }
 
-constexpr u32 MAX_HASH_PEEK_AHEADS = 5;
-
 #define APOLLO_HASH_TABLE_HEAP_ALLOCATE(name) void *(name)(void *allocator, s64 size, void *user_data)
 #define APOLLO_HASH_TABLE_HEAP_FREE(name)     void  (name)(void *allocator, void *memory, void *user_data)
 
@@ -137,31 +135,32 @@ struct hash_traits_t<u64>
 };
 
 // O(1 * num_buckets)
-template <typename ValueType>
+template <typename ValueType, typename KeyType>
 struct apollo_hash_element_t
 {
     ValueType value;
+    KeyType   key;
     u64       raw_hash;
 };
 
-template <typename ValueType>
+template <typename ValueType, typename KeyType>
 struct apollo_hash_bucket_t
 {
-    array_t<apollo_hash_element_t<ValueType>>   elements;
-    apollo_hash_bucket_t<ValueType>            *next_bucket;
+    array_t<apollo_hash_element_t<ValueType, KeyType>> elements;
+    apollo_hash_bucket_t<ValueType, KeyType>          *next_bucket;
 };
 
-template <typename ValueType>
+template <typename ValueType, typename KeyType>
 struct apollo_hash_table_iterator_t
 {
-    dynarray_t<apollo_hash_element_t<ValueType>*> *elements;
-    s32                                            current_index;
+    dynarray_t<apollo_hash_element_t<ValueType, KeyType>*> *elements;
+    s32                                                    current_index;
 
     void      operator++() {++current_index;}
     ValueType operator*()  {return(elements->items[current_index]->value);}
 
     bool8
-    operator!=(apollo_hash_table_iterator_t<ValueType> &other)
+    operator!=(apollo_hash_table_iterator_t<ValueType, KeyType> &other)
     {
         return(current_index != other.current_index);
     }
@@ -175,25 +174,25 @@ template <typename                     KeyType,
 struct apollo_hash_table_t
 {
     static constexpr s32 bucket_capacity = MaxCapacity;
-    apollo_hash_bucket_t<ValueType> first_bucket;
+    apollo_hash_bucket_t<ValueType, KeyType> first_bucket;
     void *allocator;
 
-    dynarray_t<apollo_hash_element_t<ValueType>*> used_elements;
+    dynarray_t<apollo_hash_element_t<ValueType, KeyType>*> used_elements;
 
-    apollo_hash_table_iterator_t<ValueType>
+    apollo_hash_table_iterator_t<ValueType, KeyType>
     begin()
     {
-        apollo_hash_table_iterator_t<ValueType> result = {};
+        apollo_hash_table_iterator_t<ValueType, KeyType> result = {};
         result.elements      = &used_elements;
         result.current_index =  0;
 
         return(result);
     }
 
-    apollo_hash_table_iterator_t<ValueType>
+    apollo_hash_table_iterator_t<ValueType, KeyType>
     end()
     {
-        apollo_hash_table_iterator_t<ValueType> result = {};
+        apollo_hash_table_iterator_t<ValueType, KeyType> result = {};
         result.elements      = &used_elements;
         result.current_index =  used_elements.used;
 
@@ -202,20 +201,20 @@ struct apollo_hash_table_t
 
     // NOTE(Sleepster): FUNCTIONS 
     void
-    hash_bucket_init(apollo_hash_bucket_t<ValueType> *bucket)
+    hash_bucket_init(apollo_hash_bucket_t<ValueType, KeyType> *bucket)
     {
-        bucket->elements.items = (apollo_hash_element_t<ValueType>*)AllocateFn(allocator, sizeof(apollo_hash_element_t<ValueType>) * bucket_capacity, null);
+        bucket->elements.items = (apollo_hash_element_t<ValueType, KeyType>*)AllocateFn(allocator, sizeof(apollo_hash_element_t<ValueType, KeyType>) * bucket_capacity, null);
         bucket->elements.count = bucket_capacity;
         bucket->next_bucket = null;
     }
 
-    apollo_hash_bucket_t<ValueType>*
+    apollo_hash_bucket_t<ValueType, KeyType>*
     append_new_bucket(void)
     {
-        apollo_hash_bucket_t<ValueType> *result = (apollo_hash_bucket_t<ValueType>*)AllocateFn(allocator, sizeof(apollo_hash_bucket_t<ValueType>), null);
+        apollo_hash_bucket_t<ValueType, KeyType> *result = (apollo_hash_bucket_t<ValueType, KeyType>*)AllocateFn(allocator, sizeof(apollo_hash_bucket_t<ValueType, KeyType>), null);
         hash_bucket_init(result);
 
-        apollo_hash_bucket_t<ValueType> *last_bucket = &first_bucket;
+        apollo_hash_bucket_t<ValueType, KeyType> *last_bucket = &first_bucket;
         while(last_bucket->next_bucket != null)
         {
             last_bucket = last_bucket->next_bucket;
@@ -232,65 +231,59 @@ struct apollo_hash_table_t
         hash_bucket_init(&first_bucket);
     }
 
-    apollo_hash_element_t<ValueType>*
+    // NOTE(Sleepster): A key is placed at the first free slot at or after its home slot, so
+    // lookups have to probe the same way - a bounded peek-ahead makes them disagree and leaves
+    // keys sitting in the table that find() can never reach.
+    apollo_hash_element_t<ValueType, KeyType>*
     get_hash_element(KeyType &key)
     {
-        apollo_hash_element_t<ValueType> *result = null;
-        u64 key_hash = hash_traits_t<KeyType>::get_hash_value(key);
-
+        u64 key_hash   = hash_traits_t<KeyType>::get_hash_value(key);
         u64 hash_index = key_hash % bucket_capacity;
 
-        apollo_hash_bucket_t<ValueType> *current_bucket = &first_bucket;
+        apollo_hash_bucket_t<ValueType, KeyType> *current_bucket = &first_bucket;
         while(current_bucket)
         {
-            apollo_hash_element_t<ValueType> *found = &current_bucket->elements[hash_index]; 
-            if(found->raw_hash != 0 && found->raw_hash != key_hash)
+            for(;hash_index < (u64)bucket_capacity; ++hash_index)
             {
-                u32 look_ahead = 0;
-                while(look_ahead < MAX_HASH_PEEK_AHEADS)
+                apollo_hash_element_t<ValueType, KeyType> *found = &current_bucket->elements[hash_index];
+                if(found->raw_hash == 0)
                 {
-                    hash_index = (hash_index + 1) % bucket_capacity;
-                    ++look_ahead;
-
-                    found = &current_bucket->elements[hash_index]; 
-                    if(found->raw_hash == key_hash)
-                    {
-                        result = found;
-                        goto return_value;
-                    }
+                    // NOTE(Sleepster): Free slot, so nothing was ever placed past here either.
+                    break;
                 }
-                current_bucket = current_bucket->next_bucket;
+                if(found->raw_hash == key_hash && hash_traits_t<KeyType>::hashes_equal(found->key, key))
+                {
+                    return(found);
+                }
             }
-            else
-            {
-                result = found;
-                break;
-            }
+
+            current_bucket = current_bucket->next_bucket;
+            hash_index = key_hash % bucket_capacity; // Every bucket starts at this key's home slot.
         }
 
-return_value:
-        return(result);
+        return(null);
     }
 
-    apollo_hash_element_t<ValueType>*
+    apollo_hash_element_t<ValueType, KeyType>*
     get_or_create_hash_element(KeyType &key)
     {
-        apollo_hash_element_t<ValueType> *result = get_hash_element(key);
+        apollo_hash_element_t<ValueType, KeyType> *result = get_hash_element(key);
         if(!result)
         {
             u64 key_hash   = hash_traits_t<KeyType>::get_hash_value(key);
             u64 hash_index = key_hash % bucket_capacity;
 
-            apollo_hash_bucket_t<ValueType> *current_bucket = &first_bucket;
+            apollo_hash_bucket_t<ValueType, KeyType> *current_bucket = &first_bucket;
             while(current_bucket)
             {
-                apollo_hash_element_t<ValueType> *found = &current_bucket->elements[hash_index];
+                apollo_hash_element_t<ValueType, KeyType> *found = &current_bucket->elements[hash_index];
                 if(found->raw_hash != 0)
                 {
                     hash_index = (hash_index + 1) % bucket_capacity;
                     if(hash_index == 0)
                     {
                         current_bucket = current_bucket->next_bucket;
+                        hash_index     = key_hash % bucket_capacity;
                     }
                 }
                 else
@@ -316,7 +309,7 @@ return_value:
     {
         ValueType result = {};
 
-        apollo_hash_element_t<ValueType> *element = get_hash_element(key);
+        apollo_hash_element_t<ValueType, KeyType> *element = get_hash_element(key);
         if(element && element->raw_hash != 0)
         {
             result = element->value;
@@ -330,7 +323,7 @@ return_value:
     {
         ValueType *result = null; 
 
-        apollo_hash_element_t<ValueType> *element = get_hash_element(key);
+        apollo_hash_element_t<ValueType, KeyType> *element = get_hash_element(key);
         if(element && element->raw_hash != 0)
         {
             result = &element->value;
@@ -347,13 +340,21 @@ return_value:
     void 
     add(ValueType value, KeyType &key)
     {
-        apollo_hash_element_t<ValueType> *element = get_or_create_hash_element(key);
+        apollo_hash_element_t<ValueType, KeyType> *element = get_or_create_hash_element(key);
+
+        // NOTE(Sleepster): Re-adding a key updates the entry we already have rather than creating
+        // a second one, so only brand new entries belong in the iteration list.
+        bool8 is_new_element = element->raw_hash == 0;
 
         u64 key_hash = hash_traits_t<KeyType>::get_hash_value(key);
         element->raw_hash = key_hash;
-        element->value    = value;
+        element->key       = key;
+        element->value     = value;
 
-        c_dynarray_add(&used_elements, &element);
+        if(is_new_element)
+        {
+            c_dynarray_add(&used_elements, &element);
+        }
     }
 };
 
@@ -463,6 +464,10 @@ struct code_decl_structure_t: public code_decl_t
 {
     bool8 nested_structure;
 
+    // NOTE(Sleepster): Set while we walk this declaration's members, so a type that refers back
+    // to itself doesn't walk into itself forever.
+    bool8 members_collected;
+
     dynarray_t<code_decl_member_t>       members;
     dynarray_t<inheritance_decl_info_t*> inheritance_info;
 };
@@ -539,81 +544,170 @@ convert(CXString string)
 
 /*
 ==============================
-TYPE ALIASES & NAMESPACES
+DECLARATION REGISTRATION
 ==============================
 */
 
 internal_api void collect_attributes(CXCursor cursor, code_decl_t *declaration);
+internal_api code_decl_structure_t * traverse_structure(CXCursor cursor, code_decl_t *code_decl);
+internal_api code_decl_structure_t * traverse_enum(CXCursor cursor, code_decl_t *code_decl);
+internal_api code_decl_procedure_t *  traverse_function(CXCursor cursor, code_decl_t *code_decl);
+internal_api code_decl_t *             register_type_alias(CXCursor current_cursor);
 
-internal_api void
-register_type_alias(CXCursor current_cursor)
+// NOTE(Sleepster): A name we've only seen used, a type that exists without a body, and a
+// complete type, in that order of usefulness. This is how register_declaration() settles a
+// contested key, instead of each caller rolling its own rules.
+enum code_decl_priority_t
 {
-    CXType underlying_type   = clang_getTypedefDeclUnderlyingType(current_cursor);
-    CXString type_alias_name = clang_getCursorSpelling(current_cursor);
+    CODE_DECL_PRIORITY_REFERENCE,
+    CODE_DECL_PRIORITY_DECLARATION,
+    CODE_DECL_PRIORITY_DEFINITION,
+};
 
-    string_t typename_key = STR(clang_getCString(type_alias_name));
+internal_api bool8
+is_record_cursor(CXCursorKind kind)
+{
+    return(kind == CXCursor_StructDecl || kind == CXCursor_ClassDecl ||
+           kind == CXCursor_UnionDecl  || kind == CXCursor_EnumDecl);
+}
 
-    string_t typename_alias = STR(clang_getCString(type_alias_name));
-    CXCursor declaration_info = clang_getTypeDeclaration(underlying_type);
-    if(declaration_info.kind == CXCursor_StructDecl ||
-       declaration_info.kind == CXCursor_UnionDecl  ||
-       declaration_info.kind == CXCursor_EnumDecl)
+internal_api code_decl_priority_t
+get_declaration_priority(code_decl_t *declaration)
+{
+    code_decl_priority_t result = CODE_DECL_PRIORITY_REFERENCE;
+    if(declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
+       declaration->metatype == CODE_DECL_METATYPE_ENUM)
     {
-        // NOTE(Sleepster): Set the typename to be correct, this way we correctly override names like
-        // typedef struct string {}string_t;
-        // to that of string_t rather than that of just string.
-        string_t alias_typename = STR(clang_getCString(clang_getCursorSpelling(declaration_info)));
-        code_decl_t *lookup = apollo_internal_state->code_declarations.all.find(alias_typename);
-        if(lookup)
-        {
-            // NOTE(Sleepster): We have to collect attributes on this typedef otherwise a:
-            // typedef struct string {}string_t 
-            // will lack any attributes.
-            lookup->identifier = typename_alias;
-            collect_attributes(current_cursor, lookup);
-        }
+        // NOTE(Sleepster): Typedefs and using-aliases report themselves as definitions, so what
+        // the entry we're comparing against *is* is part of the question, not just what we bring.
+        result = clang_isCursorDefinition(declaration->decl) ? CODE_DECL_PRIORITY_DEFINITION
+                                                            : CODE_DECL_PRIORITY_DECLARATION;
+    }
+    else if(declaration->metatype != CODE_DECL_METATYPE_INVALID)
+    {
+        result = CODE_DECL_PRIORITY_DEFINITION; // Procedures are keyed by USR, so they're unique.
     }
 
-    code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
-    if(!type)
-    {
-        code_decl_t *new_declaration = c_arena_push_struct(&apollo_internal_state->arena, code_decl_t);
-        new_declaration->code_type  = underlying_type;
-        new_declaration->decl       = current_cursor;
-        new_declaration->identifier = typename_alias; 
+    return(result);
+}
 
-        apollo_internal_state->code_declarations.all.add(new_declaration, typename_key);
+// NOTE(Sleepster): The one place a declaration enters the table. Returns whichever declaration
+// owns the key afterwards: ours if we won, the one that was already there if it was better, so
+// callers can tell whether they're the owner without checking the table themselves.
+internal_api code_decl_t *
+register_declaration(code_decl_t *declaration, string_t key)
+{
+    apollo_decl_table_t &declarations = apollo_internal_state->code_declarations.all;
+    code_decl_t *existing = declarations.find(key);
+    if(!existing)
+    {
+        declarations.add(declaration, key);
+        return(declaration);
+    }
+    if(existing == declaration ||
+       get_declaration_priority(existing) >= get_declaration_priority(declaration))
+    {
+        return(existing);
+    }
+
+    // NOTE(Sleepster): Upgrade in place. Swapping the table's pointer would leave every pointer
+    // we've already handed out (nested_struct, the declaration lists) on the stale declaration.
+    // Everything in the table is structure or procedure shaped, so this is always a same shape copy.
+    dynarray_t<string_t> attributes = existing->attributes;
+    if(existing->metatype == CODE_DECL_METATYPE_LAMBDA)
+    {
+        *static_cast<code_decl_procedure_t*>(existing) = *static_cast<code_decl_procedure_t*>(declaration);
     }
     else
     {
-        clang_disposeString(type_alias_name);
+        *static_cast<code_decl_structure_t*>(existing) = *static_cast<code_decl_structure_t*>(declaration);
     }
+
+    existing->attributes = attributes;
+    for(string_t &attribute: declaration->attributes)
+    {
+        c_dynarray_add(&existing->attributes, &attribute);
+    }
+
+    return(existing);
 }
 
+// NOTE(Sleepster): A name we've seen used with nothing declarable behind it (u32, char, ...).
+// Structure shaped so the registrar can upgrade one in place, and bottom of the priority list so
+// it can never shadow a real declaration.
+internal_api void
+register_type_reference(CXType type, string_t key)
+{
+    code_decl_structure_t *new_reference = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
+    new_reference->code_type  = type;
+    new_reference->identifier = key;
+
+    register_declaration(new_reference, key);
+}
+
+// NOTE(Sleepster): Registers whatever this cursor declares, or null if we don't track it.
+internal_api code_decl_t *
+register_cursor(CXCursor cursor)
+{
+    CXCursorKind kind = clang_getCursorKind(cursor);
+    if(kind == CXCursor_TypedefDecl || kind == CXCursor_TypeAliasDecl)
+    {
+        return(register_type_alias(cursor));
+    }
+    if(!is_record_cursor(kind))
+    {
+        return(null);
+    }
+
+    code_decl_structure_t *declaration = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
+    return(kind == CXCursor_EnumDecl ? traverse_enum(cursor, declaration) : traverse_structure(cursor, declaration));
+}
+
+// NOTE(Sleepster): A type alias isn't a declaration of its own, it's another name for one we
+// already have. 'string' and 'string_t' end up as two keys on the same declaration instead of
+// the alias inventing a placeholder that can shadow the real type.
+internal_api code_decl_t *
+register_type_alias(CXCursor current_cursor)
+{
+    string_t alias_key  = convert(clang_getCursorSpelling(current_cursor));
+    CXType   underlying = clang_getTypedefDeclUnderlyingType(current_cursor);
+
+    // NOTE(Sleepster): Canonical is what gets us through an alias of an alias to the type it names.
+    code_decl_t *result = register_cursor(clang_getTypeDeclaration(clang_getCanonicalType(underlying)));
+    if(!result)
+    {
+        register_type_reference(underlying, alias_key);
+        return(null);
+    }
+
+    // NOTE(Sleepster): Attributes on the typedef belong to the type, otherwise a:
+    // typedef APOLLO_TAG("foo") struct string {}string_t; loses them.
+    collect_attributes(current_cursor, result);
+
+    // NOTE(Sleepster): The alias is the name the rest of the code actually uses, so it's the one
+    // generators print. Both names stay keys for this one declaration.
+    result->identifier = alias_key;
+    apollo_internal_state->code_declarations.all.add(result, alias_key);
+
+    return(result);
+}
+
+// NOTE(Sleepster): A type we saw used on a member, an argument or an array. Canonical gets us
+// from 'string_t' to 'struct string'; the key stays the spelling that was actually written.
 internal_api void
 register_type(CXType type)
 {
+    string_t typename_key = convert(clang_getTypeSpelling(type));
     if(type.kind == CXType_Pointer ||
        type.kind == CXType_BlockPointer)
     {
         type = clang_getPointeeType(type);
     }
 
-    CXString type_name = clang_getTypeSpelling(type);
-    string_t typename_key = STR(clang_getCString(type_name));
-
-    code_decl_t *found = apollo_internal_state->code_declarations.all.find(typename_key);
-    if(!found)
+    CXCursor declaration = clang_getTypeDeclaration(clang_getCanonicalType(type));
+    if(!is_record_cursor(clang_getCursorKind(declaration)) || !register_cursor(declaration))
     {
-        code_decl_t *new_type = c_arena_push_struct(&apollo_internal_state->arena, code_decl_t);
-        new_type->code_type  = type;
-        new_type->identifier = typename_key;
-
-        apollo_internal_state->code_declarations.all.add(new_type, typename_key);
-    }
-    else
-    {
-        clang_disposeString(type_name);
+        register_type_reference(type, typename_key);
     }
 }
 
@@ -900,8 +994,8 @@ STRUCTURES
 ==========================
 */
 
-internal_api bool8 traverse_structure(CXCursor structure, code_decl_t *code_decl);
-internal_api bool8 traverse_function(CXCursor cursor, code_decl_t *code_decl);
+internal_api code_decl_structure_t * traverse_structure(CXCursor structure, code_decl_t *code_decl);
+internal_api code_decl_procedure_t *  traverse_function(CXCursor cursor, code_decl_t *code_decl);
 
 internal_api CXChildVisitResult
 traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData user_data)
@@ -922,27 +1016,14 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
             CXType type = clang_getCursorType(current_cursor);
             if(type.kind == CXType_Record || type.kind == CXType_Elaborated)
             {
-                CXCursor declaration = clang_getTypeDeclaration(type);
-                if(!clang_Cursor_isNull(declaration) &&
-                  ( clang_getCursorKind(declaration) == CXCursor_StructDecl ||
-                    clang_getCursorKind(declaration) == CXCursor_UnionDecl))
+                // NOTE(Sleepster): register_cursor() hands back whichever declaration owns this
+                // type's key, which is the one to point at even when someone else got there first
+                // with a better version of it.
+                member.nested_struct = static_cast<code_decl_structure_t*>(
+                    register_cursor(clang_getTypeDeclaration(type)));
+                if(member.nested_struct)
                 {
-                    CXString nested_structure_name        = clang_getCursorSpelling(declaration);
-                    string_t nested_structure_name_string = STR(clang_getCString(nested_structure_name));
-
-                    code_decl_t *found = apollo_internal_state->code_declarations.all.find(nested_structure_name_string);
-                    if(found)
-                    {
-                        member.nested_struct = static_cast<code_decl_structure_t*>(found);
-                        member.nested_struct->nested_structure = true;
-                    }
-                    else
-                    {
-                        member.nested_struct = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
-                        traverse_structure(declaration, member.nested_struct);
-
-                        member.nested_struct->nested_structure = true;
-                    }
+                    member.nested_struct->nested_structure = true;
                 }
             }
             c_dynarray_add(&output->members, &member);
@@ -958,23 +1039,22 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
                 return(CXChildVisit_Recurse);
             }
 
-            member.nested_struct = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
-            traverse_structure(current_cursor, member.nested_struct);
-
-            member.nested_struct->nested_structure = true;
-            c_dynarray_add(&apollo_internal_state->code_declarations.structures, (code_decl_t**)&member.nested_struct);
+            member.nested_struct = static_cast<code_decl_structure_t*>(register_cursor(current_cursor));
+            if(member.nested_struct)
+            {
+                member.nested_struct->nested_structure = true;
+            }
         }break;
         case CXCursor_CXXMethod:
         {
             member.metatype  = CODE_DECL_METATYPE_LAMBDA;
             member.code_type = clang_getCursorType(current_cursor);
 
-            CXString procedure_type_string = clang_getCursorSpelling(current_cursor);
-            member.identifier = STR(clang_getCString(procedure_type_string));
+            member.identifier = convert(clang_getCursorSpelling(current_cursor));
 
-            member.member_function = c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t);
-            bool8 add = traverse_function(current_cursor, member.member_function);
-            if(add)
+            member.member_function = traverse_function(current_cursor,
+                c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t));
+            if(member.member_function)
             {
                 c_dynarray_add(&output->members, &member);
             }
@@ -999,51 +1079,41 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
     return(CXChildVisit_Continue);
 }
 
-internal_api bool8 
+// NOTE(Sleepster): Fills in `code_decl`, registers it, and returns whichever declaration owns
+// the type's key - comparing that against what we passed in tells us if we belong in the lists.
+internal_api code_decl_structure_t *
 traverse_structure(CXCursor structure, code_decl_t *code_decl)
 {
-    bool8 result = true;
     code_decl_structure_t *structure_info = static_cast<code_decl_structure_t*>(code_decl);
     *structure_info = {};
 
     structure_info->metatype  = CODE_DECL_METATYPE_STRUCTURE;
-    structure_info->code_type = clang_getCursorType(structure);
+    structure_info->code_type = clang_getCanonicalType(clang_getCursorType(structure));
     structure_info->decl      = structure;
-    Assert(structure_info->code_type.kind == CXType_Record);
 
     CXCursor template_info = clang_getSpecializedCursorTemplate(structure);
-    bool8 template_instance = !clang_Cursor_isNull(template_info);
-    if(template_instance)
+    if(!clang_Cursor_isNull(template_info))
     {
         structure = template_info;
     }
 
     collect_attributes(structure, code_decl);
-    CXString typename_string = clang_getCursorSpelling(structure);
-    string_t typename_key    = STR(clang_getCString(typename_string));
+    structure_info->identifier = convert(clang_getCursorSpelling(structure));
 
-    code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
-    bool8 is_type_definition = false;
-    if(type)
+    // NOTE(Sleepster): Registering before walking the members is what stops a type that refers
+    // back to itself from walking into itself forever.
+    code_decl_structure_t *owner = static_cast<code_decl_structure_t*>(
+        register_declaration(structure_info, structure_info->identifier));
+
+    // NOTE(Sleepster): The pattern of a class template that's never been instantiated is a
+    // record cursor with no record type behind it, and no member data to walk either way.
+    if(owner->code_type.kind == CXType_Record && !owner->members_collected)
     {
-        // NOTE(Sleepster): Override an inplace declaration with the actual definition.
-        is_type_definition = clang_isCursorDefinition(structure) && !clang_isCursorDefinition(type->decl);
+        owner->members_collected = true;
+        clang_visitChildren(structure, traverse_members, owner);
     }
 
-    if(!type || is_type_definition)
-    {
-        structure_info->identifier = typename_key;
-
-        clang_visitChildren(structure, traverse_members, structure_info);
-        apollo_internal_state->code_declarations.all.add(static_cast<code_decl_t*>(structure_info), typename_key);
-    }
-    else
-    {
-        clang_disposeString(typename_string);
-        result = false;
-    }
-
-    return(result);
+    return(owner);
 }
 
 /*
@@ -1052,59 +1122,45 @@ FUNCTIONS / CALL EXPRESSIONS
 ==========================
 */
 
-internal_api bool8
+// NOTE(Sleepster): Same contract as traverse_structure. Procedures are keyed by USR since
+// overloads share a name, so they never collide with the type entries.
+internal_api code_decl_procedure_t *
 traverse_function(CXCursor cursor, code_decl_t *code_decl)
 {
-    bool8 result = true;
-
     code_decl_procedure_t *procedure_info = static_cast<code_decl_procedure_t *>(code_decl);
     *procedure_info = {};
 
-    CXString procedure_name = clang_getCursorSpelling(cursor);
-    CXType   procedure_type = clang_getCursorType(cursor);
-    CXType   return_type    = clang_getResultType(procedure_type);    
+    CXType procedure_type = clang_getCursorType(cursor);
 
     collect_attributes(cursor, code_decl);
-    CXString procedure_type_string = clang_getCursorUSR(cursor);
-    string_t procedure_type_key = STR(clang_getCString(procedure_type_string));
 
-    code_decl_t *type = apollo_internal_state->code_declarations.all.find(procedure_type_key);
-    if(!type)
+    procedure_info->code_type   = procedure_type;
+    procedure_info->metatype    = CODE_DECL_METATYPE_LAMBDA;
+    procedure_info->return_type = clang_getResultType(procedure_type);
+    procedure_info->decl        = cursor;
+    procedure_info->identifier  = convert(clang_getCursorSpelling(cursor));
+
+    // NOTE(Sleepster): Registering before walking the arguments, as with structures.
+    code_decl_procedure_t *owner = static_cast<code_decl_procedure_t*>(
+        register_declaration(procedure_info, convert(clang_getCursorUSR(cursor))));
+
+    if(owner == procedure_info && clang_getNumArgTypes(procedure_type) > 0)
     {
-        procedure_info->code_type   = procedure_type; 
-        procedure_info->metatype    = CODE_DECL_METATYPE_LAMBDA;
-        procedure_info->return_type = return_type;
-        procedure_info->decl        = cursor;
-        procedure_info->identifier  = STR(clang_getCString(procedure_name));
+        clang_visitChildren(cursor,
+        [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
+            code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(user_data);
+            if(clang_getCursorKind(current_cursor) == CXCursor_ParmDecl)
+            {
+                code_decl_member_t argument = {};
+                parse_field_declaration(current_cursor, &argument);
+                c_dynarray_add(&procedure->arguments, &argument);
+            }
 
-        s32 argument_count = clang_getNumArgTypes(procedure_type);
-        if(argument_count > 0)
-        {
-            clang_visitChildren(cursor,
-            [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
-                code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(user_data);
-                if(clang_getCursorKind(current_cursor) == CXCursor_ParmDecl) 
-                {
-                    code_decl_member_t argument = {};
-                    parse_field_declaration(current_cursor, &argument);
-                    c_dynarray_add(&procedure->arguments, &argument);
-                }
-
-                return CXChildVisit_Continue;
-            }, procedure_info);
-        }
-
-        apollo_internal_state->code_declarations.all.add(static_cast<code_decl_t*>(procedure_info), procedure_type_key);
-    }
-    else
-    {
-        clang_disposeString(procedure_type_string);
-        clang_disposeString(procedure_name);
-
-        result = false;
+            return CXChildVisit_Continue;
+        }, procedure_info);
     }
 
-    return(result);
+    return(owner);
 }
 
 internal_api CXChildVisitResult 
@@ -1310,25 +1366,25 @@ ENUMS
 ==========================
 */
 
-internal_api bool8 
+// NOTE(Sleepster): Same contract as traverse_structure. Enums now go through the same
+// registration path, so a definition overrides a forward declaration like it does for structures.
+internal_api code_decl_structure_t *
 traverse_enum(CXCursor cursor, code_decl_t *code_decl)
 {
-    bool8 result = true;
-
     code_decl_structure_t *enum_info = static_cast<code_decl_structure_t*>(code_decl);
     *enum_info = {};
 
     enum_info->metatype  = CODE_DECL_METATYPE_ENUM;
     enum_info->code_type = clang_getCursorType(cursor);
     enum_info->decl      = cursor;
+    enum_info->identifier = convert(clang_getCursorSpelling(cursor));
 
-    CXString typename_string = clang_getCursorSpelling(cursor);
-    string_t typename_key    = STR(clang_getCString(typename_string));
+    code_decl_structure_t *owner = static_cast<code_decl_structure_t*>(
+        register_declaration(enum_info, enum_info->identifier));
 
-    code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
-    if(!type)
+    if(!owner->members_collected)
     {
-        enum_info->identifier = typename_key;
+        owner->members_collected = true;
 
         clang_visitChildren(cursor,
         [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
@@ -1336,12 +1392,10 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
             if(clang_getCursorKind(current_cursor) == CXCursor_EnumConstantDecl)
             {
                 code_decl_member_t enum_member = {};
-                CXString enum_member_identifier = clang_getCursorSpelling(current_cursor);
-                enum_member.identifier = STR(clang_getCString(enum_member_identifier));
-
-                enum_member.code_type  = clang_getCursorType(current_cursor);
-                enum_member.has_value  = true;
-                enum_member.value.type = EXPRESSION_VALUE_TYPE_SIGNED_LONG;
+                enum_member.identifier  = convert(clang_getCursorSpelling(current_cursor));
+                enum_member.code_type   = clang_getCursorType(current_cursor);
+                enum_member.has_value   = true;
+                enum_member.value.type  = EXPRESSION_VALUE_TYPE_SIGNED_LONG;
                 enum_member.value.signed_long = clang_getEnumConstantDeclValue(current_cursor);
 
                 c_dynarray_add(&enum_info->members, &enum_member);
@@ -1350,18 +1404,10 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
             }
 
             return(CXChildVisit_Recurse);
-        }, enum_info);
-
-        apollo_internal_state->code_declarations.all.add(static_cast<code_decl_t*>(enum_info), typename_key);
-
-    }
-    else
-    {
-        clang_disposeString(typename_string);
-        result = false;
+        }, owner);
     }
 
-    return(result);
+    return(owner);
 }
 
 /*
@@ -1382,8 +1428,10 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor parent, CXClientData
         case CXCursor_StructDecl:
         {
             code_decl_structure_t *structure_info = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
-            bool8 add = traverse_structure(current_cursor, structure_info);
-            if(add)
+
+            // NOTE(Sleepster): Coming back with the declaration we passed in means we own its
+            // key and belong in the list, anything else is a duplicate of a better declaration.
+            if(traverse_structure(current_cursor, structure_info) == structure_info)
             {
                 c_dynarray_add(&decl_list->structures, (code_decl_t**)&structure_info);
             }
@@ -1391,8 +1439,7 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor parent, CXClientData
         case CXCursor_EnumDecl:
         {
             code_decl_structure_t *enum_decl = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
-            bool8 add = traverse_enum(current_cursor, enum_decl);
-            if(add)
+            if(traverse_enum(current_cursor, enum_decl) == enum_decl)
             {
                 c_dynarray_add(&decl_list->enums, (code_decl_t**)&enum_decl);
             }
@@ -1400,8 +1447,10 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor parent, CXClientData
         case CXCursor_FunctionDecl:
         {
             code_decl_procedure_t *procedure_info = c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t);
-            bool8 add = traverse_function(current_cursor, procedure_info);
-            if(add)
+
+            // NOTE(Sleepster): Procedures are keyed by USR, so "am I the owner" is whether the
+            // thing that came back from registering is the thing we just filled in.
+            if(traverse_function(current_cursor, procedure_info) == procedure_info)
             {
                 c_dynarray_add(&decl_list->procedures, (code_decl_t**)&procedure_info);
             }
@@ -1560,33 +1609,13 @@ get_procedure_calls(string_t procedure_name)
     return(result);
 }
 
-// NOTE(Sleepster): Enum, or a structure 
+// NOTE(Sleepster): Enum, or a structure. Aliases are registered as keys for the declaration
+// they alias, so 'string' and 'string_t' both land on the same structure. The result can still
+// be a reference-only declaration, so check the metatype before casting to a structure.
 code_decl_t*
 get_declaration_info(string_t requested_typename)
 {
-    string_t typename_key = requested_typename;
-    code_decl_t *result = apollo_internal_state->code_declarations.all.find(typename_key);
-    if(result && (result->metatype != CODE_DECL_METATYPE_STRUCTURE && result->metatype != CODE_DECL_METATYPE_ENUM))
-    {
-        CXCursor declaration = clang_getTypeDeclaration(result->code_type);
-        if(declaration.kind == CXCursor_StructDecl ||
-           declaration.kind == CXCursor_UnionDecl  ||
-           declaration.kind == CXCursor_EnumDecl)
-        {
-            CXString clang_name = clang_getCursorSpelling(declaration);
-            typename_key = STR(clang_getCString(clang_name));
-
-            code_decl_t *found = apollo_internal_state->code_declarations.all.find(typename_key);
-            if(found)
-            {
-                result = found;
-            }
-
-            clang_disposeString(clang_name);
-        }
-    }
-
-    return(result);
+    return(apollo_internal_state->code_declarations.all.find(requested_typename));
 }
 } // NAMESPACE APOLLO
 
