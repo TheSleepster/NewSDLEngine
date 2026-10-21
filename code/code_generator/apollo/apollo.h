@@ -26,11 +26,6 @@ HASH TABLE IMPL
 #include <c_string.h>
 #include <c_dynarray.h>
 
-/* NOTE(Sleepster): 
-    I normally hate OOP but in this case I have no choice, We'll just have to live with it ig.
-    C++ doesn't really allow us to do without it here that easily.
-*/
-
 u64
 fnv1a_hash(void *data, u32 count)
 {
@@ -134,6 +129,11 @@ struct hash_traits_t<u64>
     }
 };
 
+/* NOTE(Sleepster): 
+    I normally hate OOP but in this case I have no choice, We'll just have to live with it ig.
+    C++ doesn't really allow us to do without it here that easily.
+*/
+
 // O(1 * num_buckets)
 template <typename ValueType, typename KeyType>
 struct apollo_hash_element_t
@@ -203,7 +203,9 @@ struct apollo_hash_table_t
     void
     hash_bucket_init(apollo_hash_bucket_t<ValueType, KeyType> *bucket)
     {
-        bucket->elements.items = (apollo_hash_element_t<ValueType, KeyType>*)AllocateFn(allocator, sizeof(apollo_hash_element_t<ValueType, KeyType>) * bucket_capacity, null);
+        bucket->elements.items = (apollo_hash_element_t<ValueType, KeyType>*)AllocateFn(allocator, 
+                                                                                        sizeof(apollo_hash_element_t<ValueType, KeyType>) * bucket_capacity, 
+                                                                                        null);
         bucket->elements.count = bucket_capacity;
         bucket->next_bucket = null;
     }
@@ -211,7 +213,9 @@ struct apollo_hash_table_t
     apollo_hash_bucket_t<ValueType, KeyType>*
     append_new_bucket(void)
     {
-        apollo_hash_bucket_t<ValueType, KeyType> *result = (apollo_hash_bucket_t<ValueType, KeyType>*)AllocateFn(allocator, sizeof(apollo_hash_bucket_t<ValueType, KeyType>), null);
+        apollo_hash_bucket_t<ValueType, KeyType> *result = (apollo_hash_bucket_t<ValueType, KeyType>*)AllocateFn(allocator, 
+                                                                                                                 sizeof(apollo_hash_bucket_t<ValueType, KeyType>), 
+                                                                                                                 null);
         hash_bucket_init(result);
 
         apollo_hash_bucket_t<ValueType, KeyType> *last_bucket = &first_bucket;
@@ -350,7 +354,6 @@ struct apollo_hash_table_t
         element->raw_hash = key_hash;
         element->key       = key;
         element->value     = value;
-
         if(is_new_element)
         {
             c_dynarray_add(&used_elements, &element);
@@ -412,7 +415,7 @@ enum code_decl_metatype_t
     CODE_DECL_METATYPE_INVALID,
     CODE_DECL_METATYPE_STRUCTURE,
     CODE_DECL_METATYPE_ENUM,
-    CODE_DECL_METATYPE_LAMBDA,
+    CODE_DECL_METATYPE_PROCEDURE,
 };
 
 enum 
@@ -431,6 +434,7 @@ struct code_decl_t
     CXType   base_type; // for pointers
     CXCursor decl;
 
+    s32      size;
     s32      metatype;
     s32      pointer_depth;
     s32      flags;
@@ -447,8 +451,7 @@ struct code_decl_array_info_t: public code_decl_t
 
 struct code_decl_member_t: public code_decl_t
 {
-    u32         size;
-    u32         offset;
+    u32 offset;
 
     code_decl_structure_t *nested_struct;
     code_decl_procedure_t *member_function;
@@ -580,8 +583,9 @@ get_declaration_priority(code_decl_t *declaration)
     {
         // NOTE(Sleepster): Typedefs and using-aliases report themselves as definitions, so what
         // the entry we're comparing against *is* is part of the question, not just what we bring.
-        result = clang_isCursorDefinition(declaration->decl) ? CODE_DECL_PRIORITY_DEFINITION
-                                                            : CODE_DECL_PRIORITY_DECLARATION;
+        result = clang_isCursorDefinition(declaration->decl)
+        ? CODE_DECL_PRIORITY_DEFINITION
+        : CODE_DECL_PRIORITY_DECLARATION;
     }
     else if(declaration->metatype != CODE_DECL_METATYPE_INVALID)
     {
@@ -592,8 +596,7 @@ get_declaration_priority(code_decl_t *declaration)
 }
 
 // NOTE(Sleepster): The one place a declaration enters the table. Returns whichever declaration
-// owns the key afterwards: ours if we won, the one that was already there if it was better, so
-// callers can tell whether they're the owner without checking the table themselves.
+// owns the key afterwards: ours if we won.
 internal_api code_decl_t *
 register_declaration(code_decl_t *declaration, string_t key)
 {
@@ -610,17 +613,14 @@ register_declaration(code_decl_t *declaration, string_t key)
         return(existing);
     }
 
-    // NOTE(Sleepster): Upgrade in place. Swapping the table's pointer would leave every pointer
-    // we've already handed out (nested_struct, the declaration lists) on the stale declaration.
-    // Everything in the table is structure or procedure shaped, so this is always a same shape copy.
     dynarray_t<string_t> attributes = existing->attributes;
-    if(existing->metatype == CODE_DECL_METATYPE_LAMBDA)
+    if(existing->metatype == CODE_DECL_METATYPE_PROCEDURE)
     {
-        *static_cast<code_decl_procedure_t*>(existing) = *static_cast<code_decl_procedure_t*>(declaration);
+        *static_cast<code_decl_procedure_t*>(existing) = *(static_cast<code_decl_procedure_t*>(declaration));
     }
     else
     {
-        *static_cast<code_decl_structure_t*>(existing) = *static_cast<code_decl_structure_t*>(declaration);
+        *static_cast<code_decl_structure_t*>(existing) = *(static_cast<code_decl_structure_t*>(declaration));
     }
 
     existing->attributes = attributes;
@@ -649,23 +649,26 @@ register_type_reference(CXType type, string_t key)
 internal_api code_decl_t *
 register_cursor(CXCursor cursor)
 {
+    code_decl_t *result = null;
+
     CXCursorKind kind = clang_getCursorKind(cursor);
-    if(kind == CXCursor_TypedefDecl || kind == CXCursor_TypeAliasDecl)
+    if(is_record_cursor(kind))
     {
-        return(register_type_alias(cursor));
-    }
-    if(!is_record_cursor(kind))
-    {
-        return(null);
+        if(kind == CXCursor_TypedefDecl || kind == CXCursor_TypeAliasDecl)
+        {
+            result = register_type_alias(cursor);
+        }
+
+        code_decl_structure_t *declaration = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
+
+        result = (kind == CXCursor_EnumDecl)
+        ? traverse_enum(cursor, declaration) 
+        : traverse_structure(cursor, declaration);
     }
 
-    code_decl_structure_t *declaration = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
-    return(kind == CXCursor_EnumDecl ? traverse_enum(cursor, declaration) : traverse_structure(cursor, declaration));
+    return(result);
 }
 
-// NOTE(Sleepster): A type alias isn't a declaration of its own, it's another name for one we
-// already have. 'string' and 'string_t' end up as two keys on the same declaration instead of
-// the alias inventing a placeholder that can shadow the real type.
 internal_api code_decl_t *
 register_type_alias(CXCursor current_cursor)
 {
@@ -674,20 +677,20 @@ register_type_alias(CXCursor current_cursor)
 
     // NOTE(Sleepster): Canonical is what gets us through an alias of an alias to the type it names.
     code_decl_t *result = register_cursor(clang_getTypeDeclaration(clang_getCanonicalType(underlying)));
-    if(!result)
+    if(result)
+    {
+        collect_attributes(current_cursor, result);
+
+        // NOTE(Sleepster): The alias is the name the rest of the code actually uses, so it's the one
+        // generators print. Both names stay keys for this one declaration.
+        result->identifier = alias_key;
+        apollo_internal_state->code_declarations.all.add(result, alias_key);
+    }
+    else
     {
         register_type_reference(underlying, alias_key);
-        return(null);
+        result = null;
     }
-
-    // NOTE(Sleepster): Attributes on the typedef belong to the type, otherwise a:
-    // typedef APOLLO_TAG("foo") struct string {}string_t; loses them.
-    collect_attributes(current_cursor, result);
-
-    // NOTE(Sleepster): The alias is the name the rest of the code actually uses, so it's the one
-    // generators print. Both names stay keys for this one declaration.
-    result->identifier = alias_key;
-    apollo_internal_state->code_declarations.all.add(result, alias_key);
 
     return(result);
 }
@@ -1019,8 +1022,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
                 // NOTE(Sleepster): register_cursor() hands back whichever declaration owns this
                 // type's key, which is the one to point at even when someone else got there first
                 // with a better version of it.
-                member.nested_struct = static_cast<code_decl_structure_t*>(
-                    register_cursor(clang_getTypeDeclaration(type)));
+                member.nested_struct = static_cast<code_decl_structure_t*>(register_cursor(clang_getTypeDeclaration(type)));
                 if(member.nested_struct)
                 {
                     member.nested_struct->nested_structure = true;
@@ -1034,6 +1036,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
         {
             member.metatype  = CODE_DECL_METATYPE_STRUCTURE;
             member.code_type = clang_getCursorType(current_cursor);
+            member.size      = clang_Type_getSizeOf(member.code_type);
             if(clang_Cursor_isAnonymousRecordDecl(current_cursor))
             {
                 return(CXChildVisit_Recurse);
@@ -1047,10 +1050,10 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
         }break;
         case CXCursor_CXXMethod:
         {
-            member.metatype  = CODE_DECL_METATYPE_LAMBDA;
-            member.code_type = clang_getCursorType(current_cursor);
-
+            member.metatype   = CODE_DECL_METATYPE_PROCEDURE;
+            member.code_type  = clang_getCursorType(current_cursor);
             member.identifier = convert(clang_getCursorSpelling(current_cursor));
+            member.size       = 0;
 
             member.member_function = traverse_function(current_cursor,
                 c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t));
@@ -1090,6 +1093,7 @@ traverse_structure(CXCursor structure, code_decl_t *code_decl)
     structure_info->metatype  = CODE_DECL_METATYPE_STRUCTURE;
     structure_info->code_type = clang_getCanonicalType(clang_getCursorType(structure));
     structure_info->decl      = structure;
+    structure_info->size      = clang_Type_getSizeOf(structure_info->code_type);
 
     CXCursor template_info = clang_getSpecializedCursorTemplate(structure);
     if(!clang_Cursor_isNull(template_info))
@@ -1135,15 +1139,14 @@ traverse_function(CXCursor cursor, code_decl_t *code_decl)
     collect_attributes(cursor, code_decl);
 
     procedure_info->code_type   = procedure_type;
-    procedure_info->metatype    = CODE_DECL_METATYPE_LAMBDA;
+    procedure_info->metatype    = CODE_DECL_METATYPE_PROCEDURE;
     procedure_info->return_type = clang_getResultType(procedure_type);
     procedure_info->decl        = cursor;
     procedure_info->identifier  = convert(clang_getCursorSpelling(cursor));
+    procedure_info->size        = 0;
 
     // NOTE(Sleepster): Registering before walking the arguments, as with structures.
-    code_decl_procedure_t *owner = static_cast<code_decl_procedure_t*>(
-        register_declaration(procedure_info, convert(clang_getCursorUSR(cursor))));
-
+    code_decl_procedure_t *owner = static_cast<code_decl_procedure_t*>(register_declaration(procedure_info, convert(clang_getCursorUSR(cursor))));
     if(owner == procedure_info && clang_getNumArgTypes(procedure_type) > 0)
     {
         clang_visitChildren(cursor,
@@ -1230,7 +1233,7 @@ internal_api string_t
 get_expression_name(CXCursor current_cursor)
 {
     // NOTE(Sleepster): If there is a name, we're good. Otherwise we must look deeper into
-    // the foleded expression. 
+    // the folded expression. 
     string_t result = STR(clang_getCString(clang_getCursorSpelling(current_cursor)));
     if(result.count == 0)
     {
@@ -1379,8 +1382,7 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
     enum_info->decl      = cursor;
     enum_info->identifier = convert(clang_getCursorSpelling(cursor));
 
-    code_decl_structure_t *owner = static_cast<code_decl_structure_t*>(
-        register_declaration(enum_info, enum_info->identifier));
+    code_decl_structure_t *owner = static_cast<code_decl_structure_t*>(register_declaration(enum_info, enum_info->identifier));
 
     if(!owner->members_collected)
     {
