@@ -584,8 +584,8 @@ get_declaration_priority(code_decl_t *declaration)
         // NOTE(Sleepster): Typedefs and using-aliases report themselves as definitions, so what
         // the entry we're comparing against *is* is part of the question, not just what we bring.
         result = clang_isCursorDefinition(declaration->decl)
-        ? CODE_DECL_PRIORITY_DEFINITION
-        : CODE_DECL_PRIORITY_DECLARATION;
+            ? CODE_DECL_PRIORITY_DEFINITION
+            : CODE_DECL_PRIORITY_DECLARATION;
     }
     else if(declaration->metatype != CODE_DECL_METATYPE_INVALID)
     {
@@ -662,8 +662,8 @@ register_cursor(CXCursor cursor)
         code_decl_structure_t *declaration = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
 
         result = (kind == CXCursor_EnumDecl)
-        ? traverse_enum(cursor, declaration) 
-        : traverse_structure(cursor, declaration);
+            ? traverse_enum(cursor, declaration) 
+            : traverse_structure(cursor, declaration);
     }
 
     return(result);
@@ -1393,12 +1393,19 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
             code_decl_structure_t *enum_info = static_cast<code_decl_structure_t*>(user_data);
             if(clang_getCursorKind(current_cursor) == CXCursor_EnumConstantDecl)
             {
+                CXTypeKind underlying_type_kind = clang_getCanonicalType(clang_getEnumDeclIntegerType(enum_info->decl)).kind;
+                bool8 is_unsigned = (underlying_type_kind >= CXType_Char_U && underlying_type_kind <= CXType_UInt128);
+
                 code_decl_member_t enum_member = {};
                 enum_member.identifier  = convert(clang_getCursorSpelling(current_cursor));
                 enum_member.code_type   = clang_getCursorType(current_cursor);
                 enum_member.has_value   = true;
-                enum_member.value.type  = EXPRESSION_VALUE_TYPE_SIGNED_LONG;
-                enum_member.value.signed_long = clang_getEnumConstantDeclValue(current_cursor);
+                enum_member.value.type  = is_unsigned 
+                                              ? EXPRESSION_VALUE_TYPE_UNSIGNED_LONG 
+                                              : EXPRESSION_VALUE_TYPE_SIGNED_LONG;
+
+                if(is_unsigned) enum_member.value.unsigned_long = clang_getEnumConstantDeclUnsignedValue(current_cursor);
+                else            enum_member.value.signed_long   = clang_getEnumConstantDeclValue(current_cursor);
 
                 c_dynarray_add(&enum_info->members, &enum_member);
 
