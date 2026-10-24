@@ -35,8 +35,8 @@ struct type_info_procedure_t: public type_info_t {
     };
 };
 
-//extern constexpr type_info_t *APOLLO_type_table[];
-//extern constexpr type_info_t *APOLLO_member_table[];
+extern const type_info_t *const APOLLO_type_table[];
+extern const type_info_t *const APOLLO_member_table[];
 
 struct type_info_byte: public type_info_t { long padding; };
 struct type_info_int64_t: public type_info_t { long padding; };
@@ -120,10 +120,199 @@ struct type_info_material_archetype_t: public type_info_struct_t {
 	};
 };
 
-constexpr type_info_byte DEFAULT_byte = {};
-constexpr type_info_int64_t DEFAULT_int64_t = {};
-constexpr type_info_string_t DEFAULT_string_t = {};
-constexpr type_info_s32 DEFAULT_s32 = {};
-constexpr type_info_uint32_t DEFAULT_uint32_t = {};
-constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {};
+//constexpr type_info_byte DEFAULT_byte = {};
+//constexpr type_info_int64_t DEFAULT_int64_t = {};
+constexpr type_info_string_t DEFAULT_string_t = {
+	.members = {
+		.data = {
+			.name = "data",
+			.size = 8,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 0,
+		},
+		.count = {
+			.name = "count",
+			.size = 8,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 8,
+		},
+	},
+};
+//constexpr type_info_s32 DEFAULT_s32 = {};
+//constexpr type_info_uint32_t DEFAULT_uint32_t = {};
+constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {
+	.members = {
+		.blend_enabled = {
+			.name = "blend_enabled",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 0,
+			.value_type = 2,
+			.value = {
+				.signed_long = 1,
+			},
+		},
+		.src_color_blend_mode = {
+			.name = "src_color_blend_mode",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 4,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 6,
+			},
+		},
+		.dst_color_blend_mode = {
+			.name = "dst_color_blend_mode",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 8,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 7,
+			},
+		},
+		.src_alpha_blend_mode = {
+			.name = "src_alpha_blend_mode",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 12,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 1,
+			},
+		},
+		.dst_alpha_blend_mode = {
+			.name = "dst_alpha_blend_mode",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 16,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 0,
+			},
+		},
+		.color_blend_op = {
+			.name = "color_blend_op",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 20,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 0,
+			},
+		},
+		.alpha_blend_op = {
+			.name = "alpha_blend_op",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 24,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 0,
+			},
+		},
+		.depth_testing_enabled = {
+			.name = "depth_testing_enabled",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 28,
+			.value_type = 2,
+			.value = {
+				.signed_long = 1,
+			},
+		},
+		.depth_writing_enabled = {
+			.name = "depth_writing_enabled",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 32,
+			.value_type = 2,
+			.value = {
+				.signed_long = 1,
+			},
+		},
+		.depth_func = {
+			.name = "depth_func",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 36,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 1,
+			},
+		},
+		.stencil_enabled = {
+			.name = "stencil_enabled",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 40,
+			.value_type = 2,
+			.value = {
+				.signed_long = 0,
+			},
+		},
+		.stencil_state = {
+			.name = "stencil_state",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 44,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 0,
+			},
+		},
+		.stencil_keep = {
+			.name = "stencil_keep",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 48,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 0,
+			},
+		},
+		.polygon_mode = {
+			.name = "polygon_mode",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 52,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 0,
+			},
+		},
+		.primitive_type = {
+			.name = "primitive_type",
+			.size = 4,
+			.metatype = 0,
+			.type_info = nullptr,
+			.offset = 56,
+			.value_type = 3,
+			.value = {
+				.unsigned_value = 3,
+			},
+		},
+	},
+};
 
+constexpr const type_info_t *const APOLLO_type_table[] = {
+};
+constexpr const type_info_t *const APOLLO_member_table[] = {
+};

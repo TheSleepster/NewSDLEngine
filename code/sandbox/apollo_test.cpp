@@ -58,6 +58,32 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 }
                 c_string_builder_sprintf(&dictionary_builder, "\t\t}members;\n");
                 c_string_builder_sprintf(&dictionary_builder, "\t};\n");
+#if 0
+                c_string_builder_sprintf(&dictionary_builder, "\n\tconstexpr type_info_%.*s(", fprint_string(structure->identifier));
+                for(s32 member_index = 0;
+                    member_index < structure->members.used;
+                    ++member_index)
+                {
+                    const code_decl_member_t &member = structure->members[member_index];
+                    c_string_builder_sprintf(&dictionary_builder, "const type_info_member_t *%.*s", 
+                                             fprint_string(member.identifier));
+                    if((member_index + 1) < structure->members.used)
+                    {
+                        c_string_builder_sprintf(&dictionary_builder, ", "); 
+                    }
+                }
+                c_string_builder_sprintf(&dictionary_builder, ") \n\t\t: type_info_struct_t{}, \n\t\t\tmembers {");
+                for(s32 member_index = 0;
+                    member_index < structure->members.used;
+                    ++member_index)
+                {
+                    const code_decl_member_t &member = structure->members[member_index];
+                    c_string_builder_sprintf(&dictionary_builder, "\n\t\t\t\t%.*s,",
+                                             fprint_string(member.identifier));
+                }
+                c_string_builder_sprintf(&dictionary_builder, "\n\t\t}\n\t{\n\t};\n");
+#endif
+
                 c_string_builder_sprintf(&dictionary_builder, "};\n\n");
             }
             else if(code_declaration->metatype == CODE_DECL_METATYPE_PROCEDURE)
@@ -122,8 +148,54 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                     create_declaration_type_data(declarations, member_typename);
                 }
 
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {};\n", 
+                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n", 
                                          fprint_string(typename_string), fprint_string(typename_string));
+                c_string_builder_sprintf(&definition_builder, "\t.members = {\n");
+                for(const auto &member: structure->members)
+                {
+                    c_string_builder_sprintf(&definition_builder, "\t\t.%.*s = {\n", fprint_string(member.identifier));
+                    c_string_builder_sprintf(&definition_builder, "\t\t\t.name = \"%.*s\",\n", fprint_string(member.identifier));
+                    c_string_builder_sprintf(&definition_builder, "\t\t\t.size = %d,\n", member.size);
+                    c_string_builder_sprintf(&definition_builder, "\t\t\t.metatype = %d,\n", member.metatype);
+                    c_string_builder_sprintf(&definition_builder, "\t\t\t.type_info = nullptr,\n");
+                    c_string_builder_sprintf(&definition_builder, "\t\t\t.offset = %d,\n", member.offset);
+                    if(member.value.type != EXPRESSION_VALUE_TYPE_INVALID)
+                    {
+                        c_string_builder_sprintf(&definition_builder, "\t\t\t.value_type = %d,\n", member.value.type);
+                        c_string_builder_sprintf(&definition_builder, "\t\t\t.value = {\n");
+                        switch(member.value.type)
+                        {
+                            case EXPRESSION_VALUE_TYPE_BOOLEAN:
+                            {
+                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.boolean_value = %d,\n", member.value.boolean_value);
+                            }break;
+                            case EXPRESSION_VALUE_TYPE_SIGNED_LONG:
+                            {
+                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.signed_long = %ld,\n", member.value.signed_long);
+                            }break;
+                            case EXPRESSION_VALUE_TYPE_UNSIGNED_LONG:
+                            {
+                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.unsigned_value = %lu,\n", member.value.unsigned_long);
+                            }break;
+                            case EXPRESSION_VALUE_TYPE_FLOAT:
+                            {
+                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.float_value = %.02f,\n", member.value.float_value);
+                            }break;
+                            case EXPRESSION_VALUE_TYPE_DOUBLE:
+                            {
+                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.double_value = %.02d,\n", member.value.double_value);
+                            }break;
+                            case EXPRESSION_VALUE_TYPE_STRING_LITERAL:
+                            {
+                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.string_value = %.*s,\n", fprint_string(member.value.string));
+                            }break;
+                        }
+                        c_string_builder_sprintf(&definition_builder, "\t\t\t},\n");
+                    }
+                    c_string_builder_sprintf(&definition_builder, "\t\t},\n");
+                }
+                c_string_builder_sprintf(&definition_builder, "\t},\n");
+                c_string_builder_sprintf(&definition_builder, "};\n");
             }
             else
             {
@@ -136,7 +208,7 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                 }
 
                 typename_string = convert(clang_getTypeSpelling(element_type));
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {};\n", 
+                c_string_builder_sprintf(&definition_builder, "//constexpr type_info_%.*s DEFAULT_%.*s = {};\n", 
                                          fprint_string(typename_string), fprint_string(typename_string));
             }
         }
@@ -208,12 +280,12 @@ struct type_info_procedure_t: public type_info_t {
     };
 };
 
-//extern constexpr type_info_t *APOLLO_type_table[];
-//extern constexpr type_info_t *APOLLO_member_table[];
+extern const type_info_t *const APOLLO_type_table[];
+extern const type_info_t *const APOLLO_member_table[];
 
 )");
-        //c_string_builder_sprintf(&type_table_builder,   "constexpr type_info_t *APOLLO_type_table[] = {\n");
-        //c_string_builder_sprintf(&member_table_builder, "constexpr type_info_t *APOLLO_member_table[] = {\n");
+        c_string_builder_sprintf(&type_table_builder,   "constexpr const type_info_t *const APOLLO_type_table[] = {\n");
+        c_string_builder_sprintf(&member_table_builder, "constexpr const type_info_t *const APOLLO_member_table[] = {\n");
         dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Athena::type_info"));
         for(const auto &call: calls)
         {
@@ -231,8 +303,8 @@ struct type_info_procedure_t: public type_info_t {
             }
         }
         c_string_builder_sprintf(&definition_builder, "\n");
-        //c_string_builder_sprintf(&type_table_builder, "};\n");
-        //c_string_builder_sprintf(&member_table_builder, "};\n");
+        c_string_builder_sprintf(&type_table_builder, "};\n");
+        c_string_builder_sprintf(&member_table_builder, "};\n");
 
         c_string_builder_dump_to_file(&out_file, &header_builder);
         c_string_builder_dump_to_file(&out_file, &dictionary_builder);
