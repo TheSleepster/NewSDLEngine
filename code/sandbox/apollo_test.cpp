@@ -8,10 +8,10 @@
 
 #define APOLLO_IMPLEMENTATION 1
 #include "../code_generator/apollo/apollo.h"
-//#include <meta/test_metaprogram_file.h>
 
 static apollo_hash_table_t<string_t, bool8, 2048> dictionary_table;
 static apollo_hash_table_t<string_t, bool8, 2048> definition_table;
+static memory_arena_t *type_arena;
 
 static string_builder_t header_builder;
 static string_builder_t dictionary_builder;
@@ -19,283 +19,333 @@ static string_builder_t definition_builder;
 static string_builder_t type_table_builder;
 static string_builder_t member_table_builder;
 
+internal_api CXType
+unwrap_type(CXType type)
+{
+    while(type.kind == CXType_Pointer ||
+          type.kind == CXType_ConstantArray ||
+          type.kind == CXType_IncompleteArray)
+    {
+        if(type.kind == CXType_Pointer)
+        {
+            type = clang_getPointeeType(type);
+        }
+        else
+        {
+            type = clang_getArrayElementType(type);
+        }
+    }
+
+    return(type);
+}
+
+// NOTE(Sleepster): Keep the spelling the source used, but drop pointer/array
+// syntax because the member itself already records that.
+internal_api string_t
+get_type_identifier(code_decl_t *code_declaration)
+{
+    string_t typename_string = code_declaration->identifier;
+
+    for(s32 character_index = 0;
+        character_index < typename_string.count;
+        ++character_index)
+    {
+        if(typename_string.data[character_index] == '*' ||
+           typename_string.data[character_index] == '[')
+        {
+            typename_string = convert(clang_getTypeSpelling(unwrap_type(code_declaration->code_type)));
+            break;
+        }
+    }
+
+    byte *buffer = c_arena_push_size(type_arena, typename_string.count + 1);
+    for(s32 character_index = 0;
+        character_index < typename_string.count;
+        ++character_index)
+    {
+        char character = (char)typename_string.data[character_index];
+        if((character >= 'a' && character <= 'z') ||
+           (character >= 'A' && character <= 'Z') ||
+           (character >= '0' && character <= '9'))
+        {
+            buffer[character_index] = (byte)character;
+        }
+        else
+        {
+            buffer[character_index] = (byte)'_';
+        }
+    }
+    buffer[typename_string.count] = 0;
+
+    string_t result = { .data = buffer, .count = typename_string.count };
+    return(result);
+}
+
+// NOTE(Sleepster): Pointers to records are registered by their pointee and
+// arrays by their element, so try the raw spelling before the base spelling.
+internal_api string_t
+get_member_typename(const code_decl_member_t &member)
+{
+    string_t result = convert(clang_getTypeSpelling(member.code_type));
+    if(!Apollo::get_declaration_info(result))
+    {
+        result = convert(clang_getTypeSpelling(unwrap_type(member.code_type)));
+    }
+
+    return(result);
+}
+
 internal_api void
 create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typename_string)
 {
     code_decl_t *code_declaration = Apollo::get_declaration_info(typename_string);
     if(code_declaration)
     {
-        if(!dictionary_table.find(code_declaration->identifier))
+        string_t identifier = get_type_identifier(code_declaration);
+        if(!dictionary_table.find(identifier))
         {
-            dictionary_table.add(true, code_declaration->identifier);
+            dictionary_table.add(true, identifier);
 
-            // NOTE(Sleepster): A type we only ever saw used (u32, char, ...) has no declaration of
-            // its own, so there's nothing to emit for it.
+            dynarray_t<code_decl_member_t> *members = null;
+            const char *count_name = null;
+            const char *pointer_name = null;
+            const char *array_name = null;
+            const char *items_name = null;
+
             if(code_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
                code_declaration->metatype == CODE_DECL_METATYPE_ENUM)
             {
-                // NOTE(Sleepster): Make sure the types contained in this structure are already declared
                 code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(code_declaration);
-                for(s32 member_index = 0;
-                    member_index < structure->members.used;
-                    ++member_index)
-                {
-                    const code_decl_member_t &member = structure->members[member_index];
-
-                    string_t member_typename = convert(clang_getTypeSpelling(member.code_type));
-                    create_declaration_type_info(declarations, member_typename);
-                }
-
-                // NOTE(Sleepster): output the type info structures.
-                c_string_builder_sprintf(&dictionary_builder, R"(struct type_info_%.*s {
-    const type_info_t info;
-    const unsigned long member_count;
-    union {
-        const type_info_member_t *member_array[%d];
-        struct {
-)", fprint_string(code_declaration->identifier), structure->members.used);
-
-                for(s32 member_index = 0;
-                    member_index < structure->members.used;
-                    ++member_index)
-                {
-                    const code_decl_member_t &member = structure->members[member_index];
-                    c_string_builder_sprintf(&dictionary_builder, "\t\t\tconst type_info_member_t *%.*s;\n", fprint_string(member.identifier));
-                }
-                c_string_builder_sprintf(&dictionary_builder, "\t\t}members;\n");
-                c_string_builder_sprintf(&dictionary_builder, "\t};\n");
-                c_string_builder_sprintf(&dictionary_builder, "};\n\n");
+                members = &structure->members;
+                count_name = "member_count";
+                pointer_name = "member_pointer";
+                array_name = "member_array";
+                items_name = "members";
             }
             else if(code_declaration->metatype == CODE_DECL_METATYPE_PROCEDURE)
             {
-                code_decl_procedure_t *proc = static_cast<code_decl_procedure_t*>(code_declaration);
-                for(s32 argument_index = 0;
-                    argument_index < proc->arguments.used;
-                    ++argument_index)
-                {
-                    const code_decl_member_t &argument = proc->arguments[argument_index];
-                    string_t argument_typename = convert(clang_getTypeSpelling(argument.code_type));
-
-                    create_declaration_type_info(declarations, argument_typename);
-                }
-
-                c_string_builder_sprintf(&dictionary_builder, "struct type_info_%.*s {\n\tunion {\n\t\tconst type_info_member_t argument_array[%d];\nstruct {\n", 
-                                         fprint_string(proc->identifier), proc->arguments.used);
-                for(s32 argument_index = 0;
-                    argument_index < proc->arguments.used;
-                    ++argument_index)
-                {
-                    const code_decl_member_t &argument = proc->arguments[argument_index];
-                    c_string_builder_sprintf(&dictionary_builder, "\t\tconst type_info_member_t *%.*s;\n", fprint_string(argument.identifier));
-                }
-                c_string_builder_sprintf(&dictionary_builder, "\t}members;\n\n");
-                c_string_builder_sprintf(&dictionary_builder, "};\n\n");
+                code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(code_declaration);
+                members = &procedure->arguments;
+                count_name = "argument_count";
+                pointer_name = "argument_pointer";
+                array_name = "argument_array";
+                items_name = "arguments";
             }
-            else
+
+            if(members)
             {
-                // NOTE(Sleepster): Just get the real type... 
-                CXType element_type = code_declaration->code_type;
-                while(element_type.kind == CXType_Pointer)
+                s32 member_count = 0;
+                for(const auto &member: *members)
                 {
-                    element_type = clang_getPointeeType(element_type);
-                }
-
-                string_t typename_string = convert(clang_getTypeSpelling(element_type));
-                c_string_builder_sprintf(&dictionary_builder, "struct type_info_%.*s { const type_info_t info; };\n", 
-                                         fprint_string(typename_string));
-            }
-        }
-    }
-}
-
-#if 0
-internal_api void
-create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typename_string)
-{
-    code_decl_t *declaration = Apollo::get_declaration_info(typename_string);
-    if(declaration)
-    {
-        if(!definition_table.find(declaration->identifier))
-        {
-            definition_table.add(true, declaration->identifier);
-            if(declaration->metatype == CODE_DECL_METATYPE_STRUCTURE || declaration->metatype == CODE_DECL_METATYPE_ENUM)
-            {
-                code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(declaration);
-                for(const auto &member: structure->members)
-                {
-                    string_t member_typename = convert(clang_getTypeSpelling(member.code_type));
-                    create_declaration_type_data(declarations, member_typename);
-                }
-
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n", 
-                                         fprint_string(typename_string), fprint_string(typename_string));
-                c_string_builder_sprintf(&definition_builder, "\t.members = {\n");
-                for(const auto &member: structure->members)
-                {
-                    c_string_builder_sprintf(&definition_builder, "\t\t.%.*s = {\n", fprint_string(member.identifier));
-                    c_string_builder_sprintf(&definition_builder, "\t\t\t.name = \"%.*s\",\n", fprint_string(member.identifier));
-                    c_string_builder_sprintf(&definition_builder, "\t\t\t.size = %d,\n", member.size);
-                    c_string_builder_sprintf(&definition_builder, "\t\t\t.metatype = %d,\n", member.metatype);
-                    c_string_builder_sprintf(&definition_builder, "\t\t\t.type_info = nullptr,\n");
-                    c_string_builder_sprintf(&definition_builder, "\t\t\t.offset = %d,\n", member.offset);
-                    if(member.value.type != EXPRESSION_VALUE_TYPE_INVALID)
+                    if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
                     {
-                        c_string_builder_sprintf(&definition_builder, "\t\t\t.value_type = %d,\n", member.value.type);
-                        c_string_builder_sprintf(&definition_builder, "\t\t\t.value = {\n");
-                        switch(member.value.type)
-                        {
-                            case EXPRESSION_VALUE_TYPE_BOOLEAN:
-                            {
-                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.boolean_value = %d,\n", member.value.boolean_value);
-                            }break;
-                            case EXPRESSION_VALUE_TYPE_SIGNED_LONG:
-                            {
-                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.signed_long = %ld,\n", member.value.signed_long);
-                            }break;
-                            case EXPRESSION_VALUE_TYPE_UNSIGNED_LONG:
-                            {
-                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.unsigned_value = %lu,\n", member.value.unsigned_long);
-                            }break;
-                            case EXPRESSION_VALUE_TYPE_FLOAT:
-                            {
-                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.float_value = %.02f,\n", member.value.float_value);
-                            }break;
-                            case EXPRESSION_VALUE_TYPE_DOUBLE:
-                            {
-                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.double_value = %.02d,\n", member.value.double_value);
-                            }break;
-                            case EXPRESSION_VALUE_TYPE_STRING_LITERAL:
-                            {
-                                c_string_builder_sprintf(&definition_builder, "\t\t\t\t.string_value = %.*s,\n", fprint_string(member.value.string));
-                            }break;
-                        }
-                        c_string_builder_sprintf(&definition_builder, "\t\t\t},\n");
+                        ++member_count;
                     }
-                    c_string_builder_sprintf(&definition_builder, "\t\t},\n");
                 }
-                c_string_builder_sprintf(&definition_builder, "\t},\n");
-                c_string_builder_sprintf(&definition_builder, "};\n");
+
+                c_string_builder_sprintf(&dictionary_builder, R"(struct type_info_%.*s {
+    const type_info_t info;
+    const unsigned long %s;
+    const type_info_member_t *const *%s;
+)", fprint_string(identifier), count_name, pointer_name);
+
+                if(member_count > 0)
+                {
+                    c_string_builder_sprintf(&dictionary_builder, R"(    union {
+        const type_info_member_t *%s[%d];
+        struct {
+)", array_name, member_count);
+
+                    for(const auto &member: *members)
+                    {
+                        if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
+                        {
+                            c_string_builder_sprintf(&dictionary_builder, "\t\t\tconst type_info_member_t *%.*s;\n", fprint_string(member.identifier));
+                        }
+                    }
+                    c_string_builder_sprintf(&dictionary_builder, "\t\t}%s;\n\t};\n", items_name);
+                }
+                c_string_builder_sprintf(&dictionary_builder, "};\n");
+                c_string_builder_sprintf(&dictionary_builder, "extern const type_info_%.*s DEFAULT_%.*s;\n\n",
+                                         fprint_string(identifier), fprint_string(identifier));
+
+                for(const auto &member: *members)
+                {
+                    if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
+                    {
+                        string_t member_typename = get_member_typename(member);
+                        create_declaration_type_info(declarations, member_typename);
+                    }
+                }
             }
             else
             {
-                // NOTE(Sleepster): Just get the real type... 
-                CXType element_type = declaration->code_type;
-                while(element_type.kind == CXType_Pointer)
-                {
-                    element_type = clang_getPointeeType(element_type);
-                }
-
-                typename_string = convert(clang_getTypeSpelling(element_type));
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = { .info = {.name = \"%.*s\", .size = %d, .metatype = %d }};\n", 
-                                         fprint_string(typename_string), fprint_string(typename_string), fprint_string(typename_string), declaration->size, declaration->metatype);
+                c_string_builder_sprintf(&dictionary_builder, "struct type_info_%.*s { const type_info_t info; };\n",
+                                         fprint_string(identifier));
+                c_string_builder_sprintf(&dictionary_builder, "extern const type_info_%.*s DEFAULT_%.*s;\n\n",
+                                         fprint_string(identifier), fprint_string(identifier));
             }
         }
     }
 }
-#else
 
 internal_api void
 create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typename_string)
 {
-    (void)declarations;
-
     code_decl_t *type_declaration = Apollo::get_declaration_info(typename_string);
     if(type_declaration)
     {
-        if(!definition_table.find(type_declaration->identifier))
+        string_t identifier = get_type_identifier(type_declaration);
+        if(!definition_table.find(identifier))
         {
-            definition_table.add(true, type_declaration->identifier);
-            if(type_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE || type_declaration->metatype == CODE_DECL_METATYPE_ENUM)
+            definition_table.add(true, identifier);
+
+            s32 size = type_declaration->size;
+            if(size < 0)
+            {
+                size = 0;
+            }
+
+            dynarray_t<code_decl_member_t> *members = null;
+            const char *member_count_name = null;
+            const char *member_pointer_name = null;
+            const char *member_array_name = null;
+            const char *members_name = null;
+
+            if(type_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
+               type_declaration->metatype == CODE_DECL_METATYPE_ENUM)
             {
                 code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(type_declaration);
+                members = &structure->members;
+                member_count_name = "member_count";
+                member_pointer_name = "member_pointer";
+                member_array_name = "member_array";
+                members_name = "members";
+            }
+            else if(type_declaration->metatype == CODE_DECL_METATYPE_PROCEDURE)
+            {
+                code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(type_declaration);
+                members = &procedure->arguments;
+                member_count_name = "argument_count";
+                member_pointer_name = "argument_pointer";
+                member_array_name = "argument_array";
+                members_name = "arguments";
+            }
 
-                // NOTE(Sleepster): Print member type data
-                for(const auto &member: structure->members)
+            if(members)
+            {
+                s32 member_count = 0;
+                for(const auto &member: *members)
                 {
-                    if(member.metatype != CODE_DECL_METATYPE_STRUCTURE && member.metatype != CODE_DECL_METATYPE_ENUM)
+                    if(member.metatype == CODE_DECL_METATYPE_PROCEDURE)
                     {
-                        string_t member_typename = convert(clang_getTypeSpelling(member.code_type));
-                        create_declaration_type_data(declarations, member_typename);
+                        continue;
                     }
-                }
 
-                // NOTE(Sleepster): Print member default data 
-                for(const auto &member: structure->members)
-                {
-                    CXType element_type = member.code_type;
-                    while(element_type.kind == CXType_Pointer)
+                    ++member_count;
+
+                    string_t member_typename = get_member_typename(member);
+                    create_declaration_type_data(declarations, member_typename);
+
+                    code_decl_t *member_type = Apollo::get_declaration_info(member_typename);
+                    s32 member_size = member.size < 0 ? 0 : member.size;
+
+                    c_string_builder_sprintf(&definition_builder, "constexpr type_info_member_t DEFAULT_member_%.*s_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d },\n",
+                                             fprint_string(identifier), fprint_string(member.identifier),
+                                             fprint_string(member.identifier), member_size, member.metatype);
+
+                    if(member_type)
                     {
-                        element_type = clang_getPointeeType(element_type);
+                        string_t member_type_identifier = get_type_identifier(member_type);
+                        c_string_builder_sprintf(&definition_builder, "\t.type_info = &DEFAULT_%.*s.info,\n",
+                                                 fprint_string(member_type_identifier));
                     }
-                    typename_string = convert(clang_getTypeSpelling(element_type));
-                    c_string_builder_sprintf(&definition_builder, "constexpr type_info_member_t DEFAULT_member_%.*s_%.*s = {\n\t.member_data = {.name = \"%.*s\", .size = %d, .metatype = %d },\n\t.type_info = &DEFAULT_%.*s.info,\n",
-                                             fprint_string(type_declaration->identifier), fprint_string(member.identifier), 
-                                             fprint_string(type_declaration->identifier), member.size, member.metatype, fprint_string(typename_string)); 
-                    if(member.value.type != EXPRESSION_VALUE_TYPE_INVALID)
+
+                    c_string_builder_sprintf(&definition_builder, "\t.offset = %u,\n", member.offset);
+
+                    if(member.has_value)
                     {
-                        c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n", member.value.type);
-                        c_string_builder_sprintf(&definition_builder, "\t.value = {\n");
-                        switch(member.value.type)
+                        s32 value_type = member.value.type;
+                        switch(value_type)
                         {
                             case EXPRESSION_VALUE_TYPE_BOOLEAN:
                             {
-                                c_string_builder_sprintf(&definition_builder, "\t\t.boolean_value = %d,\n", member.value.boolean_value);
+                                c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n\t.value = { .int32_value = %d },\n",
+                                                         value_type, member.value.boolean_value ? 1 : 0);
                             }break;
                             case EXPRESSION_VALUE_TYPE_SIGNED_LONG:
                             {
-                                c_string_builder_sprintf(&definition_builder, "\t\t.signed_long = %ld,\n", member.value.signed_long);
+                                c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n\t.value = { .int64_value = %lld },\n",
+                                                         value_type, (long long)member.value.signed_long);
                             }break;
                             case EXPRESSION_VALUE_TYPE_UNSIGNED_LONG:
                             {
-                                c_string_builder_sprintf(&definition_builder, "\t\t.unsigned_value = %lu,\n", member.value.unsigned_long);
+                                c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n\t.value = { .uint64_value = %llu },\n",
+                                                         value_type, (unsigned long long)member.value.unsigned_long);
                             }break;
                             case EXPRESSION_VALUE_TYPE_FLOAT:
                             {
-                                c_string_builder_sprintf(&definition_builder, "\t\t.float_value = %.02f,\n", member.value.float_value);
+                                c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n\t.value = { .float32_value = %g },\n",
+                                                         value_type, (double)member.value.float_value);
                             }break;
                             case EXPRESSION_VALUE_TYPE_DOUBLE:
                             {
-                                c_string_builder_sprintf(&definition_builder, "\t\t.double_value = %.02d,\n", member.value.double_value);
+                                c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n\t.value = { .float64_value = %g },\n",
+                                                         value_type, member.value.double_value);
                             }break;
                             case EXPRESSION_VALUE_TYPE_STRING_LITERAL:
+                            case EXPRESSION_VALUE_TYPE_SOURCE_TEXT:
                             {
-                                c_string_builder_sprintf(&definition_builder, "\t\t.string_value = %.*s,\n", fprint_string(member.value.string));
+                                c_string_builder_sprintf(&definition_builder, "\t.value_type = %d,\n\t.value = { .string_value = \"%.*s\" },\n",
+                                                         value_type, fprint_string(member.value.string));
                             }break;
                         }
-                        c_string_builder_sprintf(&definition_builder, "\t},\n");
                     }
+
                     c_string_builder_sprintf(&definition_builder, "};\n\n");
+                    c_string_builder_sprintf(&member_table_builder, "\t&DEFAULT_member_%.*s_%.*s.info,\n",
+                                             fprint_string(identifier), fprint_string(member.identifier));
                 }
 
-                // NOTE(Sleepster): Print structure default data
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d },\n\t.member_count = %d,\n\t.members = {\n",
-                                         fprint_string(type_declaration->identifier), fprint_string(type_declaration->identifier), 
-                                         fprint_string(type_declaration->identifier), type_declaration->size, type_declaration->metatype,
-                                         structure->members.used);
-                for(const auto &member: structure->members)
+                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d },\n\t.%s = %d,\n",
+                                         fprint_string(identifier), fprint_string(identifier),
+                                         fprint_string(identifier), size, type_declaration->metatype,
+                                         member_count_name, member_count);
+
+                if(member_count > 0)
                 {
-                    c_string_builder_sprintf(&definition_builder, "\t\t&DEFAULT_member_%.*s_%.*s,\n", 
-                                             fprint_string(type_declaration->identifier), fprint_string(member.identifier));
+                    c_string_builder_sprintf(&definition_builder, "\t.%s = DEFAULT_%.*s.%s,\n\t.%s = {\n",
+                                             member_pointer_name, fprint_string(identifier), member_array_name,
+                                             members_name);
+                    for(const auto &member: *members)
+                    {
+                        if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
+                        {
+                            c_string_builder_sprintf(&definition_builder, "\t\t.%.*s = &DEFAULT_member_%.*s_%.*s,\n",
+                                                     fprint_string(member.identifier), fprint_string(identifier),
+                                                     fprint_string(member.identifier));
+                        }
+                    }
+                    c_string_builder_sprintf(&definition_builder, "\t},\n");
                 }
-                c_string_builder_sprintf(&definition_builder, "\t},\n");
-                c_string_builder_sprintf(&definition_builder, "};\n");
+                else
+                {
+                    c_string_builder_sprintf(&definition_builder, "\t.%s = nullptr,\n", member_pointer_name);
+                }
+
+                c_string_builder_sprintf(&definition_builder, "};\n\n");
             }
             else
             {
-                CXType element_type = type_declaration->code_type;
-                while(element_type.kind == CXType_Pointer)
-                {
-                    element_type = clang_getPointeeType(element_type);
-                }
-
-                typename_string = convert(clang_getTypeSpelling(element_type));
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {.info = {.name = \"%.*s\", .size = %d, .metatype = %d}};\n", 
-                                         fprint_string(typename_string), fprint_string(typename_string), fprint_string(typename_string), type_declaration->size, type_declaration->metatype);
+                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = { .info = { .name = \"%.*s\", .size = %d, .metatype = %d } };\n\n",
+                                         fprint_string(identifier), fprint_string(identifier),
+                                         fprint_string(identifier), size, type_declaration->metatype);
             }
+
+            c_string_builder_sprintf(&type_table_builder, "\t&DEFAULT_%.*s.info,\n", fprint_string(identifier));
         }
     }
 }
-#endif
 
 int
 main(void)
@@ -315,6 +365,8 @@ main(void)
     if(declarations)
     {
         memory_arena_t arena = c_arena_create(MB(20), ALLOCATOR_TAG_STATIC);
+        type_arena = &arena;
+
         dictionary_table.init(&arena);
         definition_table.init(&arena);
 
@@ -332,7 +384,8 @@ main(void)
 };
 
 struct type_info_member_t {
-    const type_info_t  member_data;
+    const type_info_t info;
+
     const type_info_t *type_info;
     const unsigned long offset;
     const unsigned long value_type;
@@ -348,21 +401,15 @@ struct type_info_member_t {
 };
 
 struct type_info_struct_t {
-    const type_info_t   info;
+    const type_info_t info;
     const unsigned long member_count;
-    union {
-        const type_info_member_t *member_array;
-        struct {}members;
-    };
+    const type_info_member_t *const *member_pointer;
 };
 
 struct type_info_procedure_t {
-    const type_info_t   info;
+    const type_info_t info;
     const unsigned long argument_count;
-    union {
-        const type_info_member_t *argument_array;
-        struct {}arguments;
-    };
+    const type_info_member_t *const *argument_pointer;
 };
 
 extern const type_info_t *const APOLLO_type_table[];
@@ -377,17 +424,17 @@ extern const type_info_t *const APOLLO_member_table[];
             // NOTE(Sleepster): A type_info call can hand us the type itself
             // (Athena::type_info<Foo>()) or the name of one (Athena::type_info(STR("Foo"))),
             // so we try the argument's name first and then its type. Whichever one resolves is
-            // enough, create_declaration_type_info() ignores anything we've already written out.
+            // enough, the create_declaration_type_*() functions ignore anything already written out.
             for(const auto &argument: call.arguments)
             {
                 create_declaration_type_info(declarations, argument.identifier);
+                create_declaration_type_data(declarations, argument.identifier);
 
                 string_t argument_type_string = convert(clang_getTypeSpelling(argument.type));
                 create_declaration_type_info(declarations, argument_type_string);
                 create_declaration_type_data(declarations, argument_type_string);
             }
         }
-        c_string_builder_sprintf(&definition_builder, "\n");
         c_string_builder_sprintf(&type_table_builder, "};\n");
         c_string_builder_sprintf(&member_table_builder, "};\n");
 
