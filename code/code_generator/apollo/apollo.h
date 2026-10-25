@@ -641,6 +641,7 @@ register_type_reference(CXType type, string_t key)
     code_decl_structure_t *new_reference = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
     new_reference->code_type  = type;
     new_reference->identifier = key;
+    new_reference->size       = clang_Type_getSizeOf(type);
 
     register_declaration(new_reference, key);
 }

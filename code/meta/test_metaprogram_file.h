@@ -1,40 +1,6 @@
-struct type_info_t {
-    const char *name;
-    const unsigned long size;
-    const unsigned long metatype;
-};
+#include <code_generator/apollo/apollo_runtime.h>
 
-struct type_info_member_t {
-    const type_info_t info;
-
-    const type_info_t *type_info;
-    const unsigned long offset;
-    const unsigned long value_type;
-    union {
-        int                int32_value;
-        long long          int64_value;
-        unsigned long      uint32_value;
-        unsigned long long uint64_value;
-        float              float32_value;
-        double             float64_value;
-        const char        *string_value;
-    }value;
-};
-
-struct type_info_struct_t {
-    const type_info_t info;
-    const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
-};
-
-struct type_info_procedure_t {
-    const type_info_t info;
-    const unsigned long argument_count;
-    const type_info_member_t *const *argument_pointer;
-};
-
-extern const type_info_t *const APOLLO_type_table[];
-extern const type_info_t *const APOLLO_member_table[];
+namespace Apollo {
 
 struct type_info_string_t {
     const type_info_t info;
@@ -49,6 +15,11 @@ struct type_info_string_t {
 	};
 };
 extern const type_info_string_t DEFAULT_string_t;
+
+namespace MemberLists { enum class string_t {
+	data,
+	count,
+}; }
 
 struct type_info_byte { const type_info_t info; };
 extern const type_info_byte DEFAULT_byte;
@@ -83,6 +54,24 @@ struct type_info_RHI_pipeline_state_t {
 };
 extern const type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t;
 
+namespace MemberLists { enum class RHI_pipeline_state_t {
+	blend_enabled,
+	src_color_blend_mode,
+	dst_color_blend_mode,
+	src_alpha_blend_mode,
+	dst_alpha_blend_mode,
+	color_blend_op,
+	alpha_blend_op,
+	depth_testing_enabled,
+	depth_writing_enabled,
+	depth_func,
+	stencil_enabled,
+	stencil_state,
+	stencil_keep,
+	polygon_mode,
+	primitive_type,
+}; }
+
 struct type_info_bool32 { const type_info_t info; };
 extern const type_info_bool32 DEFAULT_bool32;
 
@@ -107,6 +96,15 @@ struct type_info_material_archetype_t {
 };
 extern const type_info_material_archetype_t DEFAULT_material_archetype_t;
 
+namespace MemberLists { enum class material_archetype_t {
+	ID,
+	version,
+	name,
+	shader_binary_name,
+	shader_handle,
+	base_instance,
+}; }
+
 struct type_info_u64 { const type_info_t info; };
 extern const type_info_u64 DEFAULT_u64;
 
@@ -127,6 +125,15 @@ struct type_info_asset_handle_t {
 	};
 };
 extern const type_info_asset_handle_t DEFAULT_asset_handle_t;
+
+namespace MemberLists { enum class asset_handle_t {
+	is_valid,
+	slot,
+	texture,
+	shader,
+	material_info,
+	dynamic_render_font,
+}; }
 
 struct type_info_asset_slot_t {
     const type_info_t info;
@@ -152,6 +159,22 @@ struct type_info_asset_slot_t {
 	};
 };
 extern const type_info_asset_slot_t DEFAULT_asset_slot_t;
+
+namespace MemberLists { enum class asset_slot_t {
+	ID,
+	slot_state,
+	type,
+	is_valid_for_handles,
+	name,
+	owner_asset_file,
+	package_entry,
+	subtexture_data,
+	asset_manager,
+	catalog,
+	package_generation,
+	loaded_asset_index,
+	owner_asset_file_index,
+}; }
 
 struct type_info_asset_slot_load_status_t {
     const type_info_t info;
@@ -211,6 +234,17 @@ struct type_info_file_t {
 };
 extern const type_info_file_t DEFAULT_file_t;
 
+namespace MemberLists { enum class file_t {
+	handle,
+	file_name,
+	filepath,
+	file_size,
+	current_read_offset,
+	current_write_offset,
+	overlapping,
+	for_writing,
+}; }
+
 struct type_info_sys_handle_t { const type_info_t info; };
 extern const type_info_sys_handle_t DEFAULT_sys_handle_t;
 
@@ -235,6 +269,15 @@ struct type_info_jfd_package_entry_t {
 };
 extern const type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t;
 
+namespace MemberLists { enum class jfd_package_entry_t {
+	entry_header,
+	data_offset,
+	modtime,
+	filename,
+	fullpath,
+	asset_data,
+}; }
+
 struct type_info_jfd_package_chunk_header_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -253,6 +296,16 @@ struct type_info_jfd_package_chunk_header_t {
 	};
 };
 extern const type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t;
+
+namespace MemberLists { enum class jfd_package_chunk_header_t {
+	magic_value,
+	total_entry_size,
+	asset_type,
+	filename_size,
+	fullpath_size,
+	entry_data_size,
+	modtime,
+}; }
 
 struct type_info_subtexture_data_t {
     const type_info_t info;
@@ -274,6 +327,17 @@ struct type_info_subtexture_data_t {
 };
 extern const type_info_subtexture_data_t DEFAULT_subtexture_data_t;
 
+namespace MemberLists { enum class subtexture_data_t {
+	uv_min,
+	uv_max,
+	offset,
+	size,
+	atlased_generation,
+	atlas_subtexture_index,
+	atlas,
+	packed_asset,
+}; }
+
 struct type_info_float2 {
     const type_info_t info;
     const unsigned long member_count;
@@ -289,6 +353,13 @@ struct type_info_float2 {
 	};
 };
 extern const type_info_float2 DEFAULT_float2;
+
+namespace MemberLists { enum class float2 {
+	elements,
+	x,
+	y,
+	xy,
+}; }
 
 struct type_info_float32 { const type_info_t info; };
 extern const type_info_float32 DEFAULT_float32;
@@ -317,6 +388,21 @@ struct type_info_texture_atlas_t {
 };
 extern const type_info_texture_atlas_t DEFAULT_texture_atlas_t;
 
+namespace MemberLists { enum class texture_atlas_t {
+	texture,
+	bitmap_data,
+	ID,
+	merge_counter,
+	textures_to_merge,
+	packed_subtextures,
+	packed_subtexture_count,
+	is_valid,
+	atlas_cursor_x,
+	atlas_cursor_y,
+	tallest_y,
+	atlas_size,
+}; }
+
 struct type_info_texture2D_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -331,6 +417,12 @@ struct type_info_texture2D_t {
 	};
 };
 extern const type_info_texture2D_t DEFAULT_texture2D_t;
+
+namespace MemberLists { enum class texture2D_t {
+	ID,
+	bitmap,
+	gpu_data,
+}; }
 
 struct type_info_bitmap_t {
     const type_info_t info;
@@ -349,6 +441,14 @@ struct type_info_bitmap_t {
 };
 extern const type_info_bitmap_t DEFAULT_bitmap_t;
 
+namespace MemberLists { enum class bitmap_t {
+	width,
+	height,
+	channels,
+	format,
+	pixels,
+}; }
+
 struct type_info_RHI_image_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -363,6 +463,12 @@ struct type_info_RHI_image_t {
 	};
 };
 extern const type_info_RHI_image_t DEFAULT_RHI_image_t;
+
+namespace MemberLists { enum class RHI_image_t {
+	ID,
+	create_info,
+	backend_image,
+}; }
 
 struct type_info_RHI_image_create_info_t {
     const type_info_t info;
@@ -381,6 +487,15 @@ struct type_info_RHI_image_create_info_t {
 	};
 };
 extern const type_info_RHI_image_create_info_t DEFAULT_RHI_image_create_info_t;
+
+namespace MemberLists { enum class RHI_image_create_info_t {
+	data,
+	width,
+	height,
+	format,
+	usage,
+	sampler_info,
+}; }
 
 struct type_info_RHI_image_usage_t {
     const type_info_t info;
@@ -419,6 +534,17 @@ struct type_info_RHI_sampler_create_info_t {
 	};
 };
 extern const type_info_RHI_sampler_create_info_t DEFAULT_RHI_sampler_create_info_t;
+
+namespace MemberLists { enum class RHI_sampler_create_info_t {
+	filtering,
+	anisotropy_enabled,
+	max_anisotropy,
+	wrapu,
+	wrapv,
+	compare_operation,
+	compare_ops_enabled,
+	use_normalized_coordinates,
+}; }
 
 struct type_info_RHI_image_filter_type_t {
     const type_info_t info;
@@ -465,6 +591,11 @@ struct type_info_backend_image_t {
 };
 extern const type_info_backend_image_t DEFAULT_backend_image_t;
 
+namespace MemberLists { enum class backend_image_t {
+	is_valid,
+	handle,
+}; }
+
 struct type_info_void { const type_info_t info; };
 extern const type_info_void DEFAULT_void;
 
@@ -503,6 +634,29 @@ struct type_info_asset_manager_t {
 };
 extern const type_info_asset_manager_t DEFAULT_asset_manager_t;
 
+namespace MemberLists { enum class asset_manager_t {
+	is_initialized,
+	manager_arena,
+	freetype_handle,
+	asset_files,
+	asset_name_to_file,
+	loaded_file_count,
+	asset_load_queue,
+	load_queue_size,
+	asset_unload_queue,
+	unload_queue_size,
+	atlas_registry,
+	asset_allocator,
+	asset_catalogs,
+	texture_catalog,
+	shader_catalog,
+	material_catalog,
+	font_catalog,
+	sound_catalog,
+	font_manager,
+	RHI_context,
+}; }
+
 struct type_info_memory_arena_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -520,6 +674,15 @@ struct type_info_memory_arena_t {
 	};
 };
 extern const type_info_memory_arena_t DEFAULT_memory_arena_t;
+
+namespace MemberLists { enum class memory_arena_t {
+	is_initialized,
+	base,
+	used,
+	block_size,
+	block_counter,
+	scratch_arena_count,
+}; }
 
 struct type_info_int { const type_info_t info; };
 extern const type_info_int DEFAULT_int;
@@ -549,6 +712,22 @@ struct type_info_asset_file_data_t {
 };
 extern const type_info_asset_file_data_t DEFAULT_asset_file_data_t;
 
+namespace MemberLists { enum class asset_file_data_t {
+	is_initialized,
+	ID,
+	current_package_generation,
+	init_arena,
+	load_status,
+	file_info,
+	raw_file_data,
+	header,
+	package_entries,
+	package_entry_count,
+	entry_hash,
+	loaded_assets,
+	header_data,
+}; }
+
 struct type_info_volatile_u32 { const type_info_t info; };
 extern const type_info_volatile_u32 DEFAULT_volatile_u32;
 
@@ -568,6 +747,13 @@ struct type_info_jfd_file_header_t {
 };
 extern const type_info_jfd_file_header_t DEFAULT_jfd_file_header_t;
 
+namespace MemberLists { enum class jfd_file_header_t {
+	magic_value,
+	version,
+	flags,
+	entry_count,
+}; }
+
 struct type_info_texture_atlas_registry_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -581,6 +767,11 @@ struct type_info_texture_atlas_registry_t {
 	};
 };
 extern const type_info_texture_atlas_registry_t DEFAULT_texture_atlas_registry_t;
+
+namespace MemberLists { enum class texture_atlas_registry_t {
+	atlases,
+	current_atlas_count,
+}; }
 
 struct type_info_zone_allocator_t {
     const type_info_t info;
@@ -599,6 +790,14 @@ struct type_info_zone_allocator_t {
 };
 extern const type_info_zone_allocator_t DEFAULT_zone_allocator_t;
 
+namespace MemberLists { enum class zone_allocator_t {
+	mutex,
+	capacity,
+	base,
+	first_block,
+	cursor,
+}; }
+
 struct type_info_sys_mutex_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -611,6 +810,10 @@ struct type_info_sys_mutex_t {
 	};
 };
 extern const type_info_sys_mutex_t DEFAULT_sys_mutex_t;
+
+namespace MemberLists { enum class sys_mutex_t {
+	handle,
+}; }
 
 struct type_info_sys_mutex_handle_t { const type_info_t info; };
 extern const type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t;
@@ -636,6 +839,15 @@ struct type_info_zone_allocator_block_t {
 };
 extern const type_info_zone_allocator_block_t DEFAULT_zone_allocator_block_t;
 
+namespace MemberLists { enum class zone_allocator_block_t {
+	block_id,
+	is_allocated,
+	block_size,
+	allocation_tag,
+	next_block,
+	prev_block,
+}; }
+
 struct type_info_asset_catalog_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -654,6 +866,15 @@ struct type_info_asset_catalog_t {
 };
 extern const type_info_asset_catalog_t DEFAULT_asset_catalog_t;
 
+namespace MemberLists { enum class asset_catalog_t {
+	ID,
+	catalog_type,
+	asset_manager,
+	default_asset,
+	asset_lookup,
+	loaded_assets,
+}; }
+
 struct type_info_font_manager_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -667,6 +888,11 @@ struct type_info_font_manager_t {
 	};
 };
 extern const type_info_font_manager_t DEFAULT_font_manager_t;
+
+namespace MemberLists { enum class font_manager_t {
+	pages_to_update,
+	pages_queued,
+}; }
 
 struct type_info_dynamic_render_font_page_t {
     const type_info_t info;
@@ -693,6 +919,22 @@ struct type_info_dynamic_render_font_page_t {
 };
 extern const type_info_dynamic_render_font_page_t DEFAULT_dynamic_render_font_page_t;
 
+namespace MemberLists { enum class dynamic_render_font_page_t {
+	is_dirty,
+	is_full,
+	parent_font,
+	varient,
+	font_atlas,
+	glyphs,
+	loaded_glyph_count,
+	temporary_glyphs,
+	temporary_glyph_count,
+	atlas_cursor_x,
+	atlas_cursor_y,
+	tallest_y,
+	next_page,
+}; }
+
 struct type_info_dynamic_render_font_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -707,6 +949,12 @@ struct type_info_dynamic_render_font_t {
 	};
 };
 extern const type_info_dynamic_render_font_t DEFAULT_dynamic_render_font_t;
+
+namespace MemberLists { enum class dynamic_render_font_t {
+	font_arena,
+	font_face,
+	varients,
+}; }
 
 struct type_info_dynamic_render_font_varient_t {
     const type_info_t info;
@@ -733,6 +981,22 @@ struct type_info_dynamic_render_font_varient_t {
 };
 extern const type_info_dynamic_render_font_varient_t DEFAULT_dynamic_render_font_varient_t;
 
+namespace MemberLists { enum class dynamic_render_font_varient_t {
+	font_size,
+	size_to_pixels,
+	line_spacing,
+	max_ascender,
+	max_descender,
+	y_center_offset,
+	typical_ascender,
+	typical_descender,
+	em_width,
+	default_unknown_character,
+	default_utf32_unknown_character,
+	parent_font,
+	first_page,
+}; }
+
 struct type_info_float64 { const type_info_t info; };
 extern const type_info_float64 DEFAULT_float64;
 
@@ -753,6 +1017,15 @@ struct type_info_temporary_glyph_t {
 	};
 };
 extern const type_info_temporary_glyph_t DEFAULT_temporary_glyph_t;
+
+namespace MemberLists { enum class temporary_glyph_t {
+	utf32_codepoint,
+	metrics,
+	glyph_width,
+	glyph_height,
+	cursor_x,
+	cursor_y,
+}; }
 
 struct type_info_glyph_metric_t {
     const type_info_t info;
@@ -777,6 +1050,21 @@ struct type_info_glyph_metric_t {
 	};
 };
 extern const type_info_glyph_metric_t DEFAULT_glyph_metric_t;
+
+namespace MemberLists { enum class glyph_metric_t {
+	is_valid,
+	is_fetched,
+	advance,
+	ascent,
+	width,
+	height,
+	offset_x,
+	offset_y,
+	atlas_offset,
+	atlas_size,
+	owner_atlas,
+	synthetic_texture_handle,
+}; }
 
 struct type_info_RHI_context_t {
     const type_info_t info;
@@ -807,6 +1095,27 @@ struct type_info_RHI_context_t {
 	};
 };
 extern const type_info_RHI_context_t DEFAULT_RHI_context_t;
+
+namespace MemberLists { enum class RHI_context_t {
+	window,
+	backend_render_context,
+	RHI_arena,
+	transient_arena,
+	command_lists,
+	command_list_count,
+	constant_buffer_hash,
+	used_constant_buffers,
+	total_render_instances,
+	total_materials,
+	total_shaders,
+	total_buffers,
+	window_size,
+	current_window_size_generation,
+	last_window_size_generation,
+	renderpasses,
+	renderpass_count,
+	present_command,
+}; }
 
 struct type_info_SDL_Window {
     const type_info_t info;
@@ -855,6 +1164,34 @@ struct type_info_RHI_command_list_t {
 };
 extern const type_info_RHI_command_list_t DEFAULT_RHI_command_list_t;
 
+namespace MemberLists { enum class RHI_command_list_t {
+	is_initialized,
+	RHI_context,
+	transient_arena,
+	command_arena,
+	commands,
+	command_count,
+	draw_instance_command_count,
+	bind_shader_command_count,
+	bind_render_target_command_count,
+	bind_material_command_count,
+	active_render_state,
+	active_vertex_buffers,
+	vertex_buffer_count,
+	active_index_buffer,
+	active_scissor_command,
+	active_viewport_command,
+	active_shader_program,
+	active_renderpass,
+	presenting,
+	image_shader_params,
+	image_count,
+	image_ids_to_bind,
+	bound_image_count,
+	command_list_type,
+	backend_command_buffer,
+}; }
+
 struct type_info_RHI_command_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -868,6 +1205,11 @@ struct type_info_RHI_command_t {
 	};
 };
 extern const type_info_RHI_command_t DEFAULT_RHI_command_t;
+
+namespace MemberLists { enum class RHI_command_t {
+	header,
+	data,
+}; }
 
 struct type_info_RHI_command_header_t {
     const type_info_t info;
@@ -883,6 +1225,12 @@ struct type_info_RHI_command_header_t {
 	};
 };
 extern const type_info_RHI_command_header_t DEFAULT_RHI_command_header_t;
+
+namespace MemberLists { enum class RHI_command_header_t {
+	command_type,
+	line_number,
+	filename,
+}; }
 
 struct type_info_RHI_command_type_t {
     const type_info_t info;
@@ -943,6 +1291,15 @@ struct type_info_RHI_index_buffer_t {
 };
 extern const type_info_RHI_index_buffer_t DEFAULT_RHI_index_buffer_t;
 
+namespace MemberLists { enum class RHI_index_buffer_t {
+	buffer_data,
+	index_data,
+	max_indices,
+	index_count,
+	index_offset,
+	instance_offset,
+}; }
+
 struct type_info_RHI_render_buffer_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -964,6 +1321,19 @@ struct type_info_RHI_render_buffer_t {
 	};
 };
 extern const type_info_RHI_render_buffer_t DEFAULT_RHI_render_buffer_t;
+
+namespace MemberLists { enum class RHI_render_buffer_t {
+	type,
+	allocation_type,
+	constant_buffer_hash_ID,
+	buffer_ID,
+	buffer_capacity,
+	buffer_element_size,
+	buffer_elements_used,
+	working_offset,
+	mapped_data,
+	buffer_info,
+}; }
 
 struct type_info_RHI_render_buffer_type_t {
     const type_info_t info;
@@ -1023,6 +1393,23 @@ struct type_info_RHI_renderpass_t {
 };
 extern const type_info_RHI_renderpass_t DEFAULT_RHI_renderpass_t;
 
+namespace MemberLists { enum class RHI_renderpass_t {
+	ID,
+	renderpass_key,
+	create_info,
+	renderpass_handle,
+	framebuffer_handle,
+	depth_stencil_attachment,
+	color_attachments,
+	color_attachment_count,
+	total_attachment_count,
+	render_width,
+	render_height,
+	attachment_clear_values,
+	has_depth_stencil_attachment,
+	resize_with_window,
+}; }
+
 struct type_info_RHI_renderpass_key_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -1035,6 +1422,10 @@ struct type_info_RHI_renderpass_key_t {
 	};
 };
 extern const type_info_RHI_renderpass_key_t DEFAULT_RHI_renderpass_key_t;
+
+namespace MemberLists { enum class RHI_renderpass_key_t {
+	attachment_formats,
+}; }
 
 struct type_info_bitmap_format_t {
     const type_info_t info;
@@ -1079,6 +1470,15 @@ struct type_info_RHI_renderpass_desc_t {
 };
 extern const type_info_RHI_renderpass_desc_t DEFAULT_RHI_renderpass_desc_t;
 
+namespace MemberLists { enum class RHI_renderpass_desc_t {
+	render_width,
+	render_height,
+	color_attachment_count,
+	resize_with_window,
+	color_attachments,
+	depth_stencil_attachment,
+}; }
+
 struct type_info_RHI_renderpass_attachment_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -1095,6 +1495,14 @@ struct type_info_RHI_renderpass_attachment_t {
 	};
 };
 extern const type_info_RHI_renderpass_attachment_t DEFAULT_RHI_renderpass_attachment_t;
+
+namespace MemberLists { enum class RHI_renderpass_attachment_t {
+	access,
+	load_operation,
+	store_operation,
+	image,
+	clear_value,
+}; }
 
 struct type_info_RHI_renderpass_attachment_access_t {
     const type_info_t info;
@@ -1159,6 +1567,14 @@ struct type_info_RHI_clear_value_t {
 };
 extern const type_info_RHI_clear_value_t DEFAULT_RHI_clear_value_t;
 
+namespace MemberLists { enum class RHI_clear_value_t {
+	float_color,
+	int_color,
+	uint_color,
+	depth,
+	stencil,
+}; }
+
 struct type_info_float4 {
     const type_info_t info;
     const unsigned long member_count;
@@ -1209,6 +1625,10 @@ struct type_info_RHI_command_present_frame_t {
 };
 extern const type_info_RHI_command_present_frame_t DEFAULT_RHI_command_present_frame_t;
 
+namespace MemberLists { enum class RHI_command_present_frame_t {
+	presentation_source,
+}; }
+
 struct type_info_RHI_shader_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -1222,6 +1642,11 @@ struct type_info_RHI_shader_t {
 	};
 };
 extern const type_info_RHI_shader_t DEFAULT_RHI_shader_t;
+
+namespace MemberLists { enum class RHI_shader_t {
+	ID,
+	shader_data,
+}; }
 
 struct type_info_backend_shader_t { const type_info_t info; };
 extern const type_info_backend_shader_t DEFAULT_backend_shader_t;
@@ -1240,6 +1665,12 @@ struct type_info_material_data_t {
 	};
 };
 extern const type_info_material_data_t DEFAULT_material_data_t;
+
+namespace MemberLists { enum class material_data_t {
+	material_type,
+	archetype,
+	instance,
+}; }
 
 struct type_info_stored_material_type_t {
     const type_info_t info;
@@ -1275,7 +1706,17 @@ struct type_info_material_instance_t {
 };
 extern const type_info_material_instance_t DEFAULT_material_instance_t;
 
-constexpr type_info_byte DEFAULT_byte = { .info = { .name = "byte", .size = 0, .metatype = 0 } };
+namespace MemberLists { enum class material_instance_t {
+	ID,
+	version,
+	name,
+	renderer_effect_flags,
+	shader_uniform_count,
+	pipeline_state,
+	archetype,
+}; }
+
+constexpr type_info_byte DEFAULT_byte = { .info = { .name = "byte", .size = 1, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_string_t_data = {
 	.info = { .name = "data", .size = 8, .metatype = 0 },
@@ -1283,7 +1724,7 @@ constexpr type_info_member_t DEFAULT_member_string_t_data = {
 	.offset = 0,
 };
 
-constexpr type_info_s64 DEFAULT_s64 = { .info = { .name = "s64", .size = 0, .metatype = 0 } };
+constexpr type_info_s64 DEFAULT_s64 = { .info = { .name = "s64", .size = 8, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_string_t_count = {
 	.info = { .name = "count", .size = 8, .metatype = 0 },
@@ -1301,7 +1742,7 @@ constexpr type_info_string_t DEFAULT_string_t = {
 	},
 };
 
-constexpr type_info_bool32 DEFAULT_bool32 = { .info = { .name = "bool32", .size = 0, .metatype = 0 } };
+constexpr type_info_bool32 DEFAULT_bool32 = { .info = { .name = "bool32", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_blend_enabled = {
 	.info = { .name = "blend_enabled", .size = 4, .metatype = 0 },
@@ -1311,7 +1752,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_blend_enabled =
 	.value = { .int64_value = 1 },
 };
 
-constexpr type_info_u32 DEFAULT_u32 = { .info = { .name = "u32", .size = 0, .metatype = 0 } };
+constexpr type_info_u32 DEFAULT_u32 = { .info = { .name = "u32", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode = {
 	.info = { .name = "src_color_blend_mode", .size = 4, .metatype = 0 },
@@ -1448,7 +1889,7 @@ constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {
 	},
 };
 
-constexpr type_info_u64 DEFAULT_u64 = { .info = { .name = "u64", .size = 0, .metatype = 0 } };
+constexpr type_info_u64 DEFAULT_u64 = { .info = { .name = "u64", .size = 8, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_ID = {
 	.info = { .name = "ID", .size = 8, .metatype = 0 },
@@ -1652,7 +2093,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_t_name = {
 	.offset = 24,
 };
 
-constexpr type_info_sys_handle_t DEFAULT_sys_handle_t = { .info = { .name = "sys_handle_t", .size = 0, .metatype = 0 } };
+constexpr type_info_sys_handle_t DEFAULT_sys_handle_t = { .info = { .name = "sys_handle_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_file_t_handle = {
 	.info = { .name = "handle", .size = 4, .metatype = 0 },
@@ -1690,7 +2131,7 @@ constexpr type_info_member_t DEFAULT_member_file_t_current_write_offset = {
 	.offset = 56,
 };
 
-constexpr type_info_bool8 DEFAULT_bool8 = { .info = { .name = "bool8", .size = 0, .metatype = 0 } };
+constexpr type_info_bool8 DEFAULT_bool8 = { .info = { .name = "bool8", .size = 1, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_file_t_overlapping = {
 	.info = { .name = "overlapping", .size = 1, .metatype = 0 },
@@ -1839,7 +2280,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_t_package_entry = {
 	.offset = 112,
 };
 
-constexpr type_info_float32 DEFAULT_float32 = { .info = { .name = "float32", .size = 0, .metatype = 0 } };
+constexpr type_info_float32 DEFAULT_float32 = { .info = { .name = "float32", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_float2_elements = {
 	.info = { .name = "elements", .size = 8, .metatype = 0 },
@@ -2311,7 +2752,7 @@ constexpr type_info_member_t DEFAULT_member_texture_atlas_t_ID = {
 	.offset = 0,
 };
 
-constexpr type_info_s32 DEFAULT_s32 = { .info = { .name = "s32", .size = 0, .metatype = 0 } };
+constexpr type_info_s32 DEFAULT_s32 = { .info = { .name = "s32", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_merge_counter = {
 	.info = { .name = "merge_counter", .size = 4, .metatype = 0 },
@@ -2481,7 +2922,7 @@ constexpr type_info_member_t DEFAULT_member_asset_manager_t_manager_arena = {
 	.offset = 0,
 };
 
-constexpr type_info_int DEFAULT_int = { .info = { .name = "int", .size = 0, .metatype = 0 } };
+constexpr type_info_int DEFAULT_int = { .info = { .name = "int", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_freetype_handle = {
 	.info = { .name = "freetype_handle", .size = 4, .metatype = 0 },
@@ -2501,7 +2942,7 @@ constexpr type_info_member_t DEFAULT_member_asset_file_data_t_ID = {
 	.offset = 0,
 };
 
-constexpr type_info_volatile_u32 DEFAULT_volatile_u32 = { .info = { .name = "volatile_u32", .size = 0, .metatype = 0 } };
+constexpr type_info_volatile_u32 DEFAULT_volatile_u32 = { .info = { .name = "volatile_u32", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_current_package_generation = {
 	.info = { .name = "current_package_generation", .size = 4, .metatype = 0 },
@@ -2693,7 +3134,7 @@ constexpr type_info_member_t DEFAULT_member_asset_manager_t_atlas_registry = {
 	.offset = 0,
 };
 
-constexpr type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t = { .info = { .name = "sys_mutex_handle_t", .size = 0, .metatype = 0 } };
+constexpr type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t = { .info = { .name = "sys_mutex_handle_t", .size = 8, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_sys_mutex_t_handle = {
 	.info = { .name = "handle", .size = 8, .metatype = 0 },
@@ -2722,7 +3163,7 @@ constexpr type_info_member_t DEFAULT_member_zone_allocator_t_capacity = {
 	.offset = 8,
 };
 
-constexpr type_info_u8 DEFAULT_u8 = { .info = { .name = "u8", .size = 0, .metatype = 0 } };
+constexpr type_info_u8 DEFAULT_u8 = { .info = { .name = "u8", .size = 1, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_t_base = {
 	.info = { .name = "base", .size = 8, .metatype = 0 },
@@ -2945,7 +3386,7 @@ constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_font_s
 	.offset = 0,
 };
 
-constexpr type_info_float64 DEFAULT_float64 = { .info = { .name = "float64", .size = 0, .metatype = 0 } };
+constexpr type_info_float64 DEFAULT_float64 = { .info = { .name = "float64", .size = 8, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_size_to_pixels = {
 	.info = { .name = "size_to_pixels", .size = 8, .metatype = 0 },
@@ -3302,7 +3743,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_context_t_window = {
 	.offset = 0,
 };
 
-constexpr type_info_backend_render_context_t DEFAULT_backend_render_context_t = { .info = { .name = "backend_render_context_t", .size = 0, .metatype = 0 } };
+constexpr type_info_backend_render_context_t DEFAULT_backend_render_context_t = { .info = { .name = "backend_render_context_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_backend_render_context = {
 	.info = { .name = "backend_render_context", .size = 8, .metatype = 0 },
@@ -3600,7 +4041,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_line_number = {
 	.offset = 4,
 };
 
-constexpr type_info_const_char DEFAULT_const_char = { .info = { .name = "const_char", .size = 0, .metatype = 0 } };
+constexpr type_info_const_char DEFAULT_const_char = { .info = { .name = "const_char", .size = 1, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_filename = {
 	.info = { .name = "filename", .size = 8, .metatype = 0 },
@@ -3809,7 +4250,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_mapped_data = {
 	.offset = 40,
 };
 
-constexpr type_info_backend_buffer_t DEFAULT_backend_buffer_t = { .info = { .name = "backend_buffer_t", .size = 0, .metatype = 0 } };
+constexpr type_info_backend_buffer_t DEFAULT_backend_buffer_t = { .info = { .name = "backend_buffer_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_info = {
 	.info = { .name = "buffer_info", .size = 4, .metatype = 0 },
@@ -4329,7 +4770,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_create_info = {
 	.offset = 48,
 };
 
-constexpr type_info_backend_renderpass_handle_t DEFAULT_backend_renderpass_handle_t = { .info = { .name = "backend_renderpass_handle_t", .size = 0, .metatype = 0 } };
+constexpr type_info_backend_renderpass_handle_t DEFAULT_backend_renderpass_handle_t = { .info = { .name = "backend_renderpass_handle_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_renderpass_handle = {
 	.info = { .name = "renderpass_handle", .size = 4, .metatype = 0 },
@@ -4337,7 +4778,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_renderpass_handle =
 	.offset = 504,
 };
 
-constexpr type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_handle_t = { .info = { .name = "backend_framebuffer_handle_t", .size = 0, .metatype = 0 } };
+constexpr type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_handle_t = { .info = { .name = "backend_framebuffer_handle_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_framebuffer_handle = {
 	.info = { .name = "framebuffer_handle", .size = 4, .metatype = 0 },
@@ -4489,7 +4930,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_list_type
 	.offset = 0,
 };
 
-constexpr type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t = { .info = { .name = "backend_command_buffer_t", .size = 0, .metatype = 0 } };
+constexpr type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t = { .info = { .name = "backend_command_buffer_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_backend_command_buffer = {
 	.info = { .name = "backend_command_buffer", .size = 4, .metatype = 0 },
@@ -4758,7 +5199,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_shader_t_ID = {
 	.offset = 0,
 };
 
-constexpr type_info_backend_shader_t DEFAULT_backend_shader_t = { .info = { .name = "backend_shader_t", .size = 0, .metatype = 0 } };
+constexpr type_info_backend_shader_t DEFAULT_backend_shader_t = { .info = { .name = "backend_shader_t", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_shader_t_shader_data = {
 	.info = { .name = "shader_data", .size = 4, .metatype = 0 },
@@ -5042,6 +5483,7 @@ constexpr const type_info_t *const APOLLO_type_table[] = {
 	&DEFAULT_material_data_t.info,
 	&DEFAULT_asset_handle_t.info,
 	&DEFAULT_material_archetype_t.info,
+	nullptr,
 };
 constexpr const type_info_t *const APOLLO_member_table[] = {
 	&DEFAULT_member_string_t_data.info,
@@ -5464,4 +5906,7 @@ constexpr const type_info_t *const APOLLO_member_table[] = {
 	&DEFAULT_member_asset_handle_t_dynamic_render_font.info,
 	&DEFAULT_member_material_archetype_t_shader_handle.info,
 	&DEFAULT_member_material_archetype_t_base_instance.info,
+	nullptr,
 };
+
+} // namespace Apollo

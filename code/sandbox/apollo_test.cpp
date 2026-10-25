@@ -169,6 +169,19 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 c_string_builder_sprintf(&dictionary_builder, "extern const type_info_%.*s DEFAULT_%.*s;\n\n",
                                          fprint_string(identifier), fprint_string(identifier));
 
+                if(member_count > 0 && code_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE)
+                {
+                    c_string_builder_sprintf(&dictionary_builder, "namespace MemberLists { enum class %.*s {\n", fprint_string(identifier));
+                    for(const auto &member: *members)
+                    {
+                        if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
+                        {
+                            c_string_builder_sprintf(&dictionary_builder, "\t%.*s,\n", fprint_string(member.identifier));
+                        }
+                    }
+                    c_string_builder_sprintf(&dictionary_builder, "}; }\n\n");
+                }
+
                 for(const auto &member: *members)
                 {
                     if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
@@ -377,43 +390,9 @@ main(void)
         c_string_builder_init(&member_table_builder, MB(2));
 
         file_t out_file = c_file_open(STR("meta/test_metaprogram_file.h"), true, true);
-        c_string_builder_sprintf(&header_builder, R"(struct type_info_t {
-    const char *name;
-    const unsigned long size;
-    const unsigned long metatype;
-};
+        c_string_builder_sprintf(&header_builder, R"(#include <code_generator/apollo/apollo_runtime.h>
 
-struct type_info_member_t {
-    const type_info_t info;
-
-    const type_info_t *type_info;
-    const unsigned long offset;
-    const unsigned long value_type;
-    union {
-        int                int32_value;
-        long long          int64_value;
-        unsigned long      uint32_value;
-        unsigned long long uint64_value;
-        float              float32_value;
-        double             float64_value;
-        const char        *string_value;
-    }value;
-};
-
-struct type_info_struct_t {
-    const type_info_t info;
-    const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
-};
-
-struct type_info_procedure_t {
-    const type_info_t info;
-    const unsigned long argument_count;
-    const type_info_member_t *const *argument_pointer;
-};
-
-extern const type_info_t *const APOLLO_type_table[];
-extern const type_info_t *const APOLLO_member_table[];
+namespace Apollo {
 
 )");
         c_string_builder_sprintf(&type_table_builder,   "constexpr const type_info_t *const APOLLO_type_table[] = {\n");
@@ -435,8 +414,8 @@ extern const type_info_t *const APOLLO_member_table[];
                 create_declaration_type_data(declarations, argument_type_string);
             }
         }
-        c_string_builder_sprintf(&type_table_builder, "};\n");
-        c_string_builder_sprintf(&member_table_builder, "};\n");
+        c_string_builder_sprintf(&type_table_builder, "\tnullptr,\n};\n");
+        c_string_builder_sprintf(&member_table_builder, "\tnullptr,\n};\n\n} // namespace Apollo\n");
 
         c_string_builder_dump_to_file(&out_file, &header_builder);
         c_string_builder_dump_to_file(&out_file, &dictionary_builder);
