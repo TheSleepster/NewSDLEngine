@@ -1,0 +1,5912 @@
+#include <code_generator/apollo/apollo_runtime.h>
+
+namespace Apollo {
+
+struct type_info_RHI_pipeline_state_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[15];
+        struct {
+			const type_info_member_t *blend_enabled;
+			const type_info_member_t *src_color_blend_mode;
+			const type_info_member_t *dst_color_blend_mode;
+			const type_info_member_t *src_alpha_blend_mode;
+			const type_info_member_t *dst_alpha_blend_mode;
+			const type_info_member_t *color_blend_op;
+			const type_info_member_t *alpha_blend_op;
+			const type_info_member_t *depth_testing_enabled;
+			const type_info_member_t *depth_writing_enabled;
+			const type_info_member_t *depth_func;
+			const type_info_member_t *stencil_enabled;
+			const type_info_member_t *stencil_state;
+			const type_info_member_t *stencil_keep;
+			const type_info_member_t *polygon_mode;
+			const type_info_member_t *primitive_type;
+		}members;
+	};
+};
+extern const type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t;
+
+namespace MemberLists { enum class RHI_pipeline_state_t {
+	blend_enabled,
+	src_color_blend_mode,
+	dst_color_blend_mode,
+	src_alpha_blend_mode,
+	dst_alpha_blend_mode,
+	color_blend_op,
+	alpha_blend_op,
+	depth_testing_enabled,
+	depth_writing_enabled,
+	depth_func,
+	stencil_enabled,
+	stencil_state,
+	stencil_keep,
+	polygon_mode,
+	primitive_type,
+}; }
+
+struct type_info_bool32 { const type_info_t info; };
+extern const type_info_bool32 DEFAULT_bool32;
+
+struct type_info_u32 { const type_info_t info; };
+extern const type_info_u32 DEFAULT_u32;
+
+struct type_info_material_archetype_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *version;
+			const type_info_member_t *name;
+			const type_info_member_t *shader_binary_name;
+			const type_info_member_t *shader_handle;
+			const type_info_member_t *base_instance;
+		}members;
+	};
+};
+extern const type_info_material_archetype_t DEFAULT_material_archetype_t;
+
+namespace MemberLists { enum class material_archetype_t {
+	ID,
+	version,
+	name,
+	shader_binary_name,
+	shader_handle,
+	base_instance,
+}; }
+
+struct type_info_u64 { const type_info_t info; };
+extern const type_info_u64 DEFAULT_u64;
+
+struct type_info_string_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *data;
+			const type_info_member_t *count;
+		}members;
+	};
+};
+extern const type_info_string_t DEFAULT_string_t;
+
+namespace MemberLists { enum class string_t {
+	data,
+	count,
+}; }
+
+struct type_info_byte { const type_info_t info; };
+extern const type_info_byte DEFAULT_byte;
+
+struct type_info_s64 { const type_info_t info; };
+extern const type_info_s64 DEFAULT_s64;
+
+struct type_info_asset_handle_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *is_valid;
+			const type_info_member_t *slot;
+			const type_info_member_t *texture;
+			const type_info_member_t *shader;
+			const type_info_member_t *material_info;
+			const type_info_member_t *dynamic_render_font;
+		}members;
+	};
+};
+extern const type_info_asset_handle_t DEFAULT_asset_handle_t;
+
+namespace MemberLists { enum class asset_handle_t {
+	is_valid,
+	slot,
+	texture,
+	shader,
+	material_info,
+	dynamic_render_font,
+}; }
+
+struct type_info_asset_slot_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[13];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *slot_state;
+			const type_info_member_t *type;
+			const type_info_member_t *is_valid_for_handles;
+			const type_info_member_t *name;
+			const type_info_member_t *owner_asset_file;
+			const type_info_member_t *package_entry;
+			const type_info_member_t *subtexture_data;
+			const type_info_member_t *asset_manager;
+			const type_info_member_t *catalog;
+			const type_info_member_t *package_generation;
+			const type_info_member_t *loaded_asset_index;
+			const type_info_member_t *owner_asset_file_index;
+		}members;
+	};
+};
+extern const type_info_asset_slot_t DEFAULT_asset_slot_t;
+
+namespace MemberLists { enum class asset_slot_t {
+	ID,
+	slot_state,
+	type,
+	is_valid_for_handles,
+	name,
+	owner_asset_file,
+	package_entry,
+	subtexture_data,
+	asset_manager,
+	catalog,
+	package_generation,
+	loaded_asset_index,
+	owner_asset_file_index,
+}; }
+
+struct type_info_asset_slot_load_status_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[7];
+        struct {
+			const type_info_member_t *ASLS_Invalid;
+			const type_info_member_t *ASLS_Unloaded;
+			const type_info_member_t *ASLS_LoadQueued;
+			const type_info_member_t *ASLS_Loaded;
+			const type_info_member_t *ASLS_ShouldUnload;
+			const type_info_member_t *ASLS_ShouldReload;
+			const type_info_member_t *ASLS_Count;
+		}members;
+	};
+};
+extern const type_info_asset_slot_load_status_t DEFAULT_asset_slot_load_status_t;
+
+struct type_info_asset_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[7];
+        struct {
+			const type_info_member_t *AT_Invalid;
+			const type_info_member_t *AT_Bitmap;
+			const type_info_member_t *AT_Shader;
+			const type_info_member_t *AT_Material;
+			const type_info_member_t *AT_Font;
+			const type_info_member_t *AT_Sound;
+			const type_info_member_t *AT_Count;
+		}members;
+	};
+};
+extern const type_info_asset_type_t DEFAULT_asset_type_t;
+
+struct type_info_file_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[8];
+        struct {
+			const type_info_member_t *handle;
+			const type_info_member_t *file_name;
+			const type_info_member_t *filepath;
+			const type_info_member_t *file_size;
+			const type_info_member_t *current_read_offset;
+			const type_info_member_t *current_write_offset;
+			const type_info_member_t *overlapping;
+			const type_info_member_t *for_writing;
+		}members;
+	};
+};
+extern const type_info_file_t DEFAULT_file_t;
+
+namespace MemberLists { enum class file_t {
+	handle,
+	file_name,
+	filepath,
+	file_size,
+	current_read_offset,
+	current_write_offset,
+	overlapping,
+	for_writing,
+}; }
+
+struct type_info_sys_handle_t { const type_info_t info; };
+extern const type_info_sys_handle_t DEFAULT_sys_handle_t;
+
+struct type_info_bool8 { const type_info_t info; };
+extern const type_info_bool8 DEFAULT_bool8;
+
+struct type_info_jfd_package_entry_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *entry_header;
+			const type_info_member_t *data_offset;
+			const type_info_member_t *modtime;
+			const type_info_member_t *filename;
+			const type_info_member_t *fullpath;
+			const type_info_member_t *asset_data;
+		}members;
+	};
+};
+extern const type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t;
+
+namespace MemberLists { enum class jfd_package_entry_t {
+	entry_header,
+	data_offset,
+	modtime,
+	filename,
+	fullpath,
+	asset_data,
+}; }
+
+struct type_info_jfd_package_chunk_header_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[7];
+        struct {
+			const type_info_member_t *magic_value;
+			const type_info_member_t *total_entry_size;
+			const type_info_member_t *asset_type;
+			const type_info_member_t *filename_size;
+			const type_info_member_t *fullpath_size;
+			const type_info_member_t *entry_data_size;
+			const type_info_member_t *modtime;
+		}members;
+	};
+};
+extern const type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t;
+
+namespace MemberLists { enum class jfd_package_chunk_header_t {
+	magic_value,
+	total_entry_size,
+	asset_type,
+	filename_size,
+	fullpath_size,
+	entry_data_size,
+	modtime,
+}; }
+
+struct type_info_subtexture_data_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[8];
+        struct {
+			const type_info_member_t *uv_min;
+			const type_info_member_t *uv_max;
+			const type_info_member_t *offset;
+			const type_info_member_t *size;
+			const type_info_member_t *atlased_generation;
+			const type_info_member_t *atlas_subtexture_index;
+			const type_info_member_t *atlas;
+			const type_info_member_t *packed_asset;
+		}members;
+	};
+};
+extern const type_info_subtexture_data_t DEFAULT_subtexture_data_t;
+
+namespace MemberLists { enum class subtexture_data_t {
+	uv_min,
+	uv_max,
+	offset,
+	size,
+	atlased_generation,
+	atlas_subtexture_index,
+	atlas,
+	packed_asset,
+}; }
+
+struct type_info_float2 {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[4];
+        struct {
+			const type_info_member_t *elements;
+			const type_info_member_t *x;
+			const type_info_member_t *y;
+			const type_info_member_t *xy;
+		}members;
+	};
+};
+extern const type_info_float2 DEFAULT_float2;
+
+namespace MemberLists { enum class float2 {
+	elements,
+	x,
+	y,
+	xy,
+}; }
+
+struct type_info_float32 { const type_info_t info; };
+extern const type_info_float32 DEFAULT_float32;
+
+struct type_info_texture_atlas_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[12];
+        struct {
+			const type_info_member_t *texture;
+			const type_info_member_t *bitmap_data;
+			const type_info_member_t *ID;
+			const type_info_member_t *merge_counter;
+			const type_info_member_t *textures_to_merge;
+			const type_info_member_t *packed_subtextures;
+			const type_info_member_t *packed_subtexture_count;
+			const type_info_member_t *is_valid;
+			const type_info_member_t *atlas_cursor_x;
+			const type_info_member_t *atlas_cursor_y;
+			const type_info_member_t *tallest_y;
+			const type_info_member_t *atlas_size;
+		}members;
+	};
+};
+extern const type_info_texture_atlas_t DEFAULT_texture_atlas_t;
+
+namespace MemberLists { enum class texture_atlas_t {
+	texture,
+	bitmap_data,
+	ID,
+	merge_counter,
+	textures_to_merge,
+	packed_subtextures,
+	packed_subtexture_count,
+	is_valid,
+	atlas_cursor_x,
+	atlas_cursor_y,
+	tallest_y,
+	atlas_size,
+}; }
+
+struct type_info_texture2D_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *bitmap;
+			const type_info_member_t *gpu_data;
+		}members;
+	};
+};
+extern const type_info_texture2D_t DEFAULT_texture2D_t;
+
+namespace MemberLists { enum class texture2D_t {
+	ID,
+	bitmap,
+	gpu_data,
+}; }
+
+struct type_info_bitmap_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[5];
+        struct {
+			const type_info_member_t *width;
+			const type_info_member_t *height;
+			const type_info_member_t *channels;
+			const type_info_member_t *format;
+			const type_info_member_t *pixels;
+		}members;
+	};
+};
+extern const type_info_bitmap_t DEFAULT_bitmap_t;
+
+namespace MemberLists { enum class bitmap_t {
+	width,
+	height,
+	channels,
+	format,
+	pixels,
+}; }
+
+struct type_info_RHI_image_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *create_info;
+			const type_info_member_t *backend_image;
+		}members;
+	};
+};
+extern const type_info_RHI_image_t DEFAULT_RHI_image_t;
+
+namespace MemberLists { enum class RHI_image_t {
+	ID,
+	create_info,
+	backend_image,
+}; }
+
+struct type_info_RHI_image_create_info_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *data;
+			const type_info_member_t *width;
+			const type_info_member_t *height;
+			const type_info_member_t *format;
+			const type_info_member_t *usage;
+			const type_info_member_t *sampler_info;
+		}members;
+	};
+};
+extern const type_info_RHI_image_create_info_t DEFAULT_RHI_image_create_info_t;
+
+namespace MemberLists { enum class RHI_image_create_info_t {
+	data,
+	width,
+	height,
+	format,
+	usage,
+	sampler_info,
+}; }
+
+struct type_info_RHI_image_usage_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *RHI_IMAGE_USAGE_INVALID;
+			const type_info_member_t *RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT;
+			const type_info_member_t *RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT;
+			const type_info_member_t *RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE;
+			const type_info_member_t *RHI_IMAGE_USAGE_BLIT_SOURCE;
+			const type_info_member_t *RHI_IMAGE_USAGE_BLIT_DESTINATION;
+		}members;
+	};
+};
+extern const type_info_RHI_image_usage_t DEFAULT_RHI_image_usage_t;
+
+struct type_info_RHI_sampler_create_info_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[8];
+        struct {
+			const type_info_member_t *filtering;
+			const type_info_member_t *anisotropy_enabled;
+			const type_info_member_t *max_anisotropy;
+			const type_info_member_t *wrapu;
+			const type_info_member_t *wrapv;
+			const type_info_member_t *compare_operation;
+			const type_info_member_t *compare_ops_enabled;
+			const type_info_member_t *use_normalized_coordinates;
+		}members;
+	};
+};
+extern const type_info_RHI_sampler_create_info_t DEFAULT_RHI_sampler_create_info_t;
+
+namespace MemberLists { enum class RHI_sampler_create_info_t {
+	filtering,
+	anisotropy_enabled,
+	max_anisotropy,
+	wrapu,
+	wrapv,
+	compare_operation,
+	compare_ops_enabled,
+	use_normalized_coordinates,
+}; }
+
+struct type_info_RHI_image_filter_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *RHI_IMAGE_FILTER_TYPE_INVALID;
+			const type_info_member_t *RHI_IMAGE_FILTER_TYPE_NEAREST;
+			const type_info_member_t *RHI_IMAGE_FILTER_TYPE_LINEAR;
+		}members;
+	};
+};
+extern const type_info_RHI_image_filter_type_t DEFAULT_RHI_image_filter_type_t;
+
+struct type_info_RHI_image_wrapping_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[4];
+        struct {
+			const type_info_member_t *RHI_IMAGE_WRAPPING_INVALID;
+			const type_info_member_t *RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE;
+			const type_info_member_t *RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER;
+			const type_info_member_t *RHI_IMAGE_WRAPPING_REPEAT;
+		}members;
+	};
+};
+extern const type_info_RHI_image_wrapping_type_t DEFAULT_RHI_image_wrapping_type_t;
+
+struct type_info_backend_image_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *is_valid;
+			const type_info_member_t *handle;
+		}members;
+	};
+};
+extern const type_info_backend_image_t DEFAULT_backend_image_t;
+
+namespace MemberLists { enum class backend_image_t {
+	is_valid,
+	handle,
+}; }
+
+struct type_info_void { const type_info_t info; };
+extern const type_info_void DEFAULT_void;
+
+struct type_info_s32 { const type_info_t info; };
+extern const type_info_s32 DEFAULT_s32;
+
+struct type_info_asset_manager_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[20];
+        struct {
+			const type_info_member_t *is_initialized;
+			const type_info_member_t *manager_arena;
+			const type_info_member_t *freetype_handle;
+			const type_info_member_t *asset_files;
+			const type_info_member_t *asset_name_to_file;
+			const type_info_member_t *loaded_file_count;
+			const type_info_member_t *asset_load_queue;
+			const type_info_member_t *load_queue_size;
+			const type_info_member_t *asset_unload_queue;
+			const type_info_member_t *unload_queue_size;
+			const type_info_member_t *atlas_registry;
+			const type_info_member_t *asset_allocator;
+			const type_info_member_t *asset_catalogs;
+			const type_info_member_t *texture_catalog;
+			const type_info_member_t *shader_catalog;
+			const type_info_member_t *material_catalog;
+			const type_info_member_t *font_catalog;
+			const type_info_member_t *sound_catalog;
+			const type_info_member_t *font_manager;
+			const type_info_member_t *RHI_context;
+		}members;
+	};
+};
+extern const type_info_asset_manager_t DEFAULT_asset_manager_t;
+
+namespace MemberLists { enum class asset_manager_t {
+	is_initialized,
+	manager_arena,
+	freetype_handle,
+	asset_files,
+	asset_name_to_file,
+	loaded_file_count,
+	asset_load_queue,
+	load_queue_size,
+	asset_unload_queue,
+	unload_queue_size,
+	atlas_registry,
+	asset_allocator,
+	asset_catalogs,
+	texture_catalog,
+	shader_catalog,
+	material_catalog,
+	font_catalog,
+	sound_catalog,
+	font_manager,
+	RHI_context,
+}; }
+
+struct type_info_memory_arena_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *is_initialized;
+			const type_info_member_t *base;
+			const type_info_member_t *used;
+			const type_info_member_t *block_size;
+			const type_info_member_t *block_counter;
+			const type_info_member_t *scratch_arena_count;
+		}members;
+	};
+};
+extern const type_info_memory_arena_t DEFAULT_memory_arena_t;
+
+namespace MemberLists { enum class memory_arena_t {
+	is_initialized,
+	base,
+	used,
+	block_size,
+	block_counter,
+	scratch_arena_count,
+}; }
+
+struct type_info_int { const type_info_t info; };
+extern const type_info_int DEFAULT_int;
+
+struct type_info_asset_file_data_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[13];
+        struct {
+			const type_info_member_t *is_initialized;
+			const type_info_member_t *ID;
+			const type_info_member_t *current_package_generation;
+			const type_info_member_t *init_arena;
+			const type_info_member_t *load_status;
+			const type_info_member_t *file_info;
+			const type_info_member_t *raw_file_data;
+			const type_info_member_t *header;
+			const type_info_member_t *package_entries;
+			const type_info_member_t *package_entry_count;
+			const type_info_member_t *entry_hash;
+			const type_info_member_t *loaded_assets;
+			const type_info_member_t *header_data;
+		}members;
+	};
+};
+extern const type_info_asset_file_data_t DEFAULT_asset_file_data_t;
+
+namespace MemberLists { enum class asset_file_data_t {
+	is_initialized,
+	ID,
+	current_package_generation,
+	init_arena,
+	load_status,
+	file_info,
+	raw_file_data,
+	header,
+	package_entries,
+	package_entry_count,
+	entry_hash,
+	loaded_assets,
+	header_data,
+}; }
+
+struct type_info_volatile_u32 { const type_info_t info; };
+extern const type_info_volatile_u32 DEFAULT_volatile_u32;
+
+struct type_info_jfd_file_header_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[4];
+        struct {
+			const type_info_member_t *magic_value;
+			const type_info_member_t *version;
+			const type_info_member_t *flags;
+			const type_info_member_t *entry_count;
+		}members;
+	};
+};
+extern const type_info_jfd_file_header_t DEFAULT_jfd_file_header_t;
+
+namespace MemberLists { enum class jfd_file_header_t {
+	magic_value,
+	version,
+	flags,
+	entry_count,
+}; }
+
+struct type_info_texture_atlas_registry_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *atlases;
+			const type_info_member_t *current_atlas_count;
+		}members;
+	};
+};
+extern const type_info_texture_atlas_registry_t DEFAULT_texture_atlas_registry_t;
+
+namespace MemberLists { enum class texture_atlas_registry_t {
+	atlases,
+	current_atlas_count,
+}; }
+
+struct type_info_zone_allocator_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[5];
+        struct {
+			const type_info_member_t *mutex;
+			const type_info_member_t *capacity;
+			const type_info_member_t *base;
+			const type_info_member_t *first_block;
+			const type_info_member_t *cursor;
+		}members;
+	};
+};
+extern const type_info_zone_allocator_t DEFAULT_zone_allocator_t;
+
+namespace MemberLists { enum class zone_allocator_t {
+	mutex,
+	capacity,
+	base,
+	first_block,
+	cursor,
+}; }
+
+struct type_info_sys_mutex_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[1];
+        struct {
+			const type_info_member_t *handle;
+		}members;
+	};
+};
+extern const type_info_sys_mutex_t DEFAULT_sys_mutex_t;
+
+namespace MemberLists { enum class sys_mutex_t {
+	handle,
+}; }
+
+struct type_info_sys_mutex_handle_t { const type_info_t info; };
+extern const type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t;
+
+struct type_info_u8 { const type_info_t info; };
+extern const type_info_u8 DEFAULT_u8;
+
+struct type_info_zone_allocator_block_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *block_id;
+			const type_info_member_t *is_allocated;
+			const type_info_member_t *block_size;
+			const type_info_member_t *allocation_tag;
+			const type_info_member_t *next_block;
+			const type_info_member_t *prev_block;
+		}members;
+	};
+};
+extern const type_info_zone_allocator_block_t DEFAULT_zone_allocator_block_t;
+
+namespace MemberLists { enum class zone_allocator_block_t {
+	block_id,
+	is_allocated,
+	block_size,
+	allocation_tag,
+	next_block,
+	prev_block,
+}; }
+
+struct type_info_asset_catalog_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *catalog_type;
+			const type_info_member_t *asset_manager;
+			const type_info_member_t *default_asset;
+			const type_info_member_t *asset_lookup;
+			const type_info_member_t *loaded_assets;
+		}members;
+	};
+};
+extern const type_info_asset_catalog_t DEFAULT_asset_catalog_t;
+
+namespace MemberLists { enum class asset_catalog_t {
+	ID,
+	catalog_type,
+	asset_manager,
+	default_asset,
+	asset_lookup,
+	loaded_assets,
+}; }
+
+struct type_info_font_manager_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *pages_to_update;
+			const type_info_member_t *pages_queued;
+		}members;
+	};
+};
+extern const type_info_font_manager_t DEFAULT_font_manager_t;
+
+namespace MemberLists { enum class font_manager_t {
+	pages_to_update,
+	pages_queued,
+}; }
+
+struct type_info_dynamic_render_font_page_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[13];
+        struct {
+			const type_info_member_t *is_dirty;
+			const type_info_member_t *is_full;
+			const type_info_member_t *parent_font;
+			const type_info_member_t *varient;
+			const type_info_member_t *font_atlas;
+			const type_info_member_t *glyphs;
+			const type_info_member_t *loaded_glyph_count;
+			const type_info_member_t *temporary_glyphs;
+			const type_info_member_t *temporary_glyph_count;
+			const type_info_member_t *atlas_cursor_x;
+			const type_info_member_t *atlas_cursor_y;
+			const type_info_member_t *tallest_y;
+			const type_info_member_t *next_page;
+		}members;
+	};
+};
+extern const type_info_dynamic_render_font_page_t DEFAULT_dynamic_render_font_page_t;
+
+namespace MemberLists { enum class dynamic_render_font_page_t {
+	is_dirty,
+	is_full,
+	parent_font,
+	varient,
+	font_atlas,
+	glyphs,
+	loaded_glyph_count,
+	temporary_glyphs,
+	temporary_glyph_count,
+	atlas_cursor_x,
+	atlas_cursor_y,
+	tallest_y,
+	next_page,
+}; }
+
+struct type_info_dynamic_render_font_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *font_arena;
+			const type_info_member_t *font_face;
+			const type_info_member_t *varients;
+		}members;
+	};
+};
+extern const type_info_dynamic_render_font_t DEFAULT_dynamic_render_font_t;
+
+namespace MemberLists { enum class dynamic_render_font_t {
+	font_arena,
+	font_face,
+	varients,
+}; }
+
+struct type_info_dynamic_render_font_varient_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[13];
+        struct {
+			const type_info_member_t *font_size;
+			const type_info_member_t *size_to_pixels;
+			const type_info_member_t *line_spacing;
+			const type_info_member_t *max_ascender;
+			const type_info_member_t *max_descender;
+			const type_info_member_t *y_center_offset;
+			const type_info_member_t *typical_ascender;
+			const type_info_member_t *typical_descender;
+			const type_info_member_t *em_width;
+			const type_info_member_t *default_unknown_character;
+			const type_info_member_t *default_utf32_unknown_character;
+			const type_info_member_t *parent_font;
+			const type_info_member_t *first_page;
+		}members;
+	};
+};
+extern const type_info_dynamic_render_font_varient_t DEFAULT_dynamic_render_font_varient_t;
+
+namespace MemberLists { enum class dynamic_render_font_varient_t {
+	font_size,
+	size_to_pixels,
+	line_spacing,
+	max_ascender,
+	max_descender,
+	y_center_offset,
+	typical_ascender,
+	typical_descender,
+	em_width,
+	default_unknown_character,
+	default_utf32_unknown_character,
+	parent_font,
+	first_page,
+}; }
+
+struct type_info_float64 { const type_info_t info; };
+extern const type_info_float64 DEFAULT_float64;
+
+struct type_info_temporary_glyph_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *utf32_codepoint;
+			const type_info_member_t *metrics;
+			const type_info_member_t *glyph_width;
+			const type_info_member_t *glyph_height;
+			const type_info_member_t *cursor_x;
+			const type_info_member_t *cursor_y;
+		}members;
+	};
+};
+extern const type_info_temporary_glyph_t DEFAULT_temporary_glyph_t;
+
+namespace MemberLists { enum class temporary_glyph_t {
+	utf32_codepoint,
+	metrics,
+	glyph_width,
+	glyph_height,
+	cursor_x,
+	cursor_y,
+}; }
+
+struct type_info_glyph_metric_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[12];
+        struct {
+			const type_info_member_t *is_valid;
+			const type_info_member_t *is_fetched;
+			const type_info_member_t *advance;
+			const type_info_member_t *ascent;
+			const type_info_member_t *width;
+			const type_info_member_t *height;
+			const type_info_member_t *offset_x;
+			const type_info_member_t *offset_y;
+			const type_info_member_t *atlas_offset;
+			const type_info_member_t *atlas_size;
+			const type_info_member_t *owner_atlas;
+			const type_info_member_t *synthetic_texture_handle;
+		}members;
+	};
+};
+extern const type_info_glyph_metric_t DEFAULT_glyph_metric_t;
+
+namespace MemberLists { enum class glyph_metric_t {
+	is_valid,
+	is_fetched,
+	advance,
+	ascent,
+	width,
+	height,
+	offset_x,
+	offset_y,
+	atlas_offset,
+	atlas_size,
+	owner_atlas,
+	synthetic_texture_handle,
+}; }
+
+struct type_info_RHI_context_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[18];
+        struct {
+			const type_info_member_t *window;
+			const type_info_member_t *backend_render_context;
+			const type_info_member_t *RHI_arena;
+			const type_info_member_t *transient_arena;
+			const type_info_member_t *command_lists;
+			const type_info_member_t *command_list_count;
+			const type_info_member_t *constant_buffer_hash;
+			const type_info_member_t *used_constant_buffers;
+			const type_info_member_t *total_render_instances;
+			const type_info_member_t *total_materials;
+			const type_info_member_t *total_shaders;
+			const type_info_member_t *total_buffers;
+			const type_info_member_t *window_size;
+			const type_info_member_t *current_window_size_generation;
+			const type_info_member_t *last_window_size_generation;
+			const type_info_member_t *renderpasses;
+			const type_info_member_t *renderpass_count;
+			const type_info_member_t *present_command;
+		}members;
+	};
+};
+extern const type_info_RHI_context_t DEFAULT_RHI_context_t;
+
+namespace MemberLists { enum class RHI_context_t {
+	window,
+	backend_render_context,
+	RHI_arena,
+	transient_arena,
+	command_lists,
+	command_list_count,
+	constant_buffer_hash,
+	used_constant_buffers,
+	total_render_instances,
+	total_materials,
+	total_shaders,
+	total_buffers,
+	window_size,
+	current_window_size_generation,
+	last_window_size_generation,
+	renderpasses,
+	renderpass_count,
+	present_command,
+}; }
+
+struct type_info_SDL_Window {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+};
+extern const type_info_SDL_Window DEFAULT_SDL_Window;
+
+struct type_info_backend_render_context_t { const type_info_t info; };
+extern const type_info_backend_render_context_t DEFAULT_backend_render_context_t;
+
+struct type_info_RHI_command_list_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[25];
+        struct {
+			const type_info_member_t *is_initialized;
+			const type_info_member_t *RHI_context;
+			const type_info_member_t *transient_arena;
+			const type_info_member_t *command_arena;
+			const type_info_member_t *commands;
+			const type_info_member_t *command_count;
+			const type_info_member_t *draw_instance_command_count;
+			const type_info_member_t *bind_shader_command_count;
+			const type_info_member_t *bind_render_target_command_count;
+			const type_info_member_t *bind_material_command_count;
+			const type_info_member_t *active_render_state;
+			const type_info_member_t *active_vertex_buffers;
+			const type_info_member_t *vertex_buffer_count;
+			const type_info_member_t *active_index_buffer;
+			const type_info_member_t *active_scissor_command;
+			const type_info_member_t *active_viewport_command;
+			const type_info_member_t *active_shader_program;
+			const type_info_member_t *active_renderpass;
+			const type_info_member_t *presenting;
+			const type_info_member_t *image_shader_params;
+			const type_info_member_t *image_count;
+			const type_info_member_t *image_ids_to_bind;
+			const type_info_member_t *bound_image_count;
+			const type_info_member_t *command_list_type;
+			const type_info_member_t *backend_command_buffer;
+		}members;
+	};
+};
+extern const type_info_RHI_command_list_t DEFAULT_RHI_command_list_t;
+
+namespace MemberLists { enum class RHI_command_list_t {
+	is_initialized,
+	RHI_context,
+	transient_arena,
+	command_arena,
+	commands,
+	command_count,
+	draw_instance_command_count,
+	bind_shader_command_count,
+	bind_render_target_command_count,
+	bind_material_command_count,
+	active_render_state,
+	active_vertex_buffers,
+	vertex_buffer_count,
+	active_index_buffer,
+	active_scissor_command,
+	active_viewport_command,
+	active_shader_program,
+	active_renderpass,
+	presenting,
+	image_shader_params,
+	image_count,
+	image_ids_to_bind,
+	bound_image_count,
+	command_list_type,
+	backend_command_buffer,
+}; }
+
+struct type_info_RHI_command_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *header;
+			const type_info_member_t *data;
+		}members;
+	};
+};
+extern const type_info_RHI_command_t DEFAULT_RHI_command_t;
+
+namespace MemberLists { enum class RHI_command_t {
+	header,
+	data,
+}; }
+
+struct type_info_RHI_command_header_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *command_type;
+			const type_info_member_t *line_number;
+			const type_info_member_t *filename;
+		}members;
+	};
+};
+extern const type_info_RHI_command_header_t DEFAULT_RHI_command_header_t;
+
+namespace MemberLists { enum class RHI_command_header_t {
+	command_type,
+	line_number,
+	filename,
+}; }
+
+struct type_info_RHI_command_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[26];
+        struct {
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_INVALID;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_END_RENDERPASS;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BIND_SHADER;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_SET_SCISSOR;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_DRAW;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME;
+			const type_info_member_t *RHI_RENDER_COMMAND_TYPE_COUNT;
+		}members;
+	};
+};
+extern const type_info_RHI_command_type_t DEFAULT_RHI_command_type_t;
+
+struct type_info_const_char { const type_info_t info; };
+extern const type_info_const_char DEFAULT_const_char;
+
+struct type_info_RHI_index_buffer_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *buffer_data;
+			const type_info_member_t *index_data;
+			const type_info_member_t *max_indices;
+			const type_info_member_t *index_count;
+			const type_info_member_t *index_offset;
+			const type_info_member_t *instance_offset;
+		}members;
+	};
+};
+extern const type_info_RHI_index_buffer_t DEFAULT_RHI_index_buffer_t;
+
+namespace MemberLists { enum class RHI_index_buffer_t {
+	buffer_data,
+	index_data,
+	max_indices,
+	index_count,
+	index_offset,
+	instance_offset,
+}; }
+
+struct type_info_RHI_render_buffer_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[10];
+        struct {
+			const type_info_member_t *type;
+			const type_info_member_t *allocation_type;
+			const type_info_member_t *constant_buffer_hash_ID;
+			const type_info_member_t *buffer_ID;
+			const type_info_member_t *buffer_capacity;
+			const type_info_member_t *buffer_element_size;
+			const type_info_member_t *buffer_elements_used;
+			const type_info_member_t *working_offset;
+			const type_info_member_t *mapped_data;
+			const type_info_member_t *buffer_info;
+		}members;
+	};
+};
+extern const type_info_RHI_render_buffer_t DEFAULT_RHI_render_buffer_t;
+
+namespace MemberLists { enum class RHI_render_buffer_t {
+	type,
+	allocation_type,
+	constant_buffer_hash_ID,
+	buffer_ID,
+	buffer_capacity,
+	buffer_element_size,
+	buffer_elements_used,
+	working_offset,
+	mapped_data,
+	buffer_info,
+}; }
+
+struct type_info_RHI_render_buffer_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *RHI_RENDER_BUFFER_TYPE_INVALID;
+			const type_info_member_t *RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER;
+			const type_info_member_t *RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER;
+		}members;
+	};
+};
+extern const type_info_RHI_render_buffer_type_t DEFAULT_RHI_render_buffer_type_t;
+
+struct type_info_RHI_render_buffer_memory_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED;
+			const type_info_member_t *RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY;
+		}members;
+	};
+};
+extern const type_info_RHI_render_buffer_memory_type_t DEFAULT_RHI_render_buffer_memory_type_t;
+
+struct type_info_backend_buffer_t { const type_info_t info; };
+extern const type_info_backend_buffer_t DEFAULT_backend_buffer_t;
+
+struct type_info_RHI_renderpass_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[14];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *renderpass_key;
+			const type_info_member_t *create_info;
+			const type_info_member_t *renderpass_handle;
+			const type_info_member_t *framebuffer_handle;
+			const type_info_member_t *depth_stencil_attachment;
+			const type_info_member_t *color_attachments;
+			const type_info_member_t *color_attachment_count;
+			const type_info_member_t *total_attachment_count;
+			const type_info_member_t *render_width;
+			const type_info_member_t *render_height;
+			const type_info_member_t *attachment_clear_values;
+			const type_info_member_t *has_depth_stencil_attachment;
+			const type_info_member_t *resize_with_window;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_t DEFAULT_RHI_renderpass_t;
+
+namespace MemberLists { enum class RHI_renderpass_t {
+	ID,
+	renderpass_key,
+	create_info,
+	renderpass_handle,
+	framebuffer_handle,
+	depth_stencil_attachment,
+	color_attachments,
+	color_attachment_count,
+	total_attachment_count,
+	render_width,
+	render_height,
+	attachment_clear_values,
+	has_depth_stencil_attachment,
+	resize_with_window,
+}; }
+
+struct type_info_RHI_renderpass_key_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[1];
+        struct {
+			const type_info_member_t *attachment_formats;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_key_t DEFAULT_RHI_renderpass_key_t;
+
+namespace MemberLists { enum class RHI_renderpass_key_t {
+	attachment_formats,
+}; }
+
+struct type_info_bitmap_format_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[13];
+        struct {
+			const type_info_member_t *BMF_Invalid;
+			const type_info_member_t *BMF_R8;
+			const type_info_member_t *BMF_B8;
+			const type_info_member_t *BMF_G8;
+			const type_info_member_t *BMF_RGBA32_SRGB;
+			const type_info_member_t *BMF_RGBA32_UNORM;
+			const type_info_member_t *BMF_BGRA32_UNORM;
+			const type_info_member_t *BMF_RGB24_UNORM;
+			const type_info_member_t *BMF_RGB24_SRGB;
+			const type_info_member_t *BMF_D24_SFLOAT_S8;
+			const type_info_member_t *BMF_D32_SFLOAT_S8_UINT;
+			const type_info_member_t *BMF_D32_SFLOAT;
+			const type_info_member_t *BMF_Count;
+		}members;
+	};
+};
+extern const type_info_bitmap_format_t DEFAULT_bitmap_format_t;
+
+struct type_info_RHI_renderpass_desc_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[6];
+        struct {
+			const type_info_member_t *render_width;
+			const type_info_member_t *render_height;
+			const type_info_member_t *color_attachment_count;
+			const type_info_member_t *resize_with_window;
+			const type_info_member_t *color_attachments;
+			const type_info_member_t *depth_stencil_attachment;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_desc_t DEFAULT_RHI_renderpass_desc_t;
+
+namespace MemberLists { enum class RHI_renderpass_desc_t {
+	render_width,
+	render_height,
+	color_attachment_count,
+	resize_with_window,
+	color_attachments,
+	depth_stencil_attachment,
+}; }
+
+struct type_info_RHI_renderpass_attachment_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[5];
+        struct {
+			const type_info_member_t *access;
+			const type_info_member_t *load_operation;
+			const type_info_member_t *store_operation;
+			const type_info_member_t *image;
+			const type_info_member_t *clear_value;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_attachment_t DEFAULT_RHI_renderpass_attachment_t;
+
+namespace MemberLists { enum class RHI_renderpass_attachment_t {
+	access,
+	load_operation,
+	store_operation,
+	image,
+	clear_value,
+}; }
+
+struct type_info_RHI_renderpass_attachment_access_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[4];
+        struct {
+			const type_info_member_t *RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_ACCESS_READ;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_attachment_access_t DEFAULT_RHI_renderpass_attachment_access_t;
+
+struct type_info_RHI_renderpass_attachment_load_operation_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_attachment_load_operation_t DEFAULT_RHI_renderpass_attachment_load_operation_t;
+
+struct type_info_RHI_renderpass_attachment_store_operation_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE;
+			const type_info_member_t *RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE;
+		}members;
+	};
+};
+extern const type_info_RHI_renderpass_attachment_store_operation_t DEFAULT_RHI_renderpass_attachment_store_operation_t;
+
+struct type_info_RHI_clear_value_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[5];
+        struct {
+			const type_info_member_t *float_color;
+			const type_info_member_t *int_color;
+			const type_info_member_t *uint_color;
+			const type_info_member_t *depth;
+			const type_info_member_t *stencil;
+		}members;
+	};
+};
+extern const type_info_RHI_clear_value_t DEFAULT_RHI_clear_value_t;
+
+namespace MemberLists { enum class RHI_clear_value_t {
+	float_color,
+	int_color,
+	uint_color,
+	depth,
+	stencil,
+}; }
+
+struct type_info_float4 {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+};
+extern const type_info_float4 DEFAULT_float4;
+
+struct type_info_ivec4_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+};
+extern const type_info_ivec4_t DEFAULT_ivec4_t;
+
+struct type_info_backend_renderpass_handle_t { const type_info_t info; };
+extern const type_info_backend_renderpass_handle_t DEFAULT_backend_renderpass_handle_t;
+
+struct type_info_backend_framebuffer_handle_t { const type_info_t info; };
+extern const type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_handle_t;
+
+struct type_info_RHI_command_list_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS;
+			const type_info_member_t *RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE;
+		}members;
+	};
+};
+extern const type_info_RHI_command_list_type_t DEFAULT_RHI_command_list_type_t;
+
+struct type_info_backend_command_buffer_t { const type_info_t info; };
+extern const type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t;
+
+struct type_info_RHI_command_present_frame_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[1];
+        struct {
+			const type_info_member_t *presentation_source;
+		}members;
+	};
+};
+extern const type_info_RHI_command_present_frame_t DEFAULT_RHI_command_present_frame_t;
+
+namespace MemberLists { enum class RHI_command_present_frame_t {
+	presentation_source,
+}; }
+
+struct type_info_RHI_shader_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[2];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *shader_data;
+		}members;
+	};
+};
+extern const type_info_RHI_shader_t DEFAULT_RHI_shader_t;
+
+namespace MemberLists { enum class RHI_shader_t {
+	ID,
+	shader_data,
+}; }
+
+struct type_info_backend_shader_t { const type_info_t info; };
+extern const type_info_backend_shader_t DEFAULT_backend_shader_t;
+
+struct type_info_material_data_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *material_type;
+			const type_info_member_t *archetype;
+			const type_info_member_t *instance;
+		}members;
+	};
+};
+extern const type_info_material_data_t DEFAULT_material_data_t;
+
+namespace MemberLists { enum class material_data_t {
+	material_type,
+	archetype,
+	instance,
+}; }
+
+struct type_info_stored_material_type_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[3];
+        struct {
+			const type_info_member_t *SMT_Invalid;
+			const type_info_member_t *SMT_Instance;
+			const type_info_member_t *SMT_Archetype;
+		}members;
+	};
+};
+extern const type_info_stored_material_type_t DEFAULT_stored_material_type_t;
+
+struct type_info_material_instance_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[7];
+        struct {
+			const type_info_member_t *ID;
+			const type_info_member_t *version;
+			const type_info_member_t *name;
+			const type_info_member_t *renderer_effect_flags;
+			const type_info_member_t *shader_uniform_count;
+			const type_info_member_t *pipeline_state;
+			const type_info_member_t *archetype;
+		}members;
+	};
+};
+extern const type_info_material_instance_t DEFAULT_material_instance_t;
+
+namespace MemberLists { enum class material_instance_t {
+	ID,
+	version,
+	name,
+	renderer_effect_flags,
+	shader_uniform_count,
+	pipeline_state,
+	archetype,
+}; }
+
+constexpr type_info_bool32 DEFAULT_bool32 = { .info = { .name = "bool32", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_blend_enabled = {
+	.info = { .name = "blend_enabled", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 1 },
+};
+
+constexpr type_info_u32 DEFAULT_u32 = { .info = { .name = "u32", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode = {
+	.info = { .name = "src_color_blend_mode", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+	.value_type = 3,
+	.value = { .uint64_value = 6 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_dst_color_blend_mode = {
+	.info = { .name = "dst_color_blend_mode", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+	.value_type = 3,
+	.value = { .uint64_value = 7 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_alpha_blend_mode = {
+	.info = { .name = "src_alpha_blend_mode", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 12,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_dst_alpha_blend_mode = {
+	.info = { .name = "dst_alpha_blend_mode", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 16,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_color_blend_op = {
+	.info = { .name = "color_blend_op", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 20,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_alpha_blend_op = {
+	.info = { .name = "alpha_blend_op", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 24,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_testing_enabled = {
+	.info = { .name = "depth_testing_enabled", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 28,
+	.value_type = 2,
+	.value = { .int64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_writing_enabled = {
+	.info = { .name = "depth_writing_enabled", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 32,
+	.value_type = 2,
+	.value = { .int64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_func = {
+	.info = { .name = "depth_func", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 36,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_enabled = {
+	.info = { .name = "stencil_enabled", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 40,
+	.value_type = 2,
+	.value = { .int64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_state = {
+	.info = { .name = "stencil_state", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 44,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_keep = {
+	.info = { .name = "stencil_keep", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 48,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_polygon_mode = {
+	.info = { .name = "polygon_mode", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 52,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_primitive_type = {
+	.info = { .name = "primitive_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 56,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {
+	.info = { .name = "RHI_pipeline_state_t", .size = 60, .metatype = 1 },
+	.member_count = 15,
+	.member_pointer = DEFAULT_RHI_pipeline_state_t.member_array,
+	.members = {
+		.blend_enabled = &DEFAULT_member_RHI_pipeline_state_t_blend_enabled,
+		.src_color_blend_mode = &DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode,
+		.dst_color_blend_mode = &DEFAULT_member_RHI_pipeline_state_t_dst_color_blend_mode,
+		.src_alpha_blend_mode = &DEFAULT_member_RHI_pipeline_state_t_src_alpha_blend_mode,
+		.dst_alpha_blend_mode = &DEFAULT_member_RHI_pipeline_state_t_dst_alpha_blend_mode,
+		.color_blend_op = &DEFAULT_member_RHI_pipeline_state_t_color_blend_op,
+		.alpha_blend_op = &DEFAULT_member_RHI_pipeline_state_t_alpha_blend_op,
+		.depth_testing_enabled = &DEFAULT_member_RHI_pipeline_state_t_depth_testing_enabled,
+		.depth_writing_enabled = &DEFAULT_member_RHI_pipeline_state_t_depth_writing_enabled,
+		.depth_func = &DEFAULT_member_RHI_pipeline_state_t_depth_func,
+		.stencil_enabled = &DEFAULT_member_RHI_pipeline_state_t_stencil_enabled,
+		.stencil_state = &DEFAULT_member_RHI_pipeline_state_t_stencil_state,
+		.stencil_keep = &DEFAULT_member_RHI_pipeline_state_t_stencil_keep,
+		.polygon_mode = &DEFAULT_member_RHI_pipeline_state_t_polygon_mode,
+		.primitive_type = &DEFAULT_member_RHI_pipeline_state_t_primitive_type,
+	},
+};
+
+constexpr type_info_u64 DEFAULT_u64 = { .info = { .name = "u64", .size = 8, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_material_archetype_t_ID = {
+	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_archetype_t_version = {
+	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_byte DEFAULT_byte = { .info = { .name = "byte", .size = 1, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_string_t_data = {
+	.info = { .name = "data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_byte.info,
+	.offset = 0,
+};
+
+constexpr type_info_s64 DEFAULT_s64 = { .info = { .name = "s64", .size = 8, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_string_t_count = {
+	.info = { .name = "count", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_s64.info,
+	.offset = 8,
+};
+
+constexpr type_info_string_t DEFAULT_string_t = {
+	.info = { .name = "string_t", .size = 16, .metatype = 1 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_string_t.member_array,
+	.members = {
+		.data = &DEFAULT_member_string_t_data,
+		.count = &DEFAULT_member_string_t_count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_material_archetype_t_name = {
+	.info = { .name = "name", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_archetype_t_shader_binary_name = {
+	.info = { .name = "shader_binary_name", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 32,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_handle_t_is_valid = {
+	.info = { .name = "is_valid", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_ID = {
+	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Invalid = {
+	.info = { .name = "ASLS_Invalid", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Unloaded = {
+	.info = { .name = "ASLS_Unloaded", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_LoadQueued = {
+	.info = { .name = "ASLS_LoadQueued", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Loaded = {
+	.info = { .name = "ASLS_Loaded", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldUnload = {
+	.info = { .name = "ASLS_ShouldUnload", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldReload = {
+	.info = { .name = "ASLS_ShouldReload", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 5 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Count = {
+	.info = { .name = "ASLS_Count", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 6 },
+};
+
+constexpr type_info_asset_slot_load_status_t DEFAULT_asset_slot_load_status_t = {
+	.info = { .name = "asset_slot_load_status_t", .size = 0, .metatype = 2 },
+	.member_count = 7,
+	.member_pointer = DEFAULT_asset_slot_load_status_t.member_array,
+	.members = {
+		.ASLS_Invalid = &DEFAULT_member_asset_slot_load_status_t_ASLS_Invalid,
+		.ASLS_Unloaded = &DEFAULT_member_asset_slot_load_status_t_ASLS_Unloaded,
+		.ASLS_LoadQueued = &DEFAULT_member_asset_slot_load_status_t_ASLS_LoadQueued,
+		.ASLS_Loaded = &DEFAULT_member_asset_slot_load_status_t_ASLS_Loaded,
+		.ASLS_ShouldUnload = &DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldUnload,
+		.ASLS_ShouldReload = &DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldReload,
+		.ASLS_Count = &DEFAULT_member_asset_slot_load_status_t_ASLS_Count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_slot_state = {
+	.info = { .name = "slot_state", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Invalid = {
+	.info = { .name = "AT_Invalid", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Bitmap = {
+	.info = { .name = "AT_Bitmap", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Shader = {
+	.info = { .name = "AT_Shader", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Material = {
+	.info = { .name = "AT_Material", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Font = {
+	.info = { .name = "AT_Font", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Sound = {
+	.info = { .name = "AT_Sound", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 5 },
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Count = {
+	.info = { .name = "AT_Count", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 6 },
+};
+
+constexpr type_info_asset_type_t DEFAULT_asset_type_t = {
+	.info = { .name = "asset_type_t", .size = 0, .metatype = 2 },
+	.member_count = 7,
+	.member_pointer = DEFAULT_asset_type_t.member_array,
+	.members = {
+		.AT_Invalid = &DEFAULT_member_asset_type_t_AT_Invalid,
+		.AT_Bitmap = &DEFAULT_member_asset_type_t_AT_Bitmap,
+		.AT_Shader = &DEFAULT_member_asset_type_t_AT_Shader,
+		.AT_Material = &DEFAULT_member_asset_type_t_AT_Material,
+		.AT_Font = &DEFAULT_member_asset_type_t_AT_Font,
+		.AT_Sound = &DEFAULT_member_asset_type_t_AT_Sound,
+		.AT_Count = &DEFAULT_member_asset_type_t_AT_Count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_type = {
+	.info = { .name = "type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_is_valid_for_handles = {
+	.info = { .name = "is_valid_for_handles", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_name = {
+	.info = { .name = "name", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 24,
+};
+
+constexpr type_info_sys_handle_t DEFAULT_sys_handle_t = { .info = { .name = "sys_handle_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_file_t_handle = {
+	.info = { .name = "handle", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_sys_handle_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_file_t_file_name = {
+	.info = { .name = "file_name", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_file_t_filepath = {
+	.info = { .name = "filepath", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_file_t_file_size = {
+	.info = { .name = "file_size", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 40,
+};
+
+constexpr type_info_member_t DEFAULT_member_file_t_current_read_offset = {
+	.info = { .name = "current_read_offset", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 48,
+};
+
+constexpr type_info_member_t DEFAULT_member_file_t_current_write_offset = {
+	.info = { .name = "current_write_offset", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 56,
+};
+
+constexpr type_info_bool8 DEFAULT_bool8 = { .info = { .name = "bool8", .size = 1, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_file_t_overlapping = {
+	.info = { .name = "overlapping", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 64,
+};
+
+constexpr type_info_member_t DEFAULT_member_file_t_for_writing = {
+	.info = { .name = "for_writing", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 65,
+};
+
+constexpr type_info_file_t DEFAULT_file_t = {
+	.info = { .name = "file_t", .size = 72, .metatype = 1 },
+	.member_count = 8,
+	.member_pointer = DEFAULT_file_t.member_array,
+	.members = {
+		.handle = &DEFAULT_member_file_t_handle,
+		.file_name = &DEFAULT_member_file_t_file_name,
+		.filepath = &DEFAULT_member_file_t_filepath,
+		.file_size = &DEFAULT_member_file_t_file_size,
+		.current_read_offset = &DEFAULT_member_file_t_current_read_offset,
+		.current_write_offset = &DEFAULT_member_file_t_current_write_offset,
+		.overlapping = &DEFAULT_member_file_t_overlapping,
+		.for_writing = &DEFAULT_member_file_t_for_writing,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file = {
+	.info = { .name = "owner_asset_file", .size = 72, .metatype = 0 },
+	.type_info = &DEFAULT_file_t.info,
+	.offset = 40,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_magic_value = {
+	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_total_entry_size = {
+	.info = { .name = "total_entry_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_asset_type = {
+	.info = { .name = "asset_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_filename_size = {
+	.info = { .name = "filename_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_fullpath_size = {
+	.info = { .name = "fullpath_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_entry_data_size = {
+	.info = { .name = "entry_data_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 20,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_modtime = {
+	.info = { .name = "modtime", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 24,
+};
+
+constexpr type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t = {
+	.info = { .name = "jfd_package_chunk_header_t", .size = 32, .metatype = 1 },
+	.member_count = 7,
+	.member_pointer = DEFAULT_jfd_package_chunk_header_t.member_array,
+	.members = {
+		.magic_value = &DEFAULT_member_jfd_package_chunk_header_t_magic_value,
+		.total_entry_size = &DEFAULT_member_jfd_package_chunk_header_t_total_entry_size,
+		.asset_type = &DEFAULT_member_jfd_package_chunk_header_t_asset_type,
+		.filename_size = &DEFAULT_member_jfd_package_chunk_header_t_filename_size,
+		.fullpath_size = &DEFAULT_member_jfd_package_chunk_header_t_fullpath_size,
+		.entry_data_size = &DEFAULT_member_jfd_package_chunk_header_t_entry_data_size,
+		.modtime = &DEFAULT_member_jfd_package_chunk_header_t_modtime,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_entry_header = {
+	.info = { .name = "entry_header", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_jfd_package_chunk_header_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_data_offset = {
+	.info = { .name = "data_offset", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_modtime = {
+	.info = { .name = "modtime", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_filename = {
+	.info = { .name = "filename", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_fullpath = {
+	.info = { .name = "fullpath", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 40,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_asset_data = {
+	.info = { .name = "asset_data", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 56,
+};
+
+constexpr type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t = {
+	.info = { .name = "jfd_package_entry_t", .size = 72, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_jfd_package_entry_t.member_array,
+	.members = {
+		.entry_header = &DEFAULT_member_jfd_package_entry_t_entry_header,
+		.data_offset = &DEFAULT_member_jfd_package_entry_t_data_offset,
+		.modtime = &DEFAULT_member_jfd_package_entry_t_modtime,
+		.filename = &DEFAULT_member_jfd_package_entry_t_filename,
+		.fullpath = &DEFAULT_member_jfd_package_entry_t_fullpath,
+		.asset_data = &DEFAULT_member_jfd_package_entry_t_asset_data,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_package_entry = {
+	.info = { .name = "package_entry", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_jfd_package_entry_t.info,
+	.offset = 112,
+};
+
+constexpr type_info_float32 DEFAULT_float32 = { .info = { .name = "float32", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_float2_elements = {
+	.info = { .name = "elements", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_float2_x = {
+	.info = { .name = "x", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_float32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_float2_y = {
+	.info = { .name = "y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_float32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_float2_xy = {
+	.info = { .name = "xy", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float32.info,
+	.offset = 0,
+};
+
+constexpr type_info_float2 DEFAULT_float2 = {
+	.info = { .name = "float2", .size = 8, .metatype = 1 },
+	.member_count = 4,
+	.member_pointer = DEFAULT_float2.member_array,
+	.members = {
+		.elements = &DEFAULT_member_float2_elements,
+		.x = &DEFAULT_member_float2_x,
+		.y = &DEFAULT_member_float2_y,
+		.xy = &DEFAULT_member_float2_xy,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_uv_min = {
+	.info = { .name = "uv_min", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_uv_max = {
+	.info = { .name = "uv_max", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_offset = {
+	.info = { .name = "offset", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_size = {
+	.info = { .name = "size", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_atlased_generation = {
+	.info = { .name = "atlased_generation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 32,
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_atlas_subtexture_index = {
+	.info = { .name = "atlas_subtexture_index", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 36,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture2D_t_ID = {
+	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_t_width = {
+	.info = { .name = "width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_t_height = {
+	.info = { .name = "height", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_t_channels = {
+	.info = { .name = "channels", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_t_format = {
+	.info = { .name = "format", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_t_pixels = {
+	.info = { .name = "pixels", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 16,
+};
+
+constexpr type_info_bitmap_t DEFAULT_bitmap_t = {
+	.info = { .name = "bitmap_t", .size = 32, .metatype = 1 },
+	.member_count = 5,
+	.member_pointer = DEFAULT_bitmap_t.member_array,
+	.members = {
+		.width = &DEFAULT_member_bitmap_t_width,
+		.height = &DEFAULT_member_bitmap_t_height,
+		.channels = &DEFAULT_member_bitmap_t_channels,
+		.format = &DEFAULT_member_bitmap_t_format,
+		.pixels = &DEFAULT_member_bitmap_t_pixels,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_texture2D_t_bitmap = {
+	.info = { .name = "bitmap", .size = 32, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_t_ID = {
+	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_data = {
+	.info = { .name = "data", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_width = {
+	.info = { .name = "width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_height = {
+	.info = { .name = "height", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 20,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_format = {
+	.info = { .name = "format", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_INVALID = {
+	.info = { .name = "RHI_IMAGE_USAGE_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = {
+	.info = { .name = "RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT = {
+	.info = { .name = "RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE = {
+	.info = { .name = "RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 8 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_SOURCE = {
+	.info = { .name = "RHI_IMAGE_USAGE_BLIT_SOURCE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 16 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_DESTINATION = {
+	.info = { .name = "RHI_IMAGE_USAGE_BLIT_DESTINATION", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 32 },
+};
+
+constexpr type_info_RHI_image_usage_t DEFAULT_RHI_image_usage_t = {
+	.info = { .name = "RHI_image_usage_t", .size = 0, .metatype = 2 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_RHI_image_usage_t.member_array,
+	.members = {
+		.RHI_IMAGE_USAGE_INVALID = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_INVALID,
+		.RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT,
+		.RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT,
+		.RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
+		.RHI_IMAGE_USAGE_BLIT_SOURCE = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_SOURCE,
+		.RHI_IMAGE_USAGE_BLIT_DESTINATION = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_DESTINATION,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_usage = {
+	.info = { .name = "usage", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_usage_t.info,
+	.offset = 28,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_INVALID = {
+	.info = { .name = "RHI_IMAGE_FILTER_TYPE_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_NEAREST = {
+	.info = { .name = "RHI_IMAGE_FILTER_TYPE_NEAREST", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_LINEAR = {
+	.info = { .name = "RHI_IMAGE_FILTER_TYPE_LINEAR", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_RHI_image_filter_type_t DEFAULT_RHI_image_filter_type_t = {
+	.info = { .name = "RHI_image_filter_type_t", .size = 0, .metatype = 2 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_RHI_image_filter_type_t.member_array,
+	.members = {
+		.RHI_IMAGE_FILTER_TYPE_INVALID = &DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_INVALID,
+		.RHI_IMAGE_FILTER_TYPE_NEAREST = &DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_NEAREST,
+		.RHI_IMAGE_FILTER_TYPE_LINEAR = &DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_LINEAR,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_filtering = {
+	.info = { .name = "filtering", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_anisotropy_enabled = {
+	.info = { .name = "anisotropy_enabled", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_max_anisotropy = {
+	.info = { .name = "max_anisotropy", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_INVALID = {
+	.info = { .name = "RHI_IMAGE_WRAPPING_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE = {
+	.info = { .name = "RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER = {
+	.info = { .name = "RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_REPEAT = {
+	.info = { .name = "RHI_IMAGE_WRAPPING_REPEAT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_RHI_image_wrapping_type_t DEFAULT_RHI_image_wrapping_type_t = {
+	.info = { .name = "RHI_image_wrapping_type_t", .size = 0, .metatype = 2 },
+	.member_count = 4,
+	.member_pointer = DEFAULT_RHI_image_wrapping_type_t.member_array,
+	.members = {
+		.RHI_IMAGE_WRAPPING_INVALID = &DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_INVALID,
+		.RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE = &DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
+		.RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER = &DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER,
+		.RHI_IMAGE_WRAPPING_REPEAT = &DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_REPEAT,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_wrapu = {
+	.info = { .name = "wrapu", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_wrapv = {
+	.info = { .name = "wrapv", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_compare_operation = {
+	.info = { .name = "compare_operation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 20,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_compare_ops_enabled = {
+	.info = { .name = "compare_ops_enabled", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_use_normalized_coordinates = {
+	.info = { .name = "use_normalized_coordinates", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 28,
+};
+
+constexpr type_info_RHI_sampler_create_info_t DEFAULT_RHI_sampler_create_info_t = {
+	.info = { .name = "RHI_sampler_create_info_t", .size = 32, .metatype = 1 },
+	.member_count = 8,
+	.member_pointer = DEFAULT_RHI_sampler_create_info_t.member_array,
+	.members = {
+		.filtering = &DEFAULT_member_RHI_sampler_create_info_t_filtering,
+		.anisotropy_enabled = &DEFAULT_member_RHI_sampler_create_info_t_anisotropy_enabled,
+		.max_anisotropy = &DEFAULT_member_RHI_sampler_create_info_t_max_anisotropy,
+		.wrapu = &DEFAULT_member_RHI_sampler_create_info_t_wrapu,
+		.wrapv = &DEFAULT_member_RHI_sampler_create_info_t_wrapv,
+		.compare_operation = &DEFAULT_member_RHI_sampler_create_info_t_compare_operation,
+		.compare_ops_enabled = &DEFAULT_member_RHI_sampler_create_info_t_compare_ops_enabled,
+		.use_normalized_coordinates = &DEFAULT_member_RHI_sampler_create_info_t_use_normalized_coordinates,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_sampler_info = {
+	.info = { .name = "sampler_info", .size = 32, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_sampler_create_info_t.info,
+	.offset = 32,
+};
+
+constexpr type_info_RHI_image_create_info_t DEFAULT_RHI_image_create_info_t = {
+	.info = { .name = "RHI_image_create_info_t", .size = 64, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_RHI_image_create_info_t.member_array,
+	.members = {
+		.data = &DEFAULT_member_RHI_image_create_info_t_data,
+		.width = &DEFAULT_member_RHI_image_create_info_t_width,
+		.height = &DEFAULT_member_RHI_image_create_info_t_height,
+		.format = &DEFAULT_member_RHI_image_create_info_t_format,
+		.usage = &DEFAULT_member_RHI_image_create_info_t_usage,
+		.sampler_info = &DEFAULT_member_RHI_image_create_info_t_sampler_info,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_t_create_info = {
+	.info = { .name = "create_info", .size = 64, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_create_info_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_backend_image_t_is_valid = {
+	.info = { .name = "is_valid", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 0,
+};
+
+constexpr type_info_void DEFAULT_void = { .info = { .name = "void", .size = 0, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_backend_image_t_handle = {
+	.info = { .name = "handle", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_void.info,
+	.offset = 8,
+};
+
+constexpr type_info_backend_image_t DEFAULT_backend_image_t = {
+	.info = { .name = "backend_image_t", .size = 16, .metatype = 1 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_backend_image_t.member_array,
+	.members = {
+		.is_valid = &DEFAULT_member_backend_image_t_is_valid,
+		.handle = &DEFAULT_member_backend_image_t_handle,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_image_t_backend_image = {
+	.info = { .name = "backend_image", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_backend_image_t.info,
+	.offset = 72,
+};
+
+constexpr type_info_RHI_image_t DEFAULT_RHI_image_t = {
+	.info = { .name = "RHI_image_t", .size = 88, .metatype = 1 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_RHI_image_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_RHI_image_t_ID,
+		.create_info = &DEFAULT_member_RHI_image_t_create_info,
+		.backend_image = &DEFAULT_member_RHI_image_t_backend_image,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_texture2D_t_gpu_data = {
+	.info = { .name = "gpu_data", .size = 88, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_t.info,
+	.offset = 40,
+};
+
+constexpr type_info_texture2D_t DEFAULT_texture2D_t = {
+	.info = { .name = "texture2D_t", .size = 128, .metatype = 1 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_texture2D_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_texture2D_t_ID,
+		.bitmap = &DEFAULT_member_texture2D_t_bitmap,
+		.gpu_data = &DEFAULT_member_texture2D_t_gpu_data,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_texture = {
+	.info = { .name = "texture", .size = 128, .metatype = 0 },
+	.type_info = &DEFAULT_texture2D_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_bitmap_data = {
+	.info = { .name = "bitmap_data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_ID = {
+	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_s32 DEFAULT_s32 = { .info = { .name = "s32", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_merge_counter = {
+	.info = { .name = "merge_counter", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_textures_to_merge = {
+	.info = { .name = "textures_to_merge", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_packed_subtextures = {
+	.info = { .name = "packed_subtextures", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_packed_subtexture_count = {
+	.info = { .name = "packed_subtexture_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_is_valid = {
+	.info = { .name = "is_valid", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_cursor_x = {
+	.info = { .name = "atlas_cursor_x", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_cursor_y = {
+	.info = { .name = "atlas_cursor_y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_tallest_y = {
+	.info = { .name = "tallest_y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_size = {
+	.info = { .name = "atlas_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_texture_atlas_t DEFAULT_texture_atlas_t = {
+	.info = { .name = "texture_atlas_t", .size = 1, .metatype = 1 },
+	.member_count = 12,
+	.member_pointer = DEFAULT_texture_atlas_t.member_array,
+	.members = {
+		.texture = &DEFAULT_member_texture_atlas_t_texture,
+		.bitmap_data = &DEFAULT_member_texture_atlas_t_bitmap_data,
+		.ID = &DEFAULT_member_texture_atlas_t_ID,
+		.merge_counter = &DEFAULT_member_texture_atlas_t_merge_counter,
+		.textures_to_merge = &DEFAULT_member_texture_atlas_t_textures_to_merge,
+		.packed_subtextures = &DEFAULT_member_texture_atlas_t_packed_subtextures,
+		.packed_subtexture_count = &DEFAULT_member_texture_atlas_t_packed_subtexture_count,
+		.is_valid = &DEFAULT_member_texture_atlas_t_is_valid,
+		.atlas_cursor_x = &DEFAULT_member_texture_atlas_t_atlas_cursor_x,
+		.atlas_cursor_y = &DEFAULT_member_texture_atlas_t_atlas_cursor_y,
+		.tallest_y = &DEFAULT_member_texture_atlas_t_tallest_y,
+		.atlas_size = &DEFAULT_member_texture_atlas_t_atlas_size,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_atlas = {
+	.info = { .name = "atlas", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_texture_atlas_t.info,
+	.offset = 40,
+};
+
+constexpr type_info_member_t DEFAULT_member_subtexture_data_t_packed_asset = {
+	.info = { .name = "packed_asset", .size = 24, .metatype = 0 },
+	.type_info = &DEFAULT_asset_handle_t.info,
+	.offset = 48,
+};
+
+constexpr type_info_subtexture_data_t DEFAULT_subtexture_data_t = {
+	.info = { .name = "subtexture_data_t", .size = 72, .metatype = 1 },
+	.member_count = 8,
+	.member_pointer = DEFAULT_subtexture_data_t.member_array,
+	.members = {
+		.uv_min = &DEFAULT_member_subtexture_data_t_uv_min,
+		.uv_max = &DEFAULT_member_subtexture_data_t_uv_max,
+		.offset = &DEFAULT_member_subtexture_data_t_offset,
+		.size = &DEFAULT_member_subtexture_data_t_size,
+		.atlased_generation = &DEFAULT_member_subtexture_data_t_atlased_generation,
+		.atlas_subtexture_index = &DEFAULT_member_subtexture_data_t_atlas_subtexture_index,
+		.atlas = &DEFAULT_member_subtexture_data_t_atlas,
+		.packed_asset = &DEFAULT_member_subtexture_data_t_packed_asset,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_subtexture_data = {
+	.info = { .name = "subtexture_data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_subtexture_data_t.info,
+	.offset = 120,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_is_initialized = {
+	.info = { .name = "is_initialized", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_memory_arena_t_is_initialized = {
+	.info = { .name = "is_initialized", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_memory_arena_t_base = {
+	.info = { .name = "base", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_byte.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_memory_arena_t_used = {
+	.info = { .name = "used", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_memory_arena_t_block_size = {
+	.info = { .name = "block_size", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_memory_arena_t_block_counter = {
+	.info = { .name = "block_counter", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 32,
+};
+
+constexpr type_info_member_t DEFAULT_member_memory_arena_t_scratch_arena_count = {
+	.info = { .name = "scratch_arena_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 36,
+};
+
+constexpr type_info_memory_arena_t DEFAULT_memory_arena_t = {
+	.info = { .name = "memory_arena_t", .size = 40, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_memory_arena_t.member_array,
+	.members = {
+		.is_initialized = &DEFAULT_member_memory_arena_t_is_initialized,
+		.base = &DEFAULT_member_memory_arena_t_base,
+		.used = &DEFAULT_member_memory_arena_t_used,
+		.block_size = &DEFAULT_member_memory_arena_t_block_size,
+		.block_counter = &DEFAULT_member_memory_arena_t_block_counter,
+		.scratch_arena_count = &DEFAULT_member_memory_arena_t_scratch_arena_count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_manager_arena = {
+	.info = { .name = "manager_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_int DEFAULT_int = { .info = { .name = "int", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_freetype_handle = {
+	.info = { .name = "freetype_handle", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_int.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_is_initialized = {
+	.info = { .name = "is_initialized", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_ID = {
+	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_volatile_u32 DEFAULT_volatile_u32 = { .info = { .name = "volatile_u32", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_current_package_generation = {
+	.info = { .name = "current_package_generation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_volatile_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_init_arena = {
+	.info = { .name = "init_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_load_status = {
+	.info = { .name = "load_status", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_load_status_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_file_info = {
+	.info = { .name = "file_info", .size = 72, .metatype = 0 },
+	.type_info = &DEFAULT_file_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_raw_file_data = {
+	.info = { .name = "raw_file_data", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_magic_value = {
+	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_version = {
+	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_flags = {
+	.info = { .name = "flags", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_entry_count = {
+	.info = { .name = "entry_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 12,
+};
+
+constexpr type_info_jfd_file_header_t DEFAULT_jfd_file_header_t = {
+	.info = { .name = "jfd_file_header_t", .size = 16, .metatype = 1 },
+	.member_count = 4,
+	.member_pointer = DEFAULT_jfd_file_header_t.member_array,
+	.members = {
+		.magic_value = &DEFAULT_member_jfd_file_header_t_magic_value,
+		.version = &DEFAULT_member_jfd_file_header_t_version,
+		.flags = &DEFAULT_member_jfd_file_header_t_flags,
+		.entry_count = &DEFAULT_member_jfd_file_header_t_entry_count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_header = {
+	.info = { .name = "header", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_jfd_file_header_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_package_entries = {
+	.info = { .name = "package_entries", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_jfd_package_entry_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_package_entry_count = {
+	.info = { .name = "package_entry_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_entry_hash = {
+	.info = { .name = "entry_hash", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_loaded_assets = {
+	.info = { .name = "loaded_assets", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_file_data_t_header_data = {
+	.info = { .name = "header_data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_jfd_file_header_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_asset_file_data_t DEFAULT_asset_file_data_t = {
+	.info = { .name = "asset_file_data_t", .size = 1, .metatype = 1 },
+	.member_count = 13,
+	.member_pointer = DEFAULT_asset_file_data_t.member_array,
+	.members = {
+		.is_initialized = &DEFAULT_member_asset_file_data_t_is_initialized,
+		.ID = &DEFAULT_member_asset_file_data_t_ID,
+		.current_package_generation = &DEFAULT_member_asset_file_data_t_current_package_generation,
+		.init_arena = &DEFAULT_member_asset_file_data_t_init_arena,
+		.load_status = &DEFAULT_member_asset_file_data_t_load_status,
+		.file_info = &DEFAULT_member_asset_file_data_t_file_info,
+		.raw_file_data = &DEFAULT_member_asset_file_data_t_raw_file_data,
+		.header = &DEFAULT_member_asset_file_data_t_header,
+		.package_entries = &DEFAULT_member_asset_file_data_t_package_entries,
+		.package_entry_count = &DEFAULT_member_asset_file_data_t_package_entry_count,
+		.entry_hash = &DEFAULT_member_asset_file_data_t_entry_hash,
+		.loaded_assets = &DEFAULT_member_asset_file_data_t_loaded_assets,
+		.header_data = &DEFAULT_member_asset_file_data_t_header_data,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_files = {
+	.info = { .name = "asset_files", .size = 32, .metatype = 0 },
+	.type_info = &DEFAULT_asset_file_data_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_name_to_file = {
+	.info = { .name = "asset_name_to_file", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_loaded_file_count = {
+	.info = { .name = "loaded_file_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_load_queue = {
+	.info = { .name = "asset_load_queue", .size = 2048, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_load_queue_size = {
+	.info = { .name = "load_queue_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_unload_queue = {
+	.info = { .name = "asset_unload_queue", .size = 2048, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_unload_queue_size = {
+	.info = { .name = "unload_queue_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_registry_t_atlases = {
+	.info = { .name = "atlases", .size = 128, .metatype = 0 },
+	.type_info = &DEFAULT_texture_atlas_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_texture_atlas_registry_t_current_atlas_count = {
+	.info = { .name = "current_atlas_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_texture_atlas_registry_t DEFAULT_texture_atlas_registry_t = {
+	.info = { .name = "texture_atlas_registry_t", .size = 1, .metatype = 1 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_texture_atlas_registry_t.member_array,
+	.members = {
+		.atlases = &DEFAULT_member_texture_atlas_registry_t_atlases,
+		.current_atlas_count = &DEFAULT_member_texture_atlas_registry_t_current_atlas_count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_atlas_registry = {
+	.info = { .name = "atlas_registry", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_texture_atlas_registry_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t = { .info = { .name = "sys_mutex_handle_t", .size = 8, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_sys_mutex_t_handle = {
+	.info = { .name = "handle", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_sys_mutex_handle_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_sys_mutex_t DEFAULT_sys_mutex_t = {
+	.info = { .name = "sys_mutex_t", .size = 8, .metatype = 1 },
+	.member_count = 1,
+	.member_pointer = DEFAULT_sys_mutex_t.member_array,
+	.members = {
+		.handle = &DEFAULT_member_sys_mutex_t_handle,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_t_mutex = {
+	.info = { .name = "mutex", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_sys_mutex_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_t_capacity = {
+	.info = { .name = "capacity", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 8,
+};
+
+constexpr type_info_u8 DEFAULT_u8 = { .info = { .name = "u8", .size = 1, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_t_base = {
+	.info = { .name = "base", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u8.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_block_id = {
+	.info = { .name = "block_id", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_is_allocated = {
+	.info = { .name = "is_allocated", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_block_size = {
+	.info = { .name = "block_size", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_allocation_tag = {
+	.info = { .name = "allocation_tag", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_next_block = {
+	.info = { .name = "next_block", .size = 8, .metatype = 0 },
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_prev_block = {
+	.info = { .name = "prev_block", .size = 8, .metatype = 0 },
+	.offset = 32,
+};
+
+constexpr type_info_zone_allocator_block_t DEFAULT_zone_allocator_block_t = {
+	.info = { .name = "zone_allocator_block_t", .size = 40, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_zone_allocator_block_t.member_array,
+	.members = {
+		.block_id = &DEFAULT_member_zone_allocator_block_t_block_id,
+		.is_allocated = &DEFAULT_member_zone_allocator_block_t_is_allocated,
+		.block_size = &DEFAULT_member_zone_allocator_block_t_block_size,
+		.allocation_tag = &DEFAULT_member_zone_allocator_block_t_allocation_tag,
+		.next_block = &DEFAULT_member_zone_allocator_block_t_next_block,
+		.prev_block = &DEFAULT_member_zone_allocator_block_t_prev_block,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_t_first_block = {
+	.info = { .name = "first_block", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_zone_allocator_block_t.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_zone_allocator_t_cursor = {
+	.info = { .name = "cursor", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_zone_allocator_block_t.info,
+	.offset = 64,
+};
+
+constexpr type_info_zone_allocator_t DEFAULT_zone_allocator_t = {
+	.info = { .name = "zone_allocator_t", .size = 72, .metatype = 1 },
+	.member_count = 5,
+	.member_pointer = DEFAULT_zone_allocator_t.member_array,
+	.members = {
+		.mutex = &DEFAULT_member_zone_allocator_t_mutex,
+		.capacity = &DEFAULT_member_zone_allocator_t_capacity,
+		.base = &DEFAULT_member_zone_allocator_t_base,
+		.first_block = &DEFAULT_member_zone_allocator_t_first_block,
+		.cursor = &DEFAULT_member_zone_allocator_t_cursor,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_allocator = {
+	.info = { .name = "asset_allocator", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_zone_allocator_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_catalog_t_ID = {
+	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_catalog_t_catalog_type = {
+	.info = { .name = "catalog_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_asset_type_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_catalog_t_asset_manager = {
+	.info = { .name = "asset_manager", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_manager_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_catalog_t_default_asset = {
+	.info = { .name = "default_asset", .size = 24, .metatype = 0 },
+	.type_info = &DEFAULT_asset_handle_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_catalog_t_asset_lookup = {
+	.info = { .name = "asset_lookup", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_catalog_t_loaded_assets = {
+	.info = { .name = "loaded_assets", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_asset_catalog_t DEFAULT_asset_catalog_t = {
+	.info = { .name = "asset_catalog_t", .size = 1, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_asset_catalog_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_asset_catalog_t_ID,
+		.catalog_type = &DEFAULT_member_asset_catalog_t_catalog_type,
+		.asset_manager = &DEFAULT_member_asset_catalog_t_asset_manager,
+		.default_asset = &DEFAULT_member_asset_catalog_t_default_asset,
+		.asset_lookup = &DEFAULT_member_asset_catalog_t_asset_lookup,
+		.loaded_assets = &DEFAULT_member_asset_catalog_t_loaded_assets,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_catalogs = {
+	.info = { .name = "asset_catalogs", .size = 6, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_texture_catalog = {
+	.info = { .name = "texture_catalog", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_shader_catalog = {
+	.info = { .name = "shader_catalog", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_material_catalog = {
+	.info = { .name = "material_catalog", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_font_catalog = {
+	.info = { .name = "font_catalog", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_sound_catalog = {
+	.info = { .name = "sound_catalog", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_is_dirty = {
+	.info = { .name = "is_dirty", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_is_full = {
+	.info = { .name = "is_full", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_font_arena = {
+	.info = { .name = "font_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_font_face = {
+	.info = { .name = "font_face", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_int.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_varients = {
+	.info = { .name = "varients", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_dynamic_render_font_t DEFAULT_dynamic_render_font_t = {
+	.info = { .name = "dynamic_render_font_t", .size = 1, .metatype = 1 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_dynamic_render_font_t.member_array,
+	.members = {
+		.font_arena = &DEFAULT_member_dynamic_render_font_t_font_arena,
+		.font_face = &DEFAULT_member_dynamic_render_font_t_font_face,
+		.varients = &DEFAULT_member_dynamic_render_font_t_varients,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_parent_font = {
+	.info = { .name = "parent_font", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_font_size = {
+	.info = { .name = "font_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_float64 DEFAULT_float64 = { .info = { .name = "float64", .size = 8, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_size_to_pixels = {
+	.info = { .name = "size_to_pixels", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float64.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_line_spacing = {
+	.info = { .name = "line_spacing", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_s64.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_max_ascender = {
+	.info = { .name = "max_ascender", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_s64.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_max_descender = {
+	.info = { .name = "max_descender", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_s64.info,
+	.offset = 32,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_y_center_offset = {
+	.info = { .name = "y_center_offset", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 40,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_typical_ascender = {
+	.info = { .name = "typical_ascender", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 44,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_typical_descender = {
+	.info = { .name = "typical_descender", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 48,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_em_width = {
+	.info = { .name = "em_width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 52,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_default_unknown_character = {
+	.info = { .name = "default_unknown_character", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 56,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_default_utf32_unknown_character = {
+	.info = { .name = "default_utf32_unknown_character", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 60,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_parent_font = {
+	.info = { .name = "parent_font", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_t.info,
+	.offset = 64,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_first_page = {
+	.info = { .name = "first_page", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_page_t.info,
+	.offset = 72,
+};
+
+constexpr type_info_dynamic_render_font_varient_t DEFAULT_dynamic_render_font_varient_t = {
+	.info = { .name = "dynamic_render_font_varient_t", .size = 80, .metatype = 1 },
+	.member_count = 13,
+	.member_pointer = DEFAULT_dynamic_render_font_varient_t.member_array,
+	.members = {
+		.font_size = &DEFAULT_member_dynamic_render_font_varient_t_font_size,
+		.size_to_pixels = &DEFAULT_member_dynamic_render_font_varient_t_size_to_pixels,
+		.line_spacing = &DEFAULT_member_dynamic_render_font_varient_t_line_spacing,
+		.max_ascender = &DEFAULT_member_dynamic_render_font_varient_t_max_ascender,
+		.max_descender = &DEFAULT_member_dynamic_render_font_varient_t_max_descender,
+		.y_center_offset = &DEFAULT_member_dynamic_render_font_varient_t_y_center_offset,
+		.typical_ascender = &DEFAULT_member_dynamic_render_font_varient_t_typical_ascender,
+		.typical_descender = &DEFAULT_member_dynamic_render_font_varient_t_typical_descender,
+		.em_width = &DEFAULT_member_dynamic_render_font_varient_t_em_width,
+		.default_unknown_character = &DEFAULT_member_dynamic_render_font_varient_t_default_unknown_character,
+		.default_utf32_unknown_character = &DEFAULT_member_dynamic_render_font_varient_t_default_utf32_unknown_character,
+		.parent_font = &DEFAULT_member_dynamic_render_font_varient_t_parent_font,
+		.first_page = &DEFAULT_member_dynamic_render_font_varient_t_first_page,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_varient = {
+	.info = { .name = "varient", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_varient_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_font_atlas = {
+	.info = { .name = "font_atlas", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_texture_atlas_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_glyphs = {
+	.info = { .name = "glyphs", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_loaded_glyph_count = {
+	.info = { .name = "loaded_glyph_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_utf32_codepoint = {
+	.info = { .name = "utf32_codepoint", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_is_valid = {
+	.info = { .name = "is_valid", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_is_fetched = {
+	.info = { .name = "is_fetched", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 1,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_advance = {
+	.info = { .name = "advance", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_ascent = {
+	.info = { .name = "ascent", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_width = {
+	.info = { .name = "width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_height = {
+	.info = { .name = "height", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_offset_x = {
+	.info = { .name = "offset_x", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 20,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_offset_y = {
+	.info = { .name = "offset_y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_atlas_offset = {
+	.info = { .name = "atlas_offset", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 28,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_atlas_size = {
+	.info = { .name = "atlas_size", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 36,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_owner_atlas = {
+	.info = { .name = "owner_atlas", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_texture_atlas_t.info,
+	.offset = 48,
+};
+
+constexpr type_info_member_t DEFAULT_member_glyph_metric_t_synthetic_texture_handle = {
+	.info = { .name = "synthetic_texture_handle", .size = 24, .metatype = 0 },
+	.type_info = &DEFAULT_asset_handle_t.info,
+	.offset = 56,
+};
+
+constexpr type_info_glyph_metric_t DEFAULT_glyph_metric_t = {
+	.info = { .name = "glyph_metric_t", .size = 80, .metatype = 1 },
+	.member_count = 12,
+	.member_pointer = DEFAULT_glyph_metric_t.member_array,
+	.members = {
+		.is_valid = &DEFAULT_member_glyph_metric_t_is_valid,
+		.is_fetched = &DEFAULT_member_glyph_metric_t_is_fetched,
+		.advance = &DEFAULT_member_glyph_metric_t_advance,
+		.ascent = &DEFAULT_member_glyph_metric_t_ascent,
+		.width = &DEFAULT_member_glyph_metric_t_width,
+		.height = &DEFAULT_member_glyph_metric_t_height,
+		.offset_x = &DEFAULT_member_glyph_metric_t_offset_x,
+		.offset_y = &DEFAULT_member_glyph_metric_t_offset_y,
+		.atlas_offset = &DEFAULT_member_glyph_metric_t_atlas_offset,
+		.atlas_size = &DEFAULT_member_glyph_metric_t_atlas_size,
+		.owner_atlas = &DEFAULT_member_glyph_metric_t_owner_atlas,
+		.synthetic_texture_handle = &DEFAULT_member_glyph_metric_t_synthetic_texture_handle,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_metrics = {
+	.info = { .name = "metrics", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_glyph_metric_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_glyph_width = {
+	.info = { .name = "glyph_width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_glyph_height = {
+	.info = { .name = "glyph_height", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 20,
+};
+
+constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_cursor_x = {
+	.info = { .name = "cursor_x", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_cursor_y = {
+	.info = { .name = "cursor_y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 28,
+};
+
+constexpr type_info_temporary_glyph_t DEFAULT_temporary_glyph_t = {
+	.info = { .name = "temporary_glyph_t", .size = 32, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_temporary_glyph_t.member_array,
+	.members = {
+		.utf32_codepoint = &DEFAULT_member_temporary_glyph_t_utf32_codepoint,
+		.metrics = &DEFAULT_member_temporary_glyph_t_metrics,
+		.glyph_width = &DEFAULT_member_temporary_glyph_t_glyph_width,
+		.glyph_height = &DEFAULT_member_temporary_glyph_t_glyph_height,
+		.cursor_x = &DEFAULT_member_temporary_glyph_t_cursor_x,
+		.cursor_y = &DEFAULT_member_temporary_glyph_t_cursor_y,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_temporary_glyphs = {
+	.info = { .name = "temporary_glyphs", .size = 32000, .metatype = 0 },
+	.type_info = &DEFAULT_temporary_glyph_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_temporary_glyph_count = {
+	.info = { .name = "temporary_glyph_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_x = {
+	.info = { .name = "atlas_cursor_x", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_y = {
+	.info = { .name = "atlas_cursor_y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_tallest_y = {
+	.info = { .name = "tallest_y", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_next_page = {
+	.info = { .name = "next_page", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_page_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_dynamic_render_font_page_t DEFAULT_dynamic_render_font_page_t = {
+	.info = { .name = "dynamic_render_font_page_t", .size = 1, .metatype = 1 },
+	.member_count = 13,
+	.member_pointer = DEFAULT_dynamic_render_font_page_t.member_array,
+	.members = {
+		.is_dirty = &DEFAULT_member_dynamic_render_font_page_t_is_dirty,
+		.is_full = &DEFAULT_member_dynamic_render_font_page_t_is_full,
+		.parent_font = &DEFAULT_member_dynamic_render_font_page_t_parent_font,
+		.varient = &DEFAULT_member_dynamic_render_font_page_t_varient,
+		.font_atlas = &DEFAULT_member_dynamic_render_font_page_t_font_atlas,
+		.glyphs = &DEFAULT_member_dynamic_render_font_page_t_glyphs,
+		.loaded_glyph_count = &DEFAULT_member_dynamic_render_font_page_t_loaded_glyph_count,
+		.temporary_glyphs = &DEFAULT_member_dynamic_render_font_page_t_temporary_glyphs,
+		.temporary_glyph_count = &DEFAULT_member_dynamic_render_font_page_t_temporary_glyph_count,
+		.atlas_cursor_x = &DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_x,
+		.atlas_cursor_y = &DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_y,
+		.tallest_y = &DEFAULT_member_dynamic_render_font_page_t_tallest_y,
+		.next_page = &DEFAULT_member_dynamic_render_font_page_t_next_page,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_font_manager_t_pages_to_update = {
+	.info = { .name = "pages_to_update", .size = 80, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_page_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_font_manager_t_pages_queued = {
+	.info = { .name = "pages_queued", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 80,
+};
+
+constexpr type_info_font_manager_t DEFAULT_font_manager_t = {
+	.info = { .name = "font_manager_t", .size = 88, .metatype = 1 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_font_manager_t.member_array,
+	.members = {
+		.pages_to_update = &DEFAULT_member_font_manager_t_pages_to_update,
+		.pages_queued = &DEFAULT_member_font_manager_t_pages_queued,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_font_manager = {
+	.info = { .name = "font_manager", .size = 88, .metatype = 0 },
+	.type_info = &DEFAULT_font_manager_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_SDL_Window DEFAULT_SDL_Window = {
+	.info = { .name = "SDL_Window", .size = 0, .metatype = 1 },
+	.member_count = 0,
+	.member_pointer = nullptr,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_window = {
+	.info = { .name = "window", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_SDL_Window.info,
+	.offset = 0,
+};
+
+constexpr type_info_backend_render_context_t DEFAULT_backend_render_context_t = { .info = { .name = "backend_render_context_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_backend_render_context = {
+	.info = { .name = "backend_render_context", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_backend_render_context_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_RHI_arena = {
+	.info = { .name = "RHI_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_transient_arena = {
+	.info = { .name = "transient_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_is_initialized = {
+	.info = { .name = "is_initialized", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_RHI_context = {
+	.info = { .name = "RHI_context", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_context_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_transient_arena = {
+	.info = { .name = "transient_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_arena = {
+	.info = { .name = "command_arena", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_memory_arena_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_INVALID = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_END_RENDERPASS = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_END_RENDERPASS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 5 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 6 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 7 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 8 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 9 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 10 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_SHADER = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_SHADER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 11 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 12 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 13 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 14 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_SCISSOR = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_SCISSOR", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 15 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 16 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 17 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 18 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 19 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DRAW", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 20 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 21 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 22 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 23 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 24 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_COUNT = {
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_COUNT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 25 },
+};
+
+constexpr type_info_RHI_command_type_t DEFAULT_RHI_command_type_t = {
+	.info = { .name = "RHI_command_type_t", .size = 0, .metatype = 2 },
+	.member_count = 26,
+	.member_pointer = DEFAULT_RHI_command_type_t.member_array,
+	.members = {
+		.RHI_RENDER_COMMAND_TYPE_INVALID = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_INVALID,
+		.RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
+		.RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS,
+		.RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE,
+		.RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS,
+		.RHI_RENDER_COMMAND_TYPE_END_RENDERPASS = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_END_RENDERPASS,
+		.RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER,
+		.RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS,
+		.RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS,
+		.RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL,
+		.RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE,
+		.RHI_RENDER_COMMAND_TYPE_BIND_SHADER = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_SHADER,
+		.RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER,
+		.RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER,
+		.RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT,
+		.RHI_RENDER_COMMAND_TYPE_SET_SCISSOR = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_SCISSOR,
+		.RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE,
+		.RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH,
+		.RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE,
+		.RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE,
+		.RHI_RENDER_COMMAND_TYPE_DRAW = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW,
+		.RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED,
+		.RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE,
+		.RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS,
+		.RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME,
+		.RHI_RENDER_COMMAND_TYPE_COUNT = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_COUNT,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_command_type = {
+	.info = { .name = "command_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_type_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_line_number = {
+	.info = { .name = "line_number", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 4,
+};
+
+constexpr type_info_const_char DEFAULT_const_char = { .info = { .name = "const_char", .size = 1, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_filename = {
+	.info = { .name = "filename", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_const_char.info,
+	.offset = 8,
+};
+
+constexpr type_info_RHI_command_header_t DEFAULT_RHI_command_header_t = {
+	.info = { .name = "RHI_command_header_t", .size = 16, .metatype = 1 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_RHI_command_header_t.member_array,
+	.members = {
+		.command_type = &DEFAULT_member_RHI_command_header_t_command_type,
+		.line_number = &DEFAULT_member_RHI_command_header_t_line_number,
+		.filename = &DEFAULT_member_RHI_command_header_t_filename,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_t_header = {
+	.info = { .name = "header", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_header_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_t_data = {
+	.info = { .name = "data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_void.info,
+	.offset = 16,
+};
+
+constexpr type_info_RHI_command_t DEFAULT_RHI_command_t = {
+	.info = { .name = "RHI_command_t", .size = 24, .metatype = 1 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_RHI_command_t.member_array,
+	.members = {
+		.header = &DEFAULT_member_RHI_command_t_header,
+		.data = &DEFAULT_member_RHI_command_t_data,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_commands = {
+	.info = { .name = "commands", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_count = {
+	.info = { .name = "command_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_draw_instance_command_count = {
+	.info = { .name = "draw_instance_command_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bind_shader_command_count = {
+	.info = { .name = "bind_shader_command_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bind_render_target_command_count = {
+	.info = { .name = "bind_render_target_command_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bind_material_command_count = {
+	.info = { .name = "bind_material_command_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_render_state = {
+	.info = { .name = "active_render_state", .size = 60, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_pipeline_state_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_vertex_buffers = {
+	.info = { .name = "active_vertex_buffers", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_vertex_buffer_count = {
+	.info = { .name = "vertex_buffer_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INVALID = {
+	.info = { .name = "RHI_RENDER_BUFFER_TYPE_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER = {
+	.info = { .name = "RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER = {
+	.info = { .name = "RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_RHI_render_buffer_type_t DEFAULT_RHI_render_buffer_type_t = {
+	.info = { .name = "RHI_render_buffer_type_t", .size = 0, .metatype = 2 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_RHI_render_buffer_type_t.member_array,
+	.members = {
+		.RHI_RENDER_BUFFER_TYPE_INVALID = &DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INVALID,
+		.RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER = &DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER,
+		.RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER = &DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_type = {
+	.info = { .name = "type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED = {
+	.info = { .name = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_memory_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY = {
+	.info = { .name = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_memory_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_RHI_render_buffer_memory_type_t DEFAULT_RHI_render_buffer_memory_type_t = {
+	.info = { .name = "RHI_render_buffer_memory_type_t", .size = 0, .metatype = 2 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_RHI_render_buffer_memory_type_t.member_array,
+	.members = {
+		.RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED = &DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED,
+		.RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY = &DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_allocation_type = {
+	.info = { .name = "allocation_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_memory_type_t.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_constant_buffer_hash_ID = {
+	.info = { .name = "constant_buffer_hash_ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_ID = {
+	.info = { .name = "buffer_ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_capacity = {
+	.info = { .name = "buffer_capacity", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 24,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_element_size = {
+	.info = { .name = "buffer_element_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 28,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_elements_used = {
+	.info = { .name = "buffer_elements_used", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 32,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_working_offset = {
+	.info = { .name = "working_offset", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 36,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_mapped_data = {
+	.info = { .name = "mapped_data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_byte.info,
+	.offset = 40,
+};
+
+constexpr type_info_backend_buffer_t DEFAULT_backend_buffer_t = { .info = { .name = "backend_buffer_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_info = {
+	.info = { .name = "buffer_info", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_backend_buffer_t.info,
+	.offset = 48,
+};
+
+constexpr type_info_RHI_render_buffer_t DEFAULT_RHI_render_buffer_t = {
+	.info = { .name = "RHI_render_buffer_t", .size = 56, .metatype = 1 },
+	.member_count = 10,
+	.member_pointer = DEFAULT_RHI_render_buffer_t.member_array,
+	.members = {
+		.type = &DEFAULT_member_RHI_render_buffer_t_type,
+		.allocation_type = &DEFAULT_member_RHI_render_buffer_t_allocation_type,
+		.constant_buffer_hash_ID = &DEFAULT_member_RHI_render_buffer_t_constant_buffer_hash_ID,
+		.buffer_ID = &DEFAULT_member_RHI_render_buffer_t_buffer_ID,
+		.buffer_capacity = &DEFAULT_member_RHI_render_buffer_t_buffer_capacity,
+		.buffer_element_size = &DEFAULT_member_RHI_render_buffer_t_buffer_element_size,
+		.buffer_elements_used = &DEFAULT_member_RHI_render_buffer_t_buffer_elements_used,
+		.working_offset = &DEFAULT_member_RHI_render_buffer_t_working_offset,
+		.mapped_data = &DEFAULT_member_RHI_render_buffer_t_mapped_data,
+		.buffer_info = &DEFAULT_member_RHI_render_buffer_t_buffer_info,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_buffer_data = {
+	.info = { .name = "buffer_data", .size = 56, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_render_buffer_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_index_data = {
+	.info = { .name = "index_data", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_byte.info,
+	.offset = 56,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_max_indices = {
+	.info = { .name = "max_indices", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 64,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_index_count = {
+	.info = { .name = "index_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 68,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_index_offset = {
+	.info = { .name = "index_offset", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 72,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_instance_offset = {
+	.info = { .name = "instance_offset", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 76,
+};
+
+constexpr type_info_RHI_index_buffer_t DEFAULT_RHI_index_buffer_t = {
+	.info = { .name = "RHI_index_buffer_t", .size = 80, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_RHI_index_buffer_t.member_array,
+	.members = {
+		.buffer_data = &DEFAULT_member_RHI_index_buffer_t_buffer_data,
+		.index_data = &DEFAULT_member_RHI_index_buffer_t_index_data,
+		.max_indices = &DEFAULT_member_RHI_index_buffer_t_max_indices,
+		.index_count = &DEFAULT_member_RHI_index_buffer_t_index_count,
+		.index_offset = &DEFAULT_member_RHI_index_buffer_t_index_offset,
+		.instance_offset = &DEFAULT_member_RHI_index_buffer_t_instance_offset,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_index_buffer = {
+	.info = { .name = "active_index_buffer", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_index_buffer_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_scissor_command = {
+	.info = { .name = "active_scissor_command", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_viewport_command = {
+	.info = { .name = "active_viewport_command", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_shader_program = {
+	.info = { .name = "active_shader_program", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_handle_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_ID = {
+	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Invalid = {
+	.info = { .name = "BMF_Invalid", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_R8 = {
+	.info = { .name = "BMF_R8", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_B8 = {
+	.info = { .name = "BMF_B8", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_G8 = {
+	.info = { .name = "BMF_G8", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGBA32_SRGB = {
+	.info = { .name = "BMF_RGBA32_SRGB", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGBA32_UNORM = {
+	.info = { .name = "BMF_RGBA32_UNORM", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 5 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_BGRA32_UNORM = {
+	.info = { .name = "BMF_BGRA32_UNORM", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 6 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGB24_UNORM = {
+	.info = { .name = "BMF_RGB24_UNORM", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 7 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGB24_SRGB = {
+	.info = { .name = "BMF_RGB24_SRGB", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 8 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D24_SFLOAT_S8 = {
+	.info = { .name = "BMF_D24_SFLOAT_S8", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 9 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT_S8_UINT = {
+	.info = { .name = "BMF_D32_SFLOAT_S8_UINT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 10 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT = {
+	.info = { .name = "BMF_D32_SFLOAT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 11 },
+};
+
+constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Count = {
+	.info = { .name = "BMF_Count", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 12 },
+};
+
+constexpr type_info_bitmap_format_t DEFAULT_bitmap_format_t = {
+	.info = { .name = "bitmap_format_t", .size = 0, .metatype = 2 },
+	.member_count = 13,
+	.member_pointer = DEFAULT_bitmap_format_t.member_array,
+	.members = {
+		.BMF_Invalid = &DEFAULT_member_bitmap_format_t_BMF_Invalid,
+		.BMF_R8 = &DEFAULT_member_bitmap_format_t_BMF_R8,
+		.BMF_B8 = &DEFAULT_member_bitmap_format_t_BMF_B8,
+		.BMF_G8 = &DEFAULT_member_bitmap_format_t_BMF_G8,
+		.BMF_RGBA32_SRGB = &DEFAULT_member_bitmap_format_t_BMF_RGBA32_SRGB,
+		.BMF_RGBA32_UNORM = &DEFAULT_member_bitmap_format_t_BMF_RGBA32_UNORM,
+		.BMF_BGRA32_UNORM = &DEFAULT_member_bitmap_format_t_BMF_BGRA32_UNORM,
+		.BMF_RGB24_UNORM = &DEFAULT_member_bitmap_format_t_BMF_RGB24_UNORM,
+		.BMF_RGB24_SRGB = &DEFAULT_member_bitmap_format_t_BMF_RGB24_SRGB,
+		.BMF_D24_SFLOAT_S8 = &DEFAULT_member_bitmap_format_t_BMF_D24_SFLOAT_S8,
+		.BMF_D32_SFLOAT_S8_UINT = &DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT_S8_UINT,
+		.BMF_D32_SFLOAT = &DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT,
+		.BMF_Count = &DEFAULT_member_bitmap_format_t_BMF_Count,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_key_t_attachment_formats = {
+	.info = { .name = "attachment_formats", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_bitmap_format_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_RHI_renderpass_key_t DEFAULT_RHI_renderpass_key_t = {
+	.info = { .name = "RHI_renderpass_key_t", .size = 40, .metatype = 1 },
+	.member_count = 1,
+	.member_pointer = DEFAULT_RHI_renderpass_key_t.member_array,
+	.members = {
+		.attachment_formats = &DEFAULT_member_RHI_renderpass_key_t_attachment_formats,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_renderpass_key = {
+	.info = { .name = "renderpass_key", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_key_t.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_render_width = {
+	.info = { .name = "render_width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_render_height = {
+	.info = { .name = "render_height", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_color_attachment_count = {
+	.info = { .name = "color_attachment_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_resize_with_window = {
+	.info = { .name = "resize_with_window", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID = {
+	.info = { .name = "RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 6 },
+};
+
+constexpr type_info_RHI_renderpass_attachment_access_t DEFAULT_RHI_renderpass_attachment_access_t = {
+	.info = { .name = "RHI_renderpass_attachment_access_t", .size = 0, .metatype = 2 },
+	.member_count = 4,
+	.member_pointer = DEFAULT_RHI_renderpass_attachment_access_t.member_array,
+	.members = {
+		.RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID = &DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID,
+		.RHI_RENDERPASS_ATTACHMENT_ACCESS_READ = &DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ,
+		.RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE = &DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE,
+		.RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE = &DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_access = {
+	.info = { .name = "access", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_RHI_renderpass_attachment_load_operation_t DEFAULT_RHI_renderpass_attachment_load_operation_t = {
+	.info = { .name = "RHI_renderpass_attachment_load_operation_t", .size = 0, .metatype = 2 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_RHI_renderpass_attachment_load_operation_t.member_array,
+	.members = {
+		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID = &DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID,
+		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR = &DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR,
+		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD = &DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_load_operation = {
+	.info = { .name = "load_operation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE = {
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_RHI_renderpass_attachment_store_operation_t DEFAULT_RHI_renderpass_attachment_store_operation_t = {
+	.info = { .name = "RHI_renderpass_attachment_store_operation_t", .size = 0, .metatype = 2 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_RHI_renderpass_attachment_store_operation_t.member_array,
+	.members = {
+		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID = &DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID,
+		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE = &DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE,
+		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE = &DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_store_operation = {
+	.info = { .name = "store_operation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_image = {
+	.info = { .name = "image", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_t.info,
+	.offset = 16,
+};
+
+constexpr type_info_float4 DEFAULT_float4 = {
+	.info = { .name = "float4", .size = 1, .metatype = 1 },
+	.member_count = 0,
+	.member_pointer = nullptr,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_float_color = {
+	.info = { .name = "float_color", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_float4.info,
+	.offset = 0,
+};
+
+constexpr type_info_ivec4_t DEFAULT_ivec4_t = {
+	.info = { .name = "ivec4_t", .size = 1, .metatype = 1 },
+	.member_count = 0,
+	.member_pointer = nullptr,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_int_color = {
+	.info = { .name = "int_color", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_ivec4_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_uint_color = {
+	.info = { .name = "uint_color", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_depth = {
+	.info = { .name = "depth", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_float32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_stencil = {
+	.info = { .name = "stencil", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+};
+
+constexpr type_info_RHI_clear_value_t DEFAULT_RHI_clear_value_t = {
+	.info = { .name = "RHI_clear_value_t", .size = 16, .metatype = 1 },
+	.member_count = 5,
+	.member_pointer = DEFAULT_RHI_clear_value_t.member_array,
+	.members = {
+		.float_color = &DEFAULT_member_RHI_clear_value_t_float_color,
+		.int_color = &DEFAULT_member_RHI_clear_value_t_int_color,
+		.uint_color = &DEFAULT_member_RHI_clear_value_t_uint_color,
+		.depth = &DEFAULT_member_RHI_clear_value_t_depth,
+		.stencil = &DEFAULT_member_RHI_clear_value_t_stencil,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_clear_value = {
+	.info = { .name = "clear_value", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_clear_value_t.info,
+	.offset = 24,
+};
+
+constexpr type_info_RHI_renderpass_attachment_t DEFAULT_RHI_renderpass_attachment_t = {
+	.info = { .name = "RHI_renderpass_attachment_t", .size = 40, .metatype = 1 },
+	.member_count = 5,
+	.member_pointer = DEFAULT_RHI_renderpass_attachment_t.member_array,
+	.members = {
+		.access = &DEFAULT_member_RHI_renderpass_attachment_t_access,
+		.load_operation = &DEFAULT_member_RHI_renderpass_attachment_t_load_operation,
+		.store_operation = &DEFAULT_member_RHI_renderpass_attachment_t_store_operation,
+		.image = &DEFAULT_member_RHI_renderpass_attachment_t_image,
+		.clear_value = &DEFAULT_member_RHI_renderpass_attachment_t_clear_value,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_color_attachments = {
+	.info = { .name = "color_attachments", .size = 400, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_depth_stencil_attachment = {
+	.info = { .name = "depth_stencil_attachment", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
+	.offset = 416,
+};
+
+constexpr type_info_RHI_renderpass_desc_t DEFAULT_RHI_renderpass_desc_t = {
+	.info = { .name = "RHI_renderpass_desc_t", .size = 456, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_RHI_renderpass_desc_t.member_array,
+	.members = {
+		.render_width = &DEFAULT_member_RHI_renderpass_desc_t_render_width,
+		.render_height = &DEFAULT_member_RHI_renderpass_desc_t_render_height,
+		.color_attachment_count = &DEFAULT_member_RHI_renderpass_desc_t_color_attachment_count,
+		.resize_with_window = &DEFAULT_member_RHI_renderpass_desc_t_resize_with_window,
+		.color_attachments = &DEFAULT_member_RHI_renderpass_desc_t_color_attachments,
+		.depth_stencil_attachment = &DEFAULT_member_RHI_renderpass_desc_t_depth_stencil_attachment,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_create_info = {
+	.info = { .name = "create_info", .size = 456, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_desc_t.info,
+	.offset = 48,
+};
+
+constexpr type_info_backend_renderpass_handle_t DEFAULT_backend_renderpass_handle_t = { .info = { .name = "backend_renderpass_handle_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_renderpass_handle = {
+	.info = { .name = "renderpass_handle", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_backend_renderpass_handle_t.info,
+	.offset = 504,
+};
+
+constexpr type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_handle_t = { .info = { .name = "backend_framebuffer_handle_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_framebuffer_handle = {
+	.info = { .name = "framebuffer_handle", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_backend_framebuffer_handle_t.info,
+	.offset = 508,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_depth_stencil_attachment = {
+	.info = { .name = "depth_stencil_attachment", .size = 40, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
+	.offset = 512,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_color_attachments = {
+	.info = { .name = "color_attachments", .size = 400, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
+	.offset = 552,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_color_attachment_count = {
+	.info = { .name = "color_attachment_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 952,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_total_attachment_count = {
+	.info = { .name = "total_attachment_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 956,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_render_width = {
+	.info = { .name = "render_width", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 960,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_render_height = {
+	.info = { .name = "render_height", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 964,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_attachment_clear_values = {
+	.info = { .name = "attachment_clear_values", .size = 160, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_clear_value_t.info,
+	.offset = 968,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_has_depth_stencil_attachment = {
+	.info = { .name = "has_depth_stencil_attachment", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 1128,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_resize_with_window = {
+	.info = { .name = "resize_with_window", .size = 1, .metatype = 0 },
+	.type_info = &DEFAULT_bool8.info,
+	.offset = 1129,
+};
+
+constexpr type_info_RHI_renderpass_t DEFAULT_RHI_renderpass_t = {
+	.info = { .name = "RHI_renderpass_t", .size = 1136, .metatype = 1 },
+	.member_count = 14,
+	.member_pointer = DEFAULT_RHI_renderpass_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_RHI_renderpass_t_ID,
+		.renderpass_key = &DEFAULT_member_RHI_renderpass_t_renderpass_key,
+		.create_info = &DEFAULT_member_RHI_renderpass_t_create_info,
+		.renderpass_handle = &DEFAULT_member_RHI_renderpass_t_renderpass_handle,
+		.framebuffer_handle = &DEFAULT_member_RHI_renderpass_t_framebuffer_handle,
+		.depth_stencil_attachment = &DEFAULT_member_RHI_renderpass_t_depth_stencil_attachment,
+		.color_attachments = &DEFAULT_member_RHI_renderpass_t_color_attachments,
+		.color_attachment_count = &DEFAULT_member_RHI_renderpass_t_color_attachment_count,
+		.total_attachment_count = &DEFAULT_member_RHI_renderpass_t_total_attachment_count,
+		.render_width = &DEFAULT_member_RHI_renderpass_t_render_width,
+		.render_height = &DEFAULT_member_RHI_renderpass_t_render_height,
+		.attachment_clear_values = &DEFAULT_member_RHI_renderpass_t_attachment_clear_values,
+		.has_depth_stencil_attachment = &DEFAULT_member_RHI_renderpass_t_has_depth_stencil_attachment,
+		.resize_with_window = &DEFAULT_member_RHI_renderpass_t_resize_with_window,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_renderpass = {
+	.info = { .name = "active_renderpass", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_renderpass_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_presenting = {
+	.info = { .name = "presenting", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_bool32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_image_shader_params = {
+	.info = { .name = "image_shader_params", .size = 128, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_image_count = {
+	.info = { .name = "image_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_image_ids_to_bind = {
+	.info = { .name = "image_ids_to_bind", .size = 64, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bound_image_count = {
+	.info = { .name = "bound_image_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS = {
+	.info = { .name = "RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_list_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE = {
+	.info = { .name = "RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_list_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_RHI_command_list_type_t DEFAULT_RHI_command_list_type_t = {
+	.info = { .name = "RHI_command_list_type_t", .size = 0, .metatype = 2 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_RHI_command_list_type_t.member_array,
+	.members = {
+		.RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS = &DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
+		.RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE = &DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_list_type = {
+	.info = { .name = "command_list_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_list_type_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t = { .info = { .name = "backend_command_buffer_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_backend_command_buffer = {
+	.info = { .name = "backend_command_buffer", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_backend_command_buffer_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_RHI_command_list_t DEFAULT_RHI_command_list_t = {
+	.info = { .name = "RHI_command_list_t", .size = 1, .metatype = 1 },
+	.member_count = 25,
+	.member_pointer = DEFAULT_RHI_command_list_t.member_array,
+	.members = {
+		.is_initialized = &DEFAULT_member_RHI_command_list_t_is_initialized,
+		.RHI_context = &DEFAULT_member_RHI_command_list_t_RHI_context,
+		.transient_arena = &DEFAULT_member_RHI_command_list_t_transient_arena,
+		.command_arena = &DEFAULT_member_RHI_command_list_t_command_arena,
+		.commands = &DEFAULT_member_RHI_command_list_t_commands,
+		.command_count = &DEFAULT_member_RHI_command_list_t_command_count,
+		.draw_instance_command_count = &DEFAULT_member_RHI_command_list_t_draw_instance_command_count,
+		.bind_shader_command_count = &DEFAULT_member_RHI_command_list_t_bind_shader_command_count,
+		.bind_render_target_command_count = &DEFAULT_member_RHI_command_list_t_bind_render_target_command_count,
+		.bind_material_command_count = &DEFAULT_member_RHI_command_list_t_bind_material_command_count,
+		.active_render_state = &DEFAULT_member_RHI_command_list_t_active_render_state,
+		.active_vertex_buffers = &DEFAULT_member_RHI_command_list_t_active_vertex_buffers,
+		.vertex_buffer_count = &DEFAULT_member_RHI_command_list_t_vertex_buffer_count,
+		.active_index_buffer = &DEFAULT_member_RHI_command_list_t_active_index_buffer,
+		.active_scissor_command = &DEFAULT_member_RHI_command_list_t_active_scissor_command,
+		.active_viewport_command = &DEFAULT_member_RHI_command_list_t_active_viewport_command,
+		.active_shader_program = &DEFAULT_member_RHI_command_list_t_active_shader_program,
+		.active_renderpass = &DEFAULT_member_RHI_command_list_t_active_renderpass,
+		.presenting = &DEFAULT_member_RHI_command_list_t_presenting,
+		.image_shader_params = &DEFAULT_member_RHI_command_list_t_image_shader_params,
+		.image_count = &DEFAULT_member_RHI_command_list_t_image_count,
+		.image_ids_to_bind = &DEFAULT_member_RHI_command_list_t_image_ids_to_bind,
+		.bound_image_count = &DEFAULT_member_RHI_command_list_t_bound_image_count,
+		.command_list_type = &DEFAULT_member_RHI_command_list_t_command_list_type,
+		.backend_command_buffer = &DEFAULT_member_RHI_command_list_t_backend_command_buffer,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_command_lists = {
+	.info = { .name = "command_lists", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_list_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_command_list_count = {
+	.info = { .name = "command_list_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_constant_buffer_hash = {
+	.info = { .name = "constant_buffer_hash", .size = 0, .metatype = 0 },
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_used_constant_buffers = {
+	.info = { .name = "used_constant_buffers", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_render_instances = {
+	.info = { .name = "total_render_instances", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_materials = {
+	.info = { .name = "total_materials", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_shaders = {
+	.info = { .name = "total_shaders", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_buffers = {
+	.info = { .name = "total_buffers", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_window_size = {
+	.info = { .name = "window_size", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_float2.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_current_window_size_generation = {
+	.info = { .name = "current_window_size_generation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_last_window_size_generation = {
+	.info = { .name = "last_window_size_generation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_renderpasses = {
+	.info = { .name = "renderpasses", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 100 },
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_renderpass_count = {
+	.info = { .name = "renderpass_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_command_present_frame_t_presentation_source = {
+	.info = { .name = "presentation_source", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_image_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_RHI_command_present_frame_t DEFAULT_RHI_command_present_frame_t = {
+	.info = { .name = "RHI_command_present_frame_t", .size = 8, .metatype = 1 },
+	.member_count = 1,
+	.member_pointer = DEFAULT_RHI_command_present_frame_t.member_array,
+	.members = {
+		.presentation_source = &DEFAULT_member_RHI_command_present_frame_t_presentation_source,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_context_t_present_command = {
+	.info = { .name = "present_command", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_command_present_frame_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_RHI_context_t DEFAULT_RHI_context_t = {
+	.info = { .name = "RHI_context_t", .size = 1, .metatype = 1 },
+	.member_count = 18,
+	.member_pointer = DEFAULT_RHI_context_t.member_array,
+	.members = {
+		.window = &DEFAULT_member_RHI_context_t_window,
+		.backend_render_context = &DEFAULT_member_RHI_context_t_backend_render_context,
+		.RHI_arena = &DEFAULT_member_RHI_context_t_RHI_arena,
+		.transient_arena = &DEFAULT_member_RHI_context_t_transient_arena,
+		.command_lists = &DEFAULT_member_RHI_context_t_command_lists,
+		.command_list_count = &DEFAULT_member_RHI_context_t_command_list_count,
+		.constant_buffer_hash = &DEFAULT_member_RHI_context_t_constant_buffer_hash,
+		.used_constant_buffers = &DEFAULT_member_RHI_context_t_used_constant_buffers,
+		.total_render_instances = &DEFAULT_member_RHI_context_t_total_render_instances,
+		.total_materials = &DEFAULT_member_RHI_context_t_total_materials,
+		.total_shaders = &DEFAULT_member_RHI_context_t_total_shaders,
+		.total_buffers = &DEFAULT_member_RHI_context_t_total_buffers,
+		.window_size = &DEFAULT_member_RHI_context_t_window_size,
+		.current_window_size_generation = &DEFAULT_member_RHI_context_t_current_window_size_generation,
+		.last_window_size_generation = &DEFAULT_member_RHI_context_t_last_window_size_generation,
+		.renderpasses = &DEFAULT_member_RHI_context_t_renderpasses,
+		.renderpass_count = &DEFAULT_member_RHI_context_t_renderpass_count,
+		.present_command = &DEFAULT_member_RHI_context_t_present_command,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_manager_t_RHI_context = {
+	.info = { .name = "RHI_context", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_context_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_asset_manager_t DEFAULT_asset_manager_t = {
+	.info = { .name = "asset_manager_t", .size = 1, .metatype = 1 },
+	.member_count = 20,
+	.member_pointer = DEFAULT_asset_manager_t.member_array,
+	.members = {
+		.is_initialized = &DEFAULT_member_asset_manager_t_is_initialized,
+		.manager_arena = &DEFAULT_member_asset_manager_t_manager_arena,
+		.freetype_handle = &DEFAULT_member_asset_manager_t_freetype_handle,
+		.asset_files = &DEFAULT_member_asset_manager_t_asset_files,
+		.asset_name_to_file = &DEFAULT_member_asset_manager_t_asset_name_to_file,
+		.loaded_file_count = &DEFAULT_member_asset_manager_t_loaded_file_count,
+		.asset_load_queue = &DEFAULT_member_asset_manager_t_asset_load_queue,
+		.load_queue_size = &DEFAULT_member_asset_manager_t_load_queue_size,
+		.asset_unload_queue = &DEFAULT_member_asset_manager_t_asset_unload_queue,
+		.unload_queue_size = &DEFAULT_member_asset_manager_t_unload_queue_size,
+		.atlas_registry = &DEFAULT_member_asset_manager_t_atlas_registry,
+		.asset_allocator = &DEFAULT_member_asset_manager_t_asset_allocator,
+		.asset_catalogs = &DEFAULT_member_asset_manager_t_asset_catalogs,
+		.texture_catalog = &DEFAULT_member_asset_manager_t_texture_catalog,
+		.shader_catalog = &DEFAULT_member_asset_manager_t_shader_catalog,
+		.material_catalog = &DEFAULT_member_asset_manager_t_material_catalog,
+		.font_catalog = &DEFAULT_member_asset_manager_t_font_catalog,
+		.sound_catalog = &DEFAULT_member_asset_manager_t_sound_catalog,
+		.font_manager = &DEFAULT_member_asset_manager_t_font_manager,
+		.RHI_context = &DEFAULT_member_asset_manager_t_RHI_context,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_asset_manager = {
+	.info = { .name = "asset_manager", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_manager_t.info,
+	.offset = 128,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_catalog = {
+	.info = { .name = "catalog", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_catalog_t.info,
+	.offset = 136,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_package_generation = {
+	.info = { .name = "package_generation", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_volatile_u32.info,
+	.offset = 144,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_loaded_asset_index = {
+	.info = { .name = "loaded_asset_index", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_volatile_u32.info,
+	.offset = 148,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file_index = {
+	.info = { .name = "owner_asset_file_index", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_s32.info,
+	.offset = 152,
+};
+
+constexpr type_info_asset_slot_t DEFAULT_asset_slot_t = {
+	.info = { .name = "asset_slot_t", .size = 160, .metatype = 1 },
+	.member_count = 13,
+	.member_pointer = DEFAULT_asset_slot_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_asset_slot_t_ID,
+		.slot_state = &DEFAULT_member_asset_slot_t_slot_state,
+		.type = &DEFAULT_member_asset_slot_t_type,
+		.is_valid_for_handles = &DEFAULT_member_asset_slot_t_is_valid_for_handles,
+		.name = &DEFAULT_member_asset_slot_t_name,
+		.owner_asset_file = &DEFAULT_member_asset_slot_t_owner_asset_file,
+		.package_entry = &DEFAULT_member_asset_slot_t_package_entry,
+		.subtexture_data = &DEFAULT_member_asset_slot_t_subtexture_data,
+		.asset_manager = &DEFAULT_member_asset_slot_t_asset_manager,
+		.catalog = &DEFAULT_member_asset_slot_t_catalog,
+		.package_generation = &DEFAULT_member_asset_slot_t_package_generation,
+		.loaded_asset_index = &DEFAULT_member_asset_slot_t_loaded_asset_index,
+		.owner_asset_file_index = &DEFAULT_member_asset_slot_t_owner_asset_file_index,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_handle_t_slot = {
+	.info = { .name = "slot", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_asset_slot_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_handle_t_texture = {
+	.info = { .name = "texture", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_texture2D_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_RHI_shader_t_ID = {
+	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 0,
+};
+
+constexpr type_info_backend_shader_t DEFAULT_backend_shader_t = { .info = { .name = "backend_shader_t", .size = 4, .metatype = 0 } };
+
+constexpr type_info_member_t DEFAULT_member_RHI_shader_t_shader_data = {
+	.info = { .name = "shader_data", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_backend_shader_t.info,
+	.offset = 8,
+};
+
+constexpr type_info_RHI_shader_t DEFAULT_RHI_shader_t = {
+	.info = { .name = "RHI_shader_t", .size = 16, .metatype = 1 },
+	.member_count = 2,
+	.member_pointer = DEFAULT_RHI_shader_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_RHI_shader_t_ID,
+		.shader_data = &DEFAULT_member_RHI_shader_t_shader_data,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_handle_t_shader = {
+	.info = { .name = "shader", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_shader_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Invalid = {
+	.info = { .name = "SMT_Invalid", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_stored_material_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Instance = {
+	.info = { .name = "SMT_Instance", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_stored_material_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Archetype = {
+	.info = { .name = "SMT_Archetype", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_stored_material_type_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_stored_material_type_t DEFAULT_stored_material_type_t = {
+	.info = { .name = "stored_material_type_t", .size = 0, .metatype = 2 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_stored_material_type_t.member_array,
+	.members = {
+		.SMT_Invalid = &DEFAULT_member_stored_material_type_t_SMT_Invalid,
+		.SMT_Instance = &DEFAULT_member_stored_material_type_t_SMT_Instance,
+		.SMT_Archetype = &DEFAULT_member_stored_material_type_t_SMT_Archetype,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_material_data_t_material_type = {
+	.info = { .name = "material_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_stored_material_type_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_data_t_archetype = {
+	.info = { .name = "archetype", .size = 184, .metatype = 0 },
+	.type_info = &DEFAULT_material_archetype_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_ID = {
+	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_version = {
+	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_name = {
+	.info = { .name = "name", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_renderer_effect_flags = {
+	.info = { .name = "renderer_effect_flags", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 32,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_shader_uniform_count = {
+	.info = { .name = "shader_uniform_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 36,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_pipeline_state = {
+	.info = { .name = "pipeline_state", .size = 60, .metatype = 0 },
+	.type_info = &DEFAULT_RHI_pipeline_state_t.info,
+	.offset = 40,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_instance_t_archetype = {
+	.info = { .name = "archetype", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_material_archetype_t.info,
+	.offset = 104,
+};
+
+constexpr type_info_material_instance_t DEFAULT_material_instance_t = {
+	.info = { .name = "material_instance_t", .size = 112, .metatype = 1 },
+	.member_count = 7,
+	.member_pointer = DEFAULT_material_instance_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_material_instance_t_ID,
+		.version = &DEFAULT_member_material_instance_t_version,
+		.name = &DEFAULT_member_material_instance_t_name,
+		.renderer_effect_flags = &DEFAULT_member_material_instance_t_renderer_effect_flags,
+		.shader_uniform_count = &DEFAULT_member_material_instance_t_shader_uniform_count,
+		.pipeline_state = &DEFAULT_member_material_instance_t_pipeline_state,
+		.archetype = &DEFAULT_member_material_instance_t_archetype,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_material_data_t_instance = {
+	.info = { .name = "instance", .size = 112, .metatype = 0 },
+	.type_info = &DEFAULT_material_instance_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_material_data_t DEFAULT_material_data_t = {
+	.info = { .name = "material_data_t", .size = 192, .metatype = 1 },
+	.member_count = 3,
+	.member_pointer = DEFAULT_material_data_t.member_array,
+	.members = {
+		.material_type = &DEFAULT_member_material_data_t_material_type,
+		.archetype = &DEFAULT_member_material_data_t_archetype,
+		.instance = &DEFAULT_member_material_data_t_instance,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_handle_t_material_info = {
+	.info = { .name = "material_info", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_material_data_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_member_t DEFAULT_member_asset_handle_t_dynamic_render_font = {
+	.info = { .name = "dynamic_render_font", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_dynamic_render_font_t.info,
+	.offset = 0,
+};
+
+constexpr type_info_asset_handle_t DEFAULT_asset_handle_t = {
+	.info = { .name = "asset_handle_t", .size = 24, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_asset_handle_t.member_array,
+	.members = {
+		.is_valid = &DEFAULT_member_asset_handle_t_is_valid,
+		.slot = &DEFAULT_member_asset_handle_t_slot,
+		.texture = &DEFAULT_member_asset_handle_t_texture,
+		.shader = &DEFAULT_member_asset_handle_t_shader,
+		.material_info = &DEFAULT_member_asset_handle_t_material_info,
+		.dynamic_render_font = &DEFAULT_member_asset_handle_t_dynamic_render_font,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_material_archetype_t_shader_handle = {
+	.info = { .name = "shader_handle", .size = 24, .metatype = 0 },
+	.type_info = &DEFAULT_asset_handle_t.info,
+	.offset = 48,
+};
+
+constexpr type_info_member_t DEFAULT_member_material_archetype_t_base_instance = {
+	.info = { .name = "base_instance", .size = 112, .metatype = 0 },
+	.type_info = &DEFAULT_material_instance_t.info,
+	.offset = 72,
+};
+
+constexpr type_info_material_archetype_t DEFAULT_material_archetype_t = {
+	.info = { .name = "material_archetype_t", .size = 184, .metatype = 1 },
+	.member_count = 6,
+	.member_pointer = DEFAULT_material_archetype_t.member_array,
+	.members = {
+		.ID = &DEFAULT_member_material_archetype_t_ID,
+		.version = &DEFAULT_member_material_archetype_t_version,
+		.name = &DEFAULT_member_material_archetype_t_name,
+		.shader_binary_name = &DEFAULT_member_material_archetype_t_shader_binary_name,
+		.shader_handle = &DEFAULT_member_material_archetype_t_shader_handle,
+		.base_instance = &DEFAULT_member_material_archetype_t_base_instance,
+	},
+};
+
+constexpr const type_info_t *const APOLLO_type_table[] = {
+	&DEFAULT_bool32.info,
+	&DEFAULT_u32.info,
+	&DEFAULT_RHI_pipeline_state_t.info,
+	&DEFAULT_u64.info,
+	&DEFAULT_byte.info,
+	&DEFAULT_s64.info,
+	&DEFAULT_string_t.info,
+	&DEFAULT_asset_slot_load_status_t.info,
+	&DEFAULT_asset_type_t.info,
+	&DEFAULT_sys_handle_t.info,
+	&DEFAULT_bool8.info,
+	&DEFAULT_file_t.info,
+	&DEFAULT_jfd_package_chunk_header_t.info,
+	&DEFAULT_jfd_package_entry_t.info,
+	&DEFAULT_float32.info,
+	&DEFAULT_float2.info,
+	&DEFAULT_bitmap_t.info,
+	&DEFAULT_RHI_image_usage_t.info,
+	&DEFAULT_RHI_image_filter_type_t.info,
+	&DEFAULT_RHI_image_wrapping_type_t.info,
+	&DEFAULT_RHI_sampler_create_info_t.info,
+	&DEFAULT_RHI_image_create_info_t.info,
+	&DEFAULT_void.info,
+	&DEFAULT_backend_image_t.info,
+	&DEFAULT_RHI_image_t.info,
+	&DEFAULT_texture2D_t.info,
+	&DEFAULT_s32.info,
+	&DEFAULT_texture_atlas_t.info,
+	&DEFAULT_subtexture_data_t.info,
+	&DEFAULT_memory_arena_t.info,
+	&DEFAULT_int.info,
+	&DEFAULT_volatile_u32.info,
+	&DEFAULT_jfd_file_header_t.info,
+	&DEFAULT_asset_file_data_t.info,
+	&DEFAULT_texture_atlas_registry_t.info,
+	&DEFAULT_sys_mutex_handle_t.info,
+	&DEFAULT_sys_mutex_t.info,
+	&DEFAULT_u8.info,
+	&DEFAULT_zone_allocator_block_t.info,
+	&DEFAULT_zone_allocator_t.info,
+	&DEFAULT_asset_catalog_t.info,
+	&DEFAULT_dynamic_render_font_t.info,
+	&DEFAULT_float64.info,
+	&DEFAULT_dynamic_render_font_varient_t.info,
+	&DEFAULT_glyph_metric_t.info,
+	&DEFAULT_temporary_glyph_t.info,
+	&DEFAULT_dynamic_render_font_page_t.info,
+	&DEFAULT_font_manager_t.info,
+	&DEFAULT_SDL_Window.info,
+	&DEFAULT_backend_render_context_t.info,
+	&DEFAULT_RHI_command_type_t.info,
+	&DEFAULT_const_char.info,
+	&DEFAULT_RHI_command_header_t.info,
+	&DEFAULT_RHI_command_t.info,
+	&DEFAULT_RHI_render_buffer_type_t.info,
+	&DEFAULT_RHI_render_buffer_memory_type_t.info,
+	&DEFAULT_backend_buffer_t.info,
+	&DEFAULT_RHI_render_buffer_t.info,
+	&DEFAULT_RHI_index_buffer_t.info,
+	&DEFAULT_bitmap_format_t.info,
+	&DEFAULT_RHI_renderpass_key_t.info,
+	&DEFAULT_RHI_renderpass_attachment_access_t.info,
+	&DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
+	&DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
+	&DEFAULT_float4.info,
+	&DEFAULT_ivec4_t.info,
+	&DEFAULT_RHI_clear_value_t.info,
+	&DEFAULT_RHI_renderpass_attachment_t.info,
+	&DEFAULT_RHI_renderpass_desc_t.info,
+	&DEFAULT_backend_renderpass_handle_t.info,
+	&DEFAULT_backend_framebuffer_handle_t.info,
+	&DEFAULT_RHI_renderpass_t.info,
+	&DEFAULT_RHI_command_list_type_t.info,
+	&DEFAULT_backend_command_buffer_t.info,
+	&DEFAULT_RHI_command_list_t.info,
+	&DEFAULT_RHI_command_present_frame_t.info,
+	&DEFAULT_RHI_context_t.info,
+	&DEFAULT_asset_manager_t.info,
+	&DEFAULT_asset_slot_t.info,
+	&DEFAULT_backend_shader_t.info,
+	&DEFAULT_RHI_shader_t.info,
+	&DEFAULT_stored_material_type_t.info,
+	&DEFAULT_material_instance_t.info,
+	&DEFAULT_material_data_t.info,
+	&DEFAULT_asset_handle_t.info,
+	&DEFAULT_material_archetype_t.info,
+	nullptr,
+};
+constexpr const type_info_t *const APOLLO_member_table[] = {
+	&DEFAULT_member_RHI_pipeline_state_t_blend_enabled.info,
+	&DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode.info,
+	&DEFAULT_member_RHI_pipeline_state_t_dst_color_blend_mode.info,
+	&DEFAULT_member_RHI_pipeline_state_t_src_alpha_blend_mode.info,
+	&DEFAULT_member_RHI_pipeline_state_t_dst_alpha_blend_mode.info,
+	&DEFAULT_member_RHI_pipeline_state_t_color_blend_op.info,
+	&DEFAULT_member_RHI_pipeline_state_t_alpha_blend_op.info,
+	&DEFAULT_member_RHI_pipeline_state_t_depth_testing_enabled.info,
+	&DEFAULT_member_RHI_pipeline_state_t_depth_writing_enabled.info,
+	&DEFAULT_member_RHI_pipeline_state_t_depth_func.info,
+	&DEFAULT_member_RHI_pipeline_state_t_stencil_enabled.info,
+	&DEFAULT_member_RHI_pipeline_state_t_stencil_state.info,
+	&DEFAULT_member_RHI_pipeline_state_t_stencil_keep.info,
+	&DEFAULT_member_RHI_pipeline_state_t_polygon_mode.info,
+	&DEFAULT_member_RHI_pipeline_state_t_primitive_type.info,
+	&DEFAULT_member_material_archetype_t_ID.info,
+	&DEFAULT_member_material_archetype_t_version.info,
+	&DEFAULT_member_string_t_data.info,
+	&DEFAULT_member_string_t_count.info,
+	&DEFAULT_member_material_archetype_t_name.info,
+	&DEFAULT_member_material_archetype_t_shader_binary_name.info,
+	&DEFAULT_member_asset_handle_t_is_valid.info,
+	&DEFAULT_member_asset_slot_t_ID.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_Invalid.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_Unloaded.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_LoadQueued.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_Loaded.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldUnload.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldReload.info,
+	&DEFAULT_member_asset_slot_load_status_t_ASLS_Count.info,
+	&DEFAULT_member_asset_slot_t_slot_state.info,
+	&DEFAULT_member_asset_type_t_AT_Invalid.info,
+	&DEFAULT_member_asset_type_t_AT_Bitmap.info,
+	&DEFAULT_member_asset_type_t_AT_Shader.info,
+	&DEFAULT_member_asset_type_t_AT_Material.info,
+	&DEFAULT_member_asset_type_t_AT_Font.info,
+	&DEFAULT_member_asset_type_t_AT_Sound.info,
+	&DEFAULT_member_asset_type_t_AT_Count.info,
+	&DEFAULT_member_asset_slot_t_type.info,
+	&DEFAULT_member_asset_slot_t_is_valid_for_handles.info,
+	&DEFAULT_member_asset_slot_t_name.info,
+	&DEFAULT_member_file_t_handle.info,
+	&DEFAULT_member_file_t_file_name.info,
+	&DEFAULT_member_file_t_filepath.info,
+	&DEFAULT_member_file_t_file_size.info,
+	&DEFAULT_member_file_t_current_read_offset.info,
+	&DEFAULT_member_file_t_current_write_offset.info,
+	&DEFAULT_member_file_t_overlapping.info,
+	&DEFAULT_member_file_t_for_writing.info,
+	&DEFAULT_member_asset_slot_t_owner_asset_file.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_magic_value.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_total_entry_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_asset_type.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_filename_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_fullpath_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_entry_data_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_modtime.info,
+	&DEFAULT_member_jfd_package_entry_t_entry_header.info,
+	&DEFAULT_member_jfd_package_entry_t_data_offset.info,
+	&DEFAULT_member_jfd_package_entry_t_modtime.info,
+	&DEFAULT_member_jfd_package_entry_t_filename.info,
+	&DEFAULT_member_jfd_package_entry_t_fullpath.info,
+	&DEFAULT_member_jfd_package_entry_t_asset_data.info,
+	&DEFAULT_member_asset_slot_t_package_entry.info,
+	&DEFAULT_member_float2_elements.info,
+	&DEFAULT_member_float2_x.info,
+	&DEFAULT_member_float2_y.info,
+	&DEFAULT_member_float2_xy.info,
+	&DEFAULT_member_subtexture_data_t_uv_min.info,
+	&DEFAULT_member_subtexture_data_t_uv_max.info,
+	&DEFAULT_member_subtexture_data_t_offset.info,
+	&DEFAULT_member_subtexture_data_t_size.info,
+	&DEFAULT_member_subtexture_data_t_atlased_generation.info,
+	&DEFAULT_member_subtexture_data_t_atlas_subtexture_index.info,
+	&DEFAULT_member_texture2D_t_ID.info,
+	&DEFAULT_member_bitmap_t_width.info,
+	&DEFAULT_member_bitmap_t_height.info,
+	&DEFAULT_member_bitmap_t_channels.info,
+	&DEFAULT_member_bitmap_t_format.info,
+	&DEFAULT_member_bitmap_t_pixels.info,
+	&DEFAULT_member_texture2D_t_bitmap.info,
+	&DEFAULT_member_RHI_image_t_ID.info,
+	&DEFAULT_member_RHI_image_create_info_t_data.info,
+	&DEFAULT_member_RHI_image_create_info_t_width.info,
+	&DEFAULT_member_RHI_image_create_info_t_height.info,
+	&DEFAULT_member_RHI_image_create_info_t_format.info,
+	&DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_INVALID.info,
+	&DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT.info,
+	&DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT.info,
+	&DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE.info,
+	&DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_SOURCE.info,
+	&DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_DESTINATION.info,
+	&DEFAULT_member_RHI_image_create_info_t_usage.info,
+	&DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_INVALID.info,
+	&DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_NEAREST.info,
+	&DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_LINEAR.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_filtering.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_anisotropy_enabled.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_max_anisotropy.info,
+	&DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_INVALID.info,
+	&DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE.info,
+	&DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER.info,
+	&DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_REPEAT.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_wrapu.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_wrapv.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_compare_operation.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_compare_ops_enabled.info,
+	&DEFAULT_member_RHI_sampler_create_info_t_use_normalized_coordinates.info,
+	&DEFAULT_member_RHI_image_create_info_t_sampler_info.info,
+	&DEFAULT_member_RHI_image_t_create_info.info,
+	&DEFAULT_member_backend_image_t_is_valid.info,
+	&DEFAULT_member_backend_image_t_handle.info,
+	&DEFAULT_member_RHI_image_t_backend_image.info,
+	&DEFAULT_member_texture2D_t_gpu_data.info,
+	&DEFAULT_member_texture_atlas_t_texture.info,
+	&DEFAULT_member_texture_atlas_t_bitmap_data.info,
+	&DEFAULT_member_texture_atlas_t_ID.info,
+	&DEFAULT_member_texture_atlas_t_merge_counter.info,
+	&DEFAULT_member_texture_atlas_t_textures_to_merge.info,
+	&DEFAULT_member_texture_atlas_t_packed_subtextures.info,
+	&DEFAULT_member_texture_atlas_t_packed_subtexture_count.info,
+	&DEFAULT_member_texture_atlas_t_is_valid.info,
+	&DEFAULT_member_texture_atlas_t_atlas_cursor_x.info,
+	&DEFAULT_member_texture_atlas_t_atlas_cursor_y.info,
+	&DEFAULT_member_texture_atlas_t_tallest_y.info,
+	&DEFAULT_member_texture_atlas_t_atlas_size.info,
+	&DEFAULT_member_subtexture_data_t_atlas.info,
+	&DEFAULT_member_subtexture_data_t_packed_asset.info,
+	&DEFAULT_member_asset_slot_t_subtexture_data.info,
+	&DEFAULT_member_asset_manager_t_is_initialized.info,
+	&DEFAULT_member_memory_arena_t_is_initialized.info,
+	&DEFAULT_member_memory_arena_t_base.info,
+	&DEFAULT_member_memory_arena_t_used.info,
+	&DEFAULT_member_memory_arena_t_block_size.info,
+	&DEFAULT_member_memory_arena_t_block_counter.info,
+	&DEFAULT_member_memory_arena_t_scratch_arena_count.info,
+	&DEFAULT_member_asset_manager_t_manager_arena.info,
+	&DEFAULT_member_asset_manager_t_freetype_handle.info,
+	&DEFAULT_member_asset_file_data_t_is_initialized.info,
+	&DEFAULT_member_asset_file_data_t_ID.info,
+	&DEFAULT_member_asset_file_data_t_current_package_generation.info,
+	&DEFAULT_member_asset_file_data_t_init_arena.info,
+	&DEFAULT_member_asset_file_data_t_load_status.info,
+	&DEFAULT_member_asset_file_data_t_file_info.info,
+	&DEFAULT_member_asset_file_data_t_raw_file_data.info,
+	&DEFAULT_member_jfd_file_header_t_magic_value.info,
+	&DEFAULT_member_jfd_file_header_t_version.info,
+	&DEFAULT_member_jfd_file_header_t_flags.info,
+	&DEFAULT_member_jfd_file_header_t_entry_count.info,
+	&DEFAULT_member_asset_file_data_t_header.info,
+	&DEFAULT_member_asset_file_data_t_package_entries.info,
+	&DEFAULT_member_asset_file_data_t_package_entry_count.info,
+	&DEFAULT_member_asset_file_data_t_entry_hash.info,
+	&DEFAULT_member_asset_file_data_t_loaded_assets.info,
+	&DEFAULT_member_asset_file_data_t_header_data.info,
+	&DEFAULT_member_asset_manager_t_asset_files.info,
+	&DEFAULT_member_asset_manager_t_asset_name_to_file.info,
+	&DEFAULT_member_asset_manager_t_loaded_file_count.info,
+	&DEFAULT_member_asset_manager_t_asset_load_queue.info,
+	&DEFAULT_member_asset_manager_t_load_queue_size.info,
+	&DEFAULT_member_asset_manager_t_asset_unload_queue.info,
+	&DEFAULT_member_asset_manager_t_unload_queue_size.info,
+	&DEFAULT_member_texture_atlas_registry_t_atlases.info,
+	&DEFAULT_member_texture_atlas_registry_t_current_atlas_count.info,
+	&DEFAULT_member_asset_manager_t_atlas_registry.info,
+	&DEFAULT_member_sys_mutex_t_handle.info,
+	&DEFAULT_member_zone_allocator_t_mutex.info,
+	&DEFAULT_member_zone_allocator_t_capacity.info,
+	&DEFAULT_member_zone_allocator_t_base.info,
+	&DEFAULT_member_zone_allocator_block_t_block_id.info,
+	&DEFAULT_member_zone_allocator_block_t_is_allocated.info,
+	&DEFAULT_member_zone_allocator_block_t_block_size.info,
+	&DEFAULT_member_zone_allocator_block_t_allocation_tag.info,
+	&DEFAULT_member_zone_allocator_block_t_next_block.info,
+	&DEFAULT_member_zone_allocator_block_t_prev_block.info,
+	&DEFAULT_member_zone_allocator_t_first_block.info,
+	&DEFAULT_member_zone_allocator_t_cursor.info,
+	&DEFAULT_member_asset_manager_t_asset_allocator.info,
+	&DEFAULT_member_asset_catalog_t_ID.info,
+	&DEFAULT_member_asset_catalog_t_catalog_type.info,
+	&DEFAULT_member_asset_catalog_t_asset_manager.info,
+	&DEFAULT_member_asset_catalog_t_default_asset.info,
+	&DEFAULT_member_asset_catalog_t_asset_lookup.info,
+	&DEFAULT_member_asset_catalog_t_loaded_assets.info,
+	&DEFAULT_member_asset_manager_t_asset_catalogs.info,
+	&DEFAULT_member_asset_manager_t_texture_catalog.info,
+	&DEFAULT_member_asset_manager_t_shader_catalog.info,
+	&DEFAULT_member_asset_manager_t_material_catalog.info,
+	&DEFAULT_member_asset_manager_t_font_catalog.info,
+	&DEFAULT_member_asset_manager_t_sound_catalog.info,
+	&DEFAULT_member_dynamic_render_font_page_t_is_dirty.info,
+	&DEFAULT_member_dynamic_render_font_page_t_is_full.info,
+	&DEFAULT_member_dynamic_render_font_t_font_arena.info,
+	&DEFAULT_member_dynamic_render_font_t_font_face.info,
+	&DEFAULT_member_dynamic_render_font_t_varients.info,
+	&DEFAULT_member_dynamic_render_font_page_t_parent_font.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_font_size.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_size_to_pixels.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_line_spacing.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_max_ascender.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_max_descender.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_y_center_offset.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_typical_ascender.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_typical_descender.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_em_width.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_default_unknown_character.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_default_utf32_unknown_character.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_parent_font.info,
+	&DEFAULT_member_dynamic_render_font_varient_t_first_page.info,
+	&DEFAULT_member_dynamic_render_font_page_t_varient.info,
+	&DEFAULT_member_dynamic_render_font_page_t_font_atlas.info,
+	&DEFAULT_member_dynamic_render_font_page_t_glyphs.info,
+	&DEFAULT_member_dynamic_render_font_page_t_loaded_glyph_count.info,
+	&DEFAULT_member_temporary_glyph_t_utf32_codepoint.info,
+	&DEFAULT_member_glyph_metric_t_is_valid.info,
+	&DEFAULT_member_glyph_metric_t_is_fetched.info,
+	&DEFAULT_member_glyph_metric_t_advance.info,
+	&DEFAULT_member_glyph_metric_t_ascent.info,
+	&DEFAULT_member_glyph_metric_t_width.info,
+	&DEFAULT_member_glyph_metric_t_height.info,
+	&DEFAULT_member_glyph_metric_t_offset_x.info,
+	&DEFAULT_member_glyph_metric_t_offset_y.info,
+	&DEFAULT_member_glyph_metric_t_atlas_offset.info,
+	&DEFAULT_member_glyph_metric_t_atlas_size.info,
+	&DEFAULT_member_glyph_metric_t_owner_atlas.info,
+	&DEFAULT_member_glyph_metric_t_synthetic_texture_handle.info,
+	&DEFAULT_member_temporary_glyph_t_metrics.info,
+	&DEFAULT_member_temporary_glyph_t_glyph_width.info,
+	&DEFAULT_member_temporary_glyph_t_glyph_height.info,
+	&DEFAULT_member_temporary_glyph_t_cursor_x.info,
+	&DEFAULT_member_temporary_glyph_t_cursor_y.info,
+	&DEFAULT_member_dynamic_render_font_page_t_temporary_glyphs.info,
+	&DEFAULT_member_dynamic_render_font_page_t_temporary_glyph_count.info,
+	&DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_x.info,
+	&DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_y.info,
+	&DEFAULT_member_dynamic_render_font_page_t_tallest_y.info,
+	&DEFAULT_member_dynamic_render_font_page_t_next_page.info,
+	&DEFAULT_member_font_manager_t_pages_to_update.info,
+	&DEFAULT_member_font_manager_t_pages_queued.info,
+	&DEFAULT_member_asset_manager_t_font_manager.info,
+	&DEFAULT_member_RHI_context_t_window.info,
+	&DEFAULT_member_RHI_context_t_backend_render_context.info,
+	&DEFAULT_member_RHI_context_t_RHI_arena.info,
+	&DEFAULT_member_RHI_context_t_transient_arena.info,
+	&DEFAULT_member_RHI_command_list_t_is_initialized.info,
+	&DEFAULT_member_RHI_command_list_t_RHI_context.info,
+	&DEFAULT_member_RHI_command_list_t_transient_arena.info,
+	&DEFAULT_member_RHI_command_list_t_command_arena.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_INVALID.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_END_RENDERPASS.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_SHADER.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_SCISSOR.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME.info,
+	&DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_COUNT.info,
+	&DEFAULT_member_RHI_command_header_t_command_type.info,
+	&DEFAULT_member_RHI_command_header_t_line_number.info,
+	&DEFAULT_member_RHI_command_header_t_filename.info,
+	&DEFAULT_member_RHI_command_t_header.info,
+	&DEFAULT_member_RHI_command_t_data.info,
+	&DEFAULT_member_RHI_command_list_t_commands.info,
+	&DEFAULT_member_RHI_command_list_t_command_count.info,
+	&DEFAULT_member_RHI_command_list_t_draw_instance_command_count.info,
+	&DEFAULT_member_RHI_command_list_t_bind_shader_command_count.info,
+	&DEFAULT_member_RHI_command_list_t_bind_render_target_command_count.info,
+	&DEFAULT_member_RHI_command_list_t_bind_material_command_count.info,
+	&DEFAULT_member_RHI_command_list_t_active_render_state.info,
+	&DEFAULT_member_RHI_command_list_t_active_vertex_buffers.info,
+	&DEFAULT_member_RHI_command_list_t_vertex_buffer_count.info,
+	&DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INVALID.info,
+	&DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER.info,
+	&DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER.info,
+	&DEFAULT_member_RHI_render_buffer_t_type.info,
+	&DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED.info,
+	&DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY.info,
+	&DEFAULT_member_RHI_render_buffer_t_allocation_type.info,
+	&DEFAULT_member_RHI_render_buffer_t_constant_buffer_hash_ID.info,
+	&DEFAULT_member_RHI_render_buffer_t_buffer_ID.info,
+	&DEFAULT_member_RHI_render_buffer_t_buffer_capacity.info,
+	&DEFAULT_member_RHI_render_buffer_t_buffer_element_size.info,
+	&DEFAULT_member_RHI_render_buffer_t_buffer_elements_used.info,
+	&DEFAULT_member_RHI_render_buffer_t_working_offset.info,
+	&DEFAULT_member_RHI_render_buffer_t_mapped_data.info,
+	&DEFAULT_member_RHI_render_buffer_t_buffer_info.info,
+	&DEFAULT_member_RHI_index_buffer_t_buffer_data.info,
+	&DEFAULT_member_RHI_index_buffer_t_index_data.info,
+	&DEFAULT_member_RHI_index_buffer_t_max_indices.info,
+	&DEFAULT_member_RHI_index_buffer_t_index_count.info,
+	&DEFAULT_member_RHI_index_buffer_t_index_offset.info,
+	&DEFAULT_member_RHI_index_buffer_t_instance_offset.info,
+	&DEFAULT_member_RHI_command_list_t_active_index_buffer.info,
+	&DEFAULT_member_RHI_command_list_t_active_scissor_command.info,
+	&DEFAULT_member_RHI_command_list_t_active_viewport_command.info,
+	&DEFAULT_member_RHI_command_list_t_active_shader_program.info,
+	&DEFAULT_member_RHI_renderpass_t_ID.info,
+	&DEFAULT_member_bitmap_format_t_BMF_Invalid.info,
+	&DEFAULT_member_bitmap_format_t_BMF_R8.info,
+	&DEFAULT_member_bitmap_format_t_BMF_B8.info,
+	&DEFAULT_member_bitmap_format_t_BMF_G8.info,
+	&DEFAULT_member_bitmap_format_t_BMF_RGBA32_SRGB.info,
+	&DEFAULT_member_bitmap_format_t_BMF_RGBA32_UNORM.info,
+	&DEFAULT_member_bitmap_format_t_BMF_BGRA32_UNORM.info,
+	&DEFAULT_member_bitmap_format_t_BMF_RGB24_UNORM.info,
+	&DEFAULT_member_bitmap_format_t_BMF_RGB24_SRGB.info,
+	&DEFAULT_member_bitmap_format_t_BMF_D24_SFLOAT_S8.info,
+	&DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT_S8_UINT.info,
+	&DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT.info,
+	&DEFAULT_member_bitmap_format_t_BMF_Count.info,
+	&DEFAULT_member_RHI_renderpass_key_t_attachment_formats.info,
+	&DEFAULT_member_RHI_renderpass_t_renderpass_key.info,
+	&DEFAULT_member_RHI_renderpass_desc_t_render_width.info,
+	&DEFAULT_member_RHI_renderpass_desc_t_render_height.info,
+	&DEFAULT_member_RHI_renderpass_desc_t_color_attachment_count.info,
+	&DEFAULT_member_RHI_renderpass_desc_t_resize_with_window.info,
+	&DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID.info,
+	&DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ.info,
+	&DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE.info,
+	&DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE.info,
+	&DEFAULT_member_RHI_renderpass_attachment_t_access.info,
+	&DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID.info,
+	&DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR.info,
+	&DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD.info,
+	&DEFAULT_member_RHI_renderpass_attachment_t_load_operation.info,
+	&DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID.info,
+	&DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE.info,
+	&DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE.info,
+	&DEFAULT_member_RHI_renderpass_attachment_t_store_operation.info,
+	&DEFAULT_member_RHI_renderpass_attachment_t_image.info,
+	&DEFAULT_member_RHI_clear_value_t_float_color.info,
+	&DEFAULT_member_RHI_clear_value_t_int_color.info,
+	&DEFAULT_member_RHI_clear_value_t_uint_color.info,
+	&DEFAULT_member_RHI_clear_value_t_depth.info,
+	&DEFAULT_member_RHI_clear_value_t_stencil.info,
+	&DEFAULT_member_RHI_renderpass_attachment_t_clear_value.info,
+	&DEFAULT_member_RHI_renderpass_desc_t_color_attachments.info,
+	&DEFAULT_member_RHI_renderpass_desc_t_depth_stencil_attachment.info,
+	&DEFAULT_member_RHI_renderpass_t_create_info.info,
+	&DEFAULT_member_RHI_renderpass_t_renderpass_handle.info,
+	&DEFAULT_member_RHI_renderpass_t_framebuffer_handle.info,
+	&DEFAULT_member_RHI_renderpass_t_depth_stencil_attachment.info,
+	&DEFAULT_member_RHI_renderpass_t_color_attachments.info,
+	&DEFAULT_member_RHI_renderpass_t_color_attachment_count.info,
+	&DEFAULT_member_RHI_renderpass_t_total_attachment_count.info,
+	&DEFAULT_member_RHI_renderpass_t_render_width.info,
+	&DEFAULT_member_RHI_renderpass_t_render_height.info,
+	&DEFAULT_member_RHI_renderpass_t_attachment_clear_values.info,
+	&DEFAULT_member_RHI_renderpass_t_has_depth_stencil_attachment.info,
+	&DEFAULT_member_RHI_renderpass_t_resize_with_window.info,
+	&DEFAULT_member_RHI_command_list_t_active_renderpass.info,
+	&DEFAULT_member_RHI_command_list_t_presenting.info,
+	&DEFAULT_member_RHI_command_list_t_image_shader_params.info,
+	&DEFAULT_member_RHI_command_list_t_image_count.info,
+	&DEFAULT_member_RHI_command_list_t_image_ids_to_bind.info,
+	&DEFAULT_member_RHI_command_list_t_bound_image_count.info,
+	&DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS.info,
+	&DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE.info,
+	&DEFAULT_member_RHI_command_list_t_command_list_type.info,
+	&DEFAULT_member_RHI_command_list_t_backend_command_buffer.info,
+	&DEFAULT_member_RHI_context_t_command_lists.info,
+	&DEFAULT_member_RHI_context_t_command_list_count.info,
+	&DEFAULT_member_RHI_context_t_constant_buffer_hash.info,
+	&DEFAULT_member_RHI_context_t_used_constant_buffers.info,
+	&DEFAULT_member_RHI_context_t_total_render_instances.info,
+	&DEFAULT_member_RHI_context_t_total_materials.info,
+	&DEFAULT_member_RHI_context_t_total_shaders.info,
+	&DEFAULT_member_RHI_context_t_total_buffers.info,
+	&DEFAULT_member_RHI_context_t_window_size.info,
+	&DEFAULT_member_RHI_context_t_current_window_size_generation.info,
+	&DEFAULT_member_RHI_context_t_last_window_size_generation.info,
+	&DEFAULT_member_RHI_context_t_renderpasses.info,
+	&DEFAULT_member_RHI_context_t_renderpass_count.info,
+	&DEFAULT_member_RHI_command_present_frame_t_presentation_source.info,
+	&DEFAULT_member_RHI_context_t_present_command.info,
+	&DEFAULT_member_asset_manager_t_RHI_context.info,
+	&DEFAULT_member_asset_slot_t_asset_manager.info,
+	&DEFAULT_member_asset_slot_t_catalog.info,
+	&DEFAULT_member_asset_slot_t_package_generation.info,
+	&DEFAULT_member_asset_slot_t_loaded_asset_index.info,
+	&DEFAULT_member_asset_slot_t_owner_asset_file_index.info,
+	&DEFAULT_member_asset_handle_t_slot.info,
+	&DEFAULT_member_asset_handle_t_texture.info,
+	&DEFAULT_member_RHI_shader_t_ID.info,
+	&DEFAULT_member_RHI_shader_t_shader_data.info,
+	&DEFAULT_member_asset_handle_t_shader.info,
+	&DEFAULT_member_stored_material_type_t_SMT_Invalid.info,
+	&DEFAULT_member_stored_material_type_t_SMT_Instance.info,
+	&DEFAULT_member_stored_material_type_t_SMT_Archetype.info,
+	&DEFAULT_member_material_data_t_material_type.info,
+	&DEFAULT_member_material_data_t_archetype.info,
+	&DEFAULT_member_material_instance_t_ID.info,
+	&DEFAULT_member_material_instance_t_version.info,
+	&DEFAULT_member_material_instance_t_name.info,
+	&DEFAULT_member_material_instance_t_renderer_effect_flags.info,
+	&DEFAULT_member_material_instance_t_shader_uniform_count.info,
+	&DEFAULT_member_material_instance_t_pipeline_state.info,
+	&DEFAULT_member_material_instance_t_archetype.info,
+	&DEFAULT_member_material_data_t_instance.info,
+	&DEFAULT_member_asset_handle_t_material_info.info,
+	&DEFAULT_member_asset_handle_t_dynamic_render_font.info,
+	&DEFAULT_member_material_archetype_t_shader_handle.info,
+	&DEFAULT_member_material_archetype_t_base_instance.info,
+	nullptr,
+};
+
+} // namespace Apollo

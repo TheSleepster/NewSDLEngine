@@ -7,7 +7,6 @@
 #define MATH_IMPLEMENTATION
 #define HASH_TABLE_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION
-#define ATHENA_IMPLMENTATION
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION
 
 #include <c_base.h>
@@ -43,8 +42,9 @@
 #include <s_entity.h>
 
 //#include <meta/GENERATED_program_RTTI.h>
-#include <code_generator/athena/athena.h>
-#include <meta/ATHENA_GENERATED_RTTI.h>
+#if !defined(APOLLO_GENERATE)
+#include <meta/APOLLO_GENERATED_RTTI.h>
+#endif
 
 // NOTE(Sleepster): Game 
 #if defined(GAME_DLL_BUILD) || defined(RELEASE)

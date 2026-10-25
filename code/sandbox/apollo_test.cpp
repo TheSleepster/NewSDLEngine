@@ -369,11 +369,13 @@ main(void)
     string_t engine_define   = STR("-DENGINE_BUILD");
     string_t game_define     = STR("-DGAME_BUILD");
     string_t renderer_define = STR("-DRENDERER_HEADLESS");
+    string_t generate_define = STR("-DAPOLLO_GENERATE");
 
     c_dynarray_add(&options, &include_path);
     c_dynarray_add(&options, &engine_define);
     c_dynarray_add(&options, &game_define);
     c_dynarray_add(&options, &renderer_define);
+    c_dynarray_add(&options, &generate_define);
     apollo_code_decl_list_t *declarations = Apollo::parse_singular_file(STR("build.cpp"), options);
     if(declarations)
     {
@@ -389,7 +391,7 @@ main(void)
         c_string_builder_init(&type_table_builder,   MB(2));
         c_string_builder_init(&member_table_builder, MB(2));
 
-        file_t out_file = c_file_open(STR("meta/test_metaprogram_file.h"), true, true);
+        file_t out_file = c_file_open(STR("meta/APOLLO_GENERATED_RTTI.h"), true, true);
         c_string_builder_sprintf(&header_builder, R"(#include <code_generator/apollo/apollo_runtime.h>
 
 namespace Apollo {
@@ -397,11 +399,11 @@ namespace Apollo {
 )");
         c_string_builder_sprintf(&type_table_builder,   "constexpr const type_info_t *const APOLLO_type_table[] = {\n");
         c_string_builder_sprintf(&member_table_builder, "constexpr const type_info_t *const APOLLO_member_table[] = {\n");
-        dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Athena::type_info"));
+        dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Apollo::type_info"));
         for(const auto &call: calls)
         {
             // NOTE(Sleepster): A type_info call can hand us the type itself
-            // (Athena::type_info<Foo>()) or the name of one (Athena::type_info(STR("Foo"))),
+            // (Apollo::type_info<Foo>()) or the name of one (Apollo::type_info(STR("Foo"))),
             // so we try the argument's name first and then its type. Whichever one resolves is
             // enough, the create_declaration_type_*() functions ignore anything already written out.
             for(const auto &argument: call.arguments)
