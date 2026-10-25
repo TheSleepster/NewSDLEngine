@@ -281,7 +281,7 @@ add_rules("platform_config")
 add_rules("llvmmingw.debug_pdb")
 
 -- ------------------------------------------------------------------------------
--- Build the Tools (athena, shader_reflector, asset_file_packer)
+-- Build the Tools (athena, apollo, shader_reflector, asset_file_packer)
 -- ------------------------------------------------------------------------------
 
 local function build_host_utility(toolname, source_file)
@@ -314,21 +314,23 @@ local function any_file_newer(files, output)
     return false
 end
 
-target("AthenaGenerate", function()
+target("ApolloGenerate", function()
     set_kind("phony")
-    add_deps("athena")
+    add_deps("sandbox_apollo_test")
     on_build(function(target)
-        local output_file = path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RTTI.h")
+        local output_file = path.join(SOURCE_DIR, "meta", "APOLLO_GENERATED_RTTI.h")
 
         local inputs = os.files(path.join(SOURCE_DIR, "*.h"))
-        table.insert(inputs, path.join(TARGET_DIR, "athena"))
+        inputs = table.join(inputs, os.files(path.join(SOURCE_DIR, "*.cpp")))
+        table.insert(inputs, path.join(TARGET_DIR, "sandbox_apollo_test"))
 
         if any_file_newer(inputs, output_file) then
-            print("[Running: Athena]")
-            os.execv(path.join(TARGET_DIR, "athena"), {
-                "--directory=" .. SOURCE_DIR,
-                "--output_file=" .. path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RTTI.h")
-            })
+            print("[Running: Apollo]")
+            local popd = os.curdir()
+
+            os.cd(SOURCE_DIR)
+            os.execv(path.join(TARGET_DIR, "sandbox_apollo_test"))
+            os.cd(popd)
         end
     end)
 end)
@@ -450,7 +452,7 @@ make_unity_target("test",    path.join(SOURCE_DIR, "tests"),   "tests")
 -- Engine & DLL 
 -- ------------------------------------------------------------------------------
 target("game_executable", function()
-    add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
+    add_deps("ApolloGenerate", "GenerateShaderModules", "GenerateAssetPackages")
 
     -- NOTE(Sleepster): Call it game debug no matter what 
     local GAME_BASENAME = "game_DEBUG"
@@ -494,7 +496,7 @@ end)
 
 if BUILD_CONFIG == "debug" then
     target("game_DLL", function()
-        add_deps("game_executable", "AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
+        add_deps("game_executable", "ApolloGenerate", "GenerateShaderModules", "GenerateAssetPackages")
         set_kind("shared")
         set_targetdir(TARGET_DIR)
         set_basename("game_DLL.tmp")
