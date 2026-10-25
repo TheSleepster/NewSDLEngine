@@ -19,7 +19,6 @@ HASH TABLE IMPL
 #endif
 
 #include <clang-c/Index.h>
-#define APOLLO_TAG(tag_type) [[clang::annotate((tag_type))]]
 
 #include <c_base.h>
 #include <c_types.h>
@@ -496,6 +495,14 @@ struct apollo_procedure_call_expression_t
     dynarray_t<apollo_procedure_argument_t> arguments;
 };
 
+// NOTE(Sleepster): Although the general ideal usage is that of
+// for(const auto &declaration: declarations)
+// {
+// }
+//
+// (where in the above case "declarations" is a passed in pointer of apollo_code_decl_list_t)
+// I don't want to explictly permit this since it's implicitly just going to use ALL and you 
+// may not know these other options exist.
 using apollo_decl_table_t = apollo_hash_table_t<string_t, code_decl_t *, 2048>;
 struct apollo_code_decl_list_t
 {
@@ -1602,6 +1609,21 @@ bool8
 has_attribute(code_decl_procedure_t *lambda, string_t attribute)
 {
     return(has_attribute(static_cast<code_decl_t*>(lambda), attribute));
+}
+
+dynarray_t<code_decl_t *>
+get_declarations_with_attribute(apollo_code_decl_list_t *declarations, string_t attribute)
+{
+    dynarray_t<code_decl_t *> result = {};
+    for(code_decl_t *declaration: declarations->all)
+    {
+        if(has_attribute(declaration, attribute))
+        {
+            c_dynarray_add(&result, &declaration);
+        }
+    }
+
+    return(result);
 }
 
 dynarray_t<apollo_procedure_call_expression_t>

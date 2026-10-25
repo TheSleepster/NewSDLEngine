@@ -274,10 +274,11 @@ s_entity_get_entities_within_position_range(entity_manager_t *entity_manager, ve
     return(result);
 }
 
-/* =======================================
- * COLLISIONS
- * =======================================
- */
+/* 
+=======================================
+COLLISIONS
+=======================================
+*/
 
 struct sweep_result_t
 {

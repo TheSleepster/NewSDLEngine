@@ -8,8 +8,15 @@
 
 #define APOLLO_RUNTIME_H
 #include <string.h>
+#define APOLLO_TAG(tag_type) [[clang::annotate((tag_type))]]
 
 namespace Apollo {
+
+// TODO(Sleepster):  
+// The current functions like type_info() are very slow because it's just an O(N) linear search
+// which is stupid. In the future we should asign IDs to the generated structures so that binary
+// searching can be done which will be MUCH quicker. It doesn't really matter right now with like
+// ~10 type infos, but with hundreds it definitely will.
 
 enum metatype_t
 {

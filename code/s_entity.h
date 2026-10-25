@@ -20,6 +20,8 @@
 #include <s_input_manager.h>
 #include <s_asset_manager.h>
 
+#include <code_generator/apollo/apollo_runtime.h>
+
 struct animation2D_t;
 
 #define MAX_CHUNK_ENTITIES (1000)
@@ -46,7 +48,6 @@ struct entity_create_info_t
     X(ENTITY_ARCHETYPE_COLLIDER, "ENTITY_ARCHETYPE_COLLIDER", s_entity_collider_create) \
     X(ENTITY_ARCHETYPE_TILE, "ENTITY_ARCHETYPE_TILE", s_entity_tile_create) \
 
-CODE_GEN_IGNORE_DECL
 enum entity_archetype_t
 {
     ENTITY_ARCHETYPE_INVALID,
@@ -73,7 +74,7 @@ enum entity_flags_t
 };
 
 // TODO(Sleepster): The entity should probably embed it's world chunk 
-struct entity_t
+struct APOLLO_TAG("Game_Entity") entity_t
 {
     // NOTE(Sleepster): Base Entity 
     u32             ID;
@@ -140,6 +141,7 @@ struct entity_manager_t
 
 struct entity_query_t
 {
+    // TODO(Sleepster): Make this an array view so it's bounds checked
     entity_t **entities;
     s32        entity_count;
 

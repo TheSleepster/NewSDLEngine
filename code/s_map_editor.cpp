@@ -411,9 +411,13 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
             }
             else if(undo_action->kind == EDITOR_ACTION_ENTITY_DESTROY)
             {
+                // TODO(Sleepster): This can go away with the else { branch being the only
+                // code path here. We should just assume that if there is no array of entities that
+                // this is a single "destroy" rather than a grouped destroy command
                 if(undo_action->entities == null)
                 {
                     entity_t *entity = null;
+                    // s_entity_create_from_editor_action(game_state, undo_action);
                     switch(undo_action->entity_archetype)
                     {
                         case ENTITY_ARCHETYPE_TILE:
