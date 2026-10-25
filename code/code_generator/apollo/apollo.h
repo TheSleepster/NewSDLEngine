@@ -1246,6 +1246,11 @@ traverse_function(CXCursor cursor, code_decl_t *code_decl)
     procedure_info->decl        = cursor;
     procedure_info->identifier  = convert(clang_getCursorSpelling(cursor));
     procedure_info->size        = 0;
+    if(c_string_compare(procedure_info->identifier, STR("s_entity_collider_create")))
+    {
+        int x = 0;
+        (void)x;
+    }
 
     // NOTE(Sleepster): Registering before walking the arguments, as with structures.
     code_decl_procedure_t *owner = static_cast<code_decl_procedure_t*>(register_declaration(procedure_info, convert(clang_getCursorUSR(cursor))));

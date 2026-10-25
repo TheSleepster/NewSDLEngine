@@ -310,7 +310,7 @@ handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_hand
     }
 }
 
-APOLLO_TAG("Game_Entity") 
+[[Game_Entity]] 
 internal_api entity_t*
 s_entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager, vec2_t position)
 {
@@ -404,7 +404,7 @@ entity_create(u32 archetype, entity_create_info_t *create_info)
 }
 #endif
 
-APOLLO_TAG("Game_Entity")
+[[Game_Entity]] 
 internal_api entity_t*
 s_entity_collider_create(game_state_t *game_state, vec2_t initial_position, vec2_t size, u32 extra_flags)
 {
@@ -425,7 +425,7 @@ s_entity_collider_create(game_state_t *game_state, vec2_t initial_position, vec2
     return(result);
 }
 
-APOLLO_TAG("Game_Entity")
+[[Game_Entity]] 
 internal_api entity_t*
 s_entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags)
 {

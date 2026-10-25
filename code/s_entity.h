@@ -48,16 +48,17 @@ struct entity_create_info_t
     X(ENTITY_ARCHETYPE_COLLIDER, "ENTITY_ARCHETYPE_COLLIDER", s_entity_collider_create) \
     X(ENTITY_ARCHETYPE_TILE, "ENTITY_ARCHETYPE_TILE", s_entity_tile_create) \
 
-enum entity_archetype_t
+enum [[Game_Entity]] entity_archetype_t
 {
     ENTITY_ARCHETYPE_INVALID,
-#define X(enum_type, string, function_ptr) enum_type,
-    ENTITY_ARCHETYPE_LIST(X)
-#undef X
+    ENTITY_ARCHETYPE_PLAYER,
+    ENTITY_ARCHETYPE_COLLIDER,
+    ENTITY_ARCHETYPE_TILE,
     ENTITY_ARCHETYPE_COUNT
 };
 
-enum entity_flags_t
+
+enum [[Game_Entity]] entity_flags_t
 {
     ENTITY_FLAG_NONE           = 0,
     ENTITY_FLAG_IS_VALID       = BIT(1),
@@ -74,7 +75,7 @@ enum entity_flags_t
 };
 
 // TODO(Sleepster): The entity should probably embed it's world chunk 
-struct APOLLO_TAG("Game_Entity") entity_t
+struct [[Game_Entity]] entity_t
 {
     // NOTE(Sleepster): Base Entity 
     u32             ID;
