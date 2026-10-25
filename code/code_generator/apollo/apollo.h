@@ -728,26 +728,120 @@ ATTRIBUTE STUFF
 ==========================
 */
 
+internal_api bool8
+token_is(CXTranslationUnit translation_unit, CXToken token, const char *text)
+{
+    CXString token_string = clang_getTokenSpelling(translation_unit, token);
+    bool8 result = (strcmp(clang_getCString(token_string), text) == 0);
+
+    clang_disposeString(token_string);
+    return(result);
+}
+
+// NOTE(Sleepster): Clang only reports attributes it understands. Generic [[tags]] live before the
+// declaration, outside of its extent, so tokenize backward from the declaration name for them.
+internal_api void
+collect_token_attributes(CXCursor cursor, code_decl_t *declaration)
+{
+    CXTranslationUnit translation_unit = clang_Cursor_getTranslationUnit(cursor);
+    CXFile file = null;
+    u32 offset = 0;
+    clang_getExpansionLocation(clang_getCursorLocation(cursor), &file, null, null, &offset);
+    Assert(file);
+
+    u32 window_start = (offset > 1024) ? offset - 1024 : 0;
+    CXSourceRange range = clang_getRange(clang_getLocationForOffset(translation_unit, file, window_start),
+                                         clang_getLocationForOffset(translation_unit, file, offset));
+
+    CXToken *tokens = null;
+    u32 token_count = 0;
+    clang_tokenize(translation_unit, range, &tokens, &token_count);
+
+    s32 token_limit = static_cast<s32>(token_count);
+
+    // NOTE(Sleepster): Walk back to the start of this declaration so a previous declaration's
+    // attributes can't get picked up along with ours.
+    s32 token_start = token_limit - 1;
+    while(token_start >= 0)
+    {
+        CXString token_string = clang_getTokenSpelling(translation_unit, tokens[token_start]);
+        const char *token_content = clang_getCString(token_string);
+        bool8 is_boundary = (strcmp(token_content, ";") == 0 || strcmp(token_content, "{") == 0 ||
+                             strcmp(token_content, "}") == 0 || strcmp(token_content, ",") == 0 ||
+                             strcmp(token_content, "(") == 0 || strcmp(token_content, "#") == 0);
+        clang_disposeString(token_string);
+        if(is_boundary)
+        {
+            break;
+        }
+
+        --token_start;
+    }
+    ++token_start;
+
+    for(s32 token_index = token_start;
+        token_index + 1 < token_limit;
+        ++token_index)
+    {
+        if(!token_is(translation_unit, tokens[token_index], "[") ||
+           !token_is(translation_unit, tokens[token_index + 1], "["))
+        {
+            continue;
+        }
+
+        s32 attribute_end = token_index + 2;
+        while(attribute_end + 1 < token_limit &&
+              !(token_is(translation_unit, tokens[attribute_end], "]") &&
+                token_is(translation_unit, tokens[attribute_end + 1], "]")))
+        {
+            ++attribute_end;
+        }
+
+        if(attribute_end + 1 >= token_limit)
+        {
+            break;
+        }
+
+        if(token_index + 2 < attribute_end)
+        {
+            CXString attribute_string = clang_getTokenSpelling(translation_unit, tokens[token_index + 2]);
+            const char *attribute_content = clang_getCString(attribute_string);
+
+            // NOTE(Sleepster): APOLLO_TAG expands to clang::annotate, which the visitor above
+            // already gives us the contents of.
+            if(strcmp(attribute_content, "clang") != 0)
+            {
+                string_t attribute = c_string_make_copy(&apollo_internal_state->arena, STR(attribute_content));
+                c_dynarray_add(&declaration->attributes, &attribute);
+            }
+
+            clang_disposeString(attribute_string);
+        }
+
+        token_index = attribute_end + 1;
+    }
+
+    clang_disposeTokens(translation_unit, tokens, token_count);
+}
+
 internal_api void
 collect_attributes(CXCursor cursor, code_decl_t *declaration)
 {
     clang_visitChildren(cursor, 
     [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
         code_decl_t *code_decl = static_cast<code_decl_t*>(user_data);    
-        switch(clang_getCursorKind(current_cursor))
+        if(clang_getCursorKind(current_cursor) == CXCursor_AnnotateAttr)
         {
-            case CXCursor_AnnotateAttr:
-            {
-                CXString attribute_string = clang_getCursorSpelling(current_cursor);
-                const char *attribute_content = clang_getCString(attribute_string);
-
-                string_t attribute_data = STR(attribute_content);
-                c_dynarray_add(&code_decl->attributes, &attribute_data);
-            }break;
+            CXString attribute_string = clang_getCursorSpelling(current_cursor);
+            string_t attribute = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(attribute_string)));
+            c_dynarray_add(&code_decl->attributes, &attribute);
+            clang_disposeString(attribute_string);
         }
 
         return(CXChildVisit_Continue);
     }, declaration);
+
+    collect_token_attributes(cursor, declaration);
 }
 
 /*
@@ -1390,6 +1484,7 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
     enum_info->decl      = cursor;
     enum_info->identifier = convert(clang_getCursorSpelling(cursor));
 
+    collect_attributes(cursor, code_decl);
     code_decl_structure_t *owner = static_cast<code_decl_structure_t*>(register_declaration(enum_info, enum_info->identifier));
 
     if(!owner->members_collected)
@@ -1463,13 +1558,20 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor parent, CXClientData
         }break;
         case CXCursor_FunctionDecl:
         {
-            code_decl_procedure_t *procedure_info = c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t);
+            // NOTE(Sleepster): Compiler builtins have no source file and can't carry attributes.
+            CXFile source_file = null;
+            clang_getSpellingLocation(clang_getCursorLocation(current_cursor), &source_file, null, null, null);
 
-            // NOTE(Sleepster): Procedures are keyed by USR, so "am I the owner" is whether the
-            // thing that came back from registering is the thing we just filled in.
-            if(traverse_function(current_cursor, procedure_info) == procedure_info)
+            if(source_file)
             {
-                c_dynarray_add(&decl_list->procedures, (code_decl_t**)&procedure_info);
+                code_decl_procedure_t *procedure_info = c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t);
+
+                // NOTE(Sleepster): Procedures are keyed by USR, so "am I the owner" is whether the
+                // thing that came back from registering is the thing we just filled in.
+                if(traverse_function(current_cursor, procedure_info) == procedure_info)
+                {
+                    c_dynarray_add(&decl_list->procedures, (code_decl_t**)&procedure_info);
+                }
             }
         }break;
         case CXCursor_TypedefDecl:
