@@ -327,6 +327,21 @@ c_string_to_upper(memory_arena_t *arena, string_t string)
     return(result);
 }
 
+ENGINE_API string_t
+c_string_to_lower(memory_arena_t *arena, string_t string)
+{
+    string_t result = c_string_make_copy(arena, string);
+    for(u32 index = 0;
+        index < result.count;
+        ++index)
+    {
+        byte *character = result.data + index;
+        *character = tolower(*character);
+    }
+
+    return(result);
+}
+
 ENGINE_API void 
 c_string_override_file_separators(string_t *string)
 {

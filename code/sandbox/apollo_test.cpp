@@ -19,6 +19,8 @@ static string_builder_t definition_builder;
 static string_builder_t type_table_builder;
 static string_builder_t member_table_builder;
 
+static string_builder_t entity_builder;
+
 internal_api CXType
 unwrap_type(CXType type)
 {
@@ -363,11 +365,10 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 internal_api void
 generate_apollo_structure_type_info_header(apollo_code_decl_list_t *declarations)
 {
-    memory_arena_t arena = c_arena_create(MB(20), ALLOCATOR_TAG_STATIC);
-    type_arena = &arena;
+    memory_arena_t *arena = type_arena;
 
-    dictionary_table.init(&arena);
-    definition_table.init(&arena);
+    dictionary_table.init(arena);
+    definition_table.init(arena);
 
     c_string_builder_init(&header_builder,       MB(2));
     c_string_builder_init(&dictionary_builder,   MB(2));
@@ -415,17 +416,19 @@ namespace Apollo {
 internal_api void
 generate_entity_structure_functions(apollo_code_decl_list_t *declarations)
 {
+    c_string_builder_init(&entity_builder, MB(2));
+
     dynarray_t<code_decl_t *> entity_decls = Apollo::get_declarations_with_attribute(declarations, STR("Game_Entity"));
+    file_t entity_file = c_file_open(STR("meta/GENERATED_entity_data.cpp"), true, true);
 
-    file_t entity_file = c_file_open(STR("meta/GENERATED"), true, true);
-
-    dynarray_t<code_decl_t*> tagged_procedures = {};
+    dynarray_t<code_decl_procedure_t*> tagged_procedures = {};
     code_decl_structure_t *archetype_declaration = null;
     for(code_decl_t *declaration: entity_decls)
     {
         if(declaration->metatype == CODE_DECL_METATYPE_PROCEDURE)
         {
-            c_dynarray_add(&tagged_procedures, &declaration);
+            code_decl_procedure_t *proc = static_cast<code_decl_procedure_t*>(declaration);
+            c_dynarray_add(&tagged_procedures, proc);
         }
         else if(c_string_compare(declaration->identifier, STR("entity_archetype_t")))
         {
@@ -433,26 +436,83 @@ generate_entity_structure_functions(apollo_code_decl_list_t *declarations)
         }
     }
 
-    int x = 0;
-    (void)x;
+    c_string_builder_sprintf(&entity_builder, R"(
+struct entity_create_info_t {
+)");
+
+    dynarray_t<u64> unique_arguments = {};
+    for(code_decl_procedure_t *procedure: tagged_procedures)
+    {
+        for(auto &argument: procedure->arguments)
+        {
+            u64 parameter_hash = fnv1a_hash(argument.identifier.data, argument.identifier.count);
+            if(c_dynarray_add_if_unique(&unique_arguments, &parameter_hash))
+            {
+                string_t argument_type = convert(clang_getTypeSpelling(unwrap_type(argument.code_type)));
+                string_t argument_identifier = argument.identifier;
+                c_string_builder_sprintf(&entity_builder, "\t%.*s",
+                                         fprint_string(argument_type));
+                if(argument.flags & CODE_DECL_FLAG_POINTER)
+                {
+                    c_string_builder_sprintf(&entity_builder, "*");
+                }
+
+                c_string_builder_sprintf(&entity_builder, " %.*s;\n",
+                                         fprint_string(argument_identifier));
+            }
+        }
+    }
+
+    c_string_builder_sprintf(&entity_builder, "};\n");
+    c_string_builder_sprintf(&entity_builder, "entity_t *s_entity_create_of_type(u32 entity_archetype, entity_create_info_t *create_info);\n");
+    c_string_builder_sprintf(&entity_builder, "\nentity_t *s_entity_create_of_type(u32 entity_archetype, entity_create_info_t *create_info) {\n\tswitch(entity_archetype) {\n");
+    for(s32 member_index = 1;
+        member_index < (archetype_declaration->members.used - 1);
+        ++member_index)
+    {
+        code_decl_member_t *member = &archetype_declaration->members[member_index];
+        c_string_builder_sprintf(&entity_builder, "\t\tcase %.*s: {\n", fprint_string(member->identifier));
+
+        code_decl_procedure_t *procedure = tagged_procedures[member_index - 1];
+
+        c_string_builder_sprintf(&entity_builder, "\t\t\t%.*s(", fprint_string(procedure->identifier));
+        for(s32 argument_index = 0;
+            argument_index < procedure->arguments.used;
+            ++argument_index)
+        {
+            code_decl_member_t *argument = &procedure->arguments[argument_index];
+
+            c_string_builder_sprintf(&entity_builder, "create_info->%.*s", fprint_string(argument->identifier));
+            if(argument_index < procedure->arguments.used - 1)
+            {
+                c_string_builder_sprintf(&entity_builder, ", ");
+            }
+        }
+        c_string_builder_sprintf(&entity_builder, ");\n\t\t}break;\n");
+    }
+    c_string_builder_sprintf(&entity_builder, "\t}\n\treturn(nullptr);\n}\n");
+
+    c_string_builder_dump_to_file(&entity_file, &entity_builder);
 }
 
 int
 main(void)
 {
+    c_global_context_init();
     dynarray_t<string_t> options = {};
+
+    memory_arena_t arena = c_arena_create(MB(20), ALLOCATOR_TAG_STATIC);
+    type_arena = &arena;
 
     string_t include_path    = STR("-I../code/");
     string_t engine_define   = STR("-DENGINE_BUILD");
-    string_t game_define     = STR("-DGAME_BUILD");
+    string_t game_define     = STR("-DGAME_DLL_BUILD");
     string_t renderer_define = STR("-DRENDERER_HEADLESS");
-    string_t generate_define = STR("-DAPOLLO_GENERATE");
 
     c_dynarray_add(&options, &include_path);
     c_dynarray_add(&options, &engine_define);
     c_dynarray_add(&options, &game_define);
     c_dynarray_add(&options, &renderer_define);
-    c_dynarray_add(&options, &generate_define);
     apollo_code_decl_list_t *declarations = Apollo::parse_singular_file(STR("build.cpp"), options);
     if(declarations)
     {

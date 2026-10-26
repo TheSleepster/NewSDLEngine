@@ -42,9 +42,7 @@
 #include <s_entity.h>
 
 //#include <meta/GENERATED_program_RTTI.h>
-#if !defined(APOLLO_GENERATE)
 #include <meta/APOLLO_GENERATED_RTTI.h>
-#endif
 
 // NOTE(Sleepster): Game 
 #if defined(GAME_DLL_BUILD) || defined(RELEASE)

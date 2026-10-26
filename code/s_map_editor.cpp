@@ -418,13 +418,6 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                 {
                     entity_t *entity = null;
                     // s_entity_create_from_editor_action(game_state, undo_action);
-                    switch(undo_action->entity_archetype)
-                    {
-                        case ENTITY_ARCHETYPE_TILE:
-                        {
-                            entity = s_entity_tile_create(game_state, undo_action->entity_position, undo_action->entity_flags);
-                        }break;
-                    }
 
                     editor_action_t action = {
                         .type   = EDITOR_ACTION_TYPE_REDO,

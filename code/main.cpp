@@ -108,7 +108,7 @@ struct game_state_t
         input_action_t *dash;
     }mappings;
 
-struct {
+    struct {
         vec2_t movement_axis;
         bool8  jumped;
         bool8  dashed;
@@ -136,11 +136,14 @@ constexpr s32     WORLD_TILE_SIZE = 8;
 global string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
 
-internal_api vec2_t    world_to_tile(vec2_t world_position);
-internal_api entity_t* s_entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags);
+internal_api vec2_t world_to_tile(vec2_t world_position);
+[[Game_Entity]] internal_api entity_t* s_entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager, vec2_t position);
+[[Game_Entity]] internal_api entity_t* s_entity_collider_create(game_state_t *game_state, vec2_t initial_position, vec2_t size, u32 extra_flags);
+[[Game_Entity]] internal_api entity_t* s_entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags);
 
 #include <s_ui_core.cpp>
 #include <s_entity.cpp>
+#include <meta/GENERATED_entity_data.cpp>
 #include <s_map_editor.cpp>
 
 // NOTE(Sleepster): DEBUG CODE
@@ -387,23 +390,6 @@ s_entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager,
     return(result);
 }
 
-#if 0
-internal_api entity_t
-entity_create(u32 archetype, entity_create_info_t *create_info)
-{
-    switch(archetype)
-    {
-        case ENTITY_ARCHETYPE_COLLIDER:
-        {
-            s_entity_collider_create(create_info->game_state, 
-                                     create_info->initial_position, 
-                                     create_info->size, 
-                                     create_info->extra_flags);
-        }break;
-    }
-}
-#endif
-
 [[Game_Entity]] 
 internal_api entity_t*
 s_entity_collider_create(game_state_t *game_state, vec2_t initial_position, vec2_t size, u32 extra_flags)
@@ -442,26 +428,6 @@ s_entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags)
 
     return(result);
 }
-
-#if 0
-internal_api void
-render_collider(render_group_t *render_group, entity_t *entity)
-{
-    vec2_t render_position = entity->bounding_box.min;
-#if 0
-    if(game_state->game_mode == GAME_MODE_EDIT_MODE)
-    {
-        render_position = entity->render_position;
-    }
-#endif
-    vec4_t color = vec4(0.5f, 0.0f, 0.0f, 0.2f);
-    render_quad(render_group,
-                vec2_expand_vec3(render_position, 0.6f),
-                vec2_multiply(entity->bounding_box.half_size, vec2(2, 2)),
-                color,
-                -1);
-}
-#endif
 
 void
 render_immediate_entity(render_group_t *render_group, render_group_vertex_stream_t *vertex_data, entity_t *entity)

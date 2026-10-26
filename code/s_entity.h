@@ -33,20 +33,12 @@ constexpr u32 MAX_ACTIVE_CHUNKS = 51;
 
 struct entity_t;
 
-struct entity_create_info_t
-{
-    u32              archetype;
-    u32              extra_flags;
-    game_state_t    *game_state;
-    asset_manager_t *asset_manager;
-    vec2_t           initial_position;
-    vec2_t           size;
-};
-
+#if 0
 #define ENTITY_ARCHETYPE_LIST(X) \
     X(ENTITY_ARCHETYPE_PLAYER, "ENTITY_ARCHETYPE_PLAYER", s_entity_player_create) \
     X(ENTITY_ARCHETYPE_COLLIDER, "ENTITY_ARCHETYPE_COLLIDER", s_entity_collider_create) \
-    X(ENTITY_ARCHETYPE_TILE, "ENTITY_ARCHETYPE_TILE", s_entity_tile_create) \
+    X(ENTITY_ARCHETYPE_TILE, "ENTITY_ARCHETYPE_TILE", s_entity_tile_create) 
+#endif
 
 enum [[Game_Entity]] entity_archetype_t
 {
