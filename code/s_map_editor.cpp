@@ -7,66 +7,54 @@
 constexpr u32 MAX_EDITOR_UNDO_ACTION_COUNT = 1024;
 constexpr u32 MAX_SELECTED_EDITOR_ENTITIES = 256;
 
-// TODO(Sleepster): Type and kind do the same thing 
-enum editor_action_kind_t
+enum editor_event_type_t
 {
-    EDITOR_ACTION_INVALID,
-    EDITOR_ACTION_ENTITY_CREATE,
-    EDITOR_ACTION_ENTITY_DESTROY,
+    EDITOR_EVENT_TYPE_CREATE_ENTITY,
+    EDITOR_EVENT_TYPE_DESTROY_ENTITY,
 };
 
-enum editor_action_type_t
+// NOTE(Sleepster): 
+//
+// Swap this out for entities_to_create and entities_to_destroy
+// Right now this is super confusing because placing entities adds a CREATE event
+// to the undo buffer which is wrong, very wrong. It should produce a DESTROY event
+// so that it better fits with the sentence:
+//
+// "To undo this create event, destroy these entities"
+//
+// Right now it's too confusing.
+struct editor_event_t 
 {
-    EDITOR_ACTION_TYPE_INVALID,
-    EDITOR_ACTION_TYPE_UNDO,
-    EDITOR_ACTION_TYPE_REDO,
-    EDITOR_ACTION_TYPE_PLACE_ENTITY,
-    EDITOR_ACTION_TYPE_REMOVE_ENTITY,
+    u32               ID;
+    u32               type;
+    union {
+        array_t<entity_t*> entities_created;
+        array_t<entity_t>  entities_destroyed;
+    };
 };
 
-struct editor_entity_action_info_t 
+struct editor_event_buffer_t 
 {
-    u32    archetype;
-    u32    flags;
-    vec2_t position;
+    memory_arena_t                    *editor_arena;
 
-    entity_t *entity;
+    fixed_array_t<editor_event_t, 128> event_list;
+    s32                                current_event_count;
+
+    editor_event_buffer_t             *next_buffer;
 };
 
-struct editor_action_t
-{
-    u32       type;
-    u32       kind;
-
-    u32    entity_archetype;
-    u32    entity_flags;
-    vec2_t entity_position;
-    entity_t *entity;
-
-    // NOTE(Sleepster): Used for box placing and removing 
-    editor_entity_action_info_t *entities;
-    u32                          entity_count;
-
-    vec2_t    min;
-    vec2_t    max;
-};
-
-using editor_action_array_t          = fixed_array_t<editor_action_t, MAX_EDITOR_UNDO_ACTION_COUNT>;
-using editor_selected_entity_array_t = fixed_array_t<entity_t*,       MAX_SELECTED_EDITOR_ENTITIES>;
-
-struct editor_action_buffer_t
-{
-    editor_action_array_t actions;
-    s32                   current_action_count;
-
-    editor_action_buffer_t *next_buffer;
-};
-
+using editor_selected_entity_array_t = fixed_array_t<entity_t*, MAX_SELECTED_EDITOR_ENTITIES>;
 struct map_editor_t
 {
     memory_arena_t                 editor_arena;
     memory_arena_t                 undo_arena;
     memory_arena_t                 redo_arena;
+
+    // NOTE(Sleepster): This is definitely okay here since this needs to:
+    // A.) Modify the game_state to actual manipulate the game
+    // B.) Retrieve information related to the assets tiles and entities use
+    game_state_t                  *game_state;
+    asset_manager_t               *asset_manager;
 
     bool8                          show_panel;
     bool8                          show_grid;
@@ -84,25 +72,31 @@ struct map_editor_t
     asset_handle_t                 gizmo_image;
     asset_handle_t                 mouse_cursor_image;
 
-    editor_action_buffer_t         action_event_buffer;
-    editor_action_buffer_t         first_undo_buffer;
-    editor_action_buffer_t         first_redo_buffer;
-
     editor_selected_entity_array_t selected_entities;
     s32                            selected_entity_count;
+
+    editor_event_buffer_t          first_undo_event_buffer;
+    editor_event_buffer_t          first_redo_event_buffer;
 
     vec2_t                         boxing_start;
     vec2_t                         boxing_end;
 };
 
 internal_api map_editor_t*
-s_map_editor_create(input_manager_t *input_manager, asset_manager_t *asset_manager, render_state_t *render_state)
+s_map_editor_create(game_state_t *game_state, input_manager_t *input_manager, asset_manager_t *asset_manager, render_state_t *render_state)
 {
     map_editor_t *result     = (map_editor_t*)c_alloc(sizeof(map_editor_t), ALLOCATOR_TAG_GAME);
+
     result->editor_arena     = c_arena_create(MB(50), ALLOCATOR_TAG_GAME);
     result->undo_arena       = c_arena_create(MB(50), ALLOCATOR_TAG_GAME);
     result->redo_arena       = c_arena_create(MB(50), ALLOCATOR_TAG_GAME);
     result->controller       = s_im_init_input_controller(input_manager);
+
+    result->game_state    = game_state;
+    result->asset_manager = asset_manager;
+
+    result->first_undo_event_buffer.editor_arena = &result->editor_arena;
+    result->first_redo_event_buffer.editor_arena = &result->editor_arena;
 
     result->zoom                 = 2.5f;
     result->show_grid            = true;
@@ -244,6 +238,7 @@ s_map_editor_handle_ui(map_editor_t *editor, ui_state_t *main_ui, RHI_context_t 
     }
 }
 
+#if 0
 internal_api editor_action_buffer_t*
 s_editor_get_last_action_buffer(editor_action_buffer_t *first_buffer)
 {
@@ -294,6 +289,184 @@ s_editor_append_action(map_editor_t *editor, editor_action_buffer_t *buffer, edi
         ++chosen_buffer->current_action_count;
     }
 }
+#endif
+
+internal_api void
+editor_append_event(editor_event_buffer_t *first_buffer, editor_event_t *event)
+{
+    editor_event_buffer_t *active_buffer = null;
+    editor_event_buffer_t *last_buffer = null;
+
+    for(editor_event_buffer_t *current_buffer = first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
+    {
+        last_buffer = current_buffer;
+        if(current_buffer->current_event_count + 1 < current_buffer->event_list.count)
+        {
+            active_buffer = current_buffer;
+            break;
+        }
+    }
+
+    if(!active_buffer)
+    {
+        active_buffer = c_arena_push_struct(first_buffer->editor_arena, editor_event_buffer_t);
+        last_buffer->next_buffer = active_buffer;
+    }
+
+    editor_event_t *new_event = active_buffer->event_list + active_buffer->current_event_count++;
+    *new_event = *event;
+}
+
+internal_api editor_event_t*
+editor_read_next_event(editor_event_buffer_t *first_buffer)
+{
+    editor_event_t *result = null;
+
+    editor_event_buffer_t  *active_buffer = null;
+    for(editor_event_buffer_t *current_buffer = first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
+    {
+        if(current_buffer->current_event_count > 0)
+        {
+            active_buffer = current_buffer;
+        }
+    }
+
+    if(active_buffer)
+    {
+        result = active_buffer->event_list + active_buffer->current_event_count - 1;
+        --active_buffer->current_event_count;
+    }
+
+    return(result);
+}
+
+internal_api void
+process_next_undo_event(map_editor_t *editor)
+{
+    editor_event_t *current_event = editor_read_next_event(&editor->first_undo_event_buffer);
+    if(current_event)
+    {
+        switch(current_event->type)
+        {   
+            default: { InvalidCodePath; }break;
+            case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
+            {
+                 entity_create_info_t entity_create_info = {};
+                 entity_create_info.game_state    = editor->game_state;
+                 entity_create_info.asset_manager = editor->asset_manager;
+
+                 entity_t *entity_array = c_arena_push_array(&editor->redo_arena, entity_t, current_event->entities_destroyed.count);
+                 for(s32 entity_index = 0;
+                     entity_index < current_event->entities_destroyed.count;
+                     ++entity_index)
+                 {
+                     entity_t *entity_info = current_event->entities_destroyed + entity_index;
+                     entity_array[entity_index] = *entity_info;
+
+                     entity_create_info.position         = entity_info->position;
+                     entity_create_info.initial_position = entity_info->editor_position;
+                     entity_create_info.size             = entity_info->size;
+                     entity_create_info.flags            = entity_info->flags;
+                     entity_create_info.extra_flags      = entity_info->flags;
+
+                     s_entity_create_of_type(entity_info->archetype, &entity_create_info); 
+                 }
+
+                 editor_event_t redo_event = {};
+                 redo_event.type = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                 redo_event.entities_destroyed = {entity_array, current_event->entities_destroyed.count};
+
+                 editor_append_event(&editor->first_redo_event_buffer, &redo_event);
+            }break;
+            case EDITOR_EVENT_TYPE_CREATE_ENTITY:
+            {
+                entity_t **entity_array = c_arena_push_array(&editor->redo_arena, entity_t*, current_event->entities_created.count);
+                for(s32 entity_index = 0;
+                    entity_index < current_event->entities_created.count;
+                    ++entity_index)
+                {
+                    entity_t *entity_info = current_event->entities_created[entity_index];
+                    Assert(entity_info)
+
+                    if((entity_info->flags & ENTITY_FLAG_IS_VALID) != 0)
+                    {
+                        entity_array[entity_index] = entity_info;
+                        s_entity_destroy(editor->game_state->entity_manager, entity_info);
+                    }
+                }
+
+                 // NOTE(Sleepster): This outputs a create entity event because here we are UNDOING a creation, therefore
+                 // in order to redo this very same creation, we must output a create event into the redo buffer.
+                 editor_event_t redo_event = {};
+                 redo_event.type = EDITOR_EVENT_TYPE_CREATE_ENTITY;
+                 redo_event.entities_created = {entity_array, current_event->entities_created.count};
+
+                 editor_append_event(&editor->first_redo_event_buffer, &redo_event);
+            }break;
+        }
+    }
+    else
+    {
+        c_arena_reset(&editor->undo_arena);
+    }
+}
+
+internal_api void
+process_next_redo_event(map_editor_t *editor)
+{
+    editor_event_t *current_event = editor_read_next_event(&editor->first_redo_event_buffer);
+    if(current_event)
+    {
+        switch(current_event->type)
+        {   
+            default: { InvalidCodePath }break;
+            case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
+            {                 
+                for(s32 entity_index = 0;
+                    entity_index < current_event->entities_created.count;
+                    ++entity_index)
+                {
+                    entity_t *entity_info = current_event->entities_created[entity_index];
+                    Assert(entity_info)
+
+                    if((entity_info->flags & ENTITY_FLAG_IS_VALID) != 0)
+                    {
+                        s_entity_destroy(editor->game_state->entity_manager, entity_info);
+                    }
+                }
+            }break;
+            case EDITOR_EVENT_TYPE_CREATE_ENTITY:
+            {
+                entity_create_info_t entity_create_info = {};
+                entity_create_info.game_state    = editor->game_state;
+                entity_create_info.asset_manager = editor->asset_manager;
+
+                for(s32 entity_index = 0;
+                    entity_index < current_event->entities_destroyed.count;
+                    ++entity_index)
+                {
+                    entity_t *entity_info = current_event->entities_destroyed +entity_index;
+
+                    entity_create_info.position         = entity_info->position;
+                    entity_create_info.initial_position = entity_info->editor_position;
+                    entity_create_info.size             = entity_info->size;
+                    entity_create_info.flags            = entity_info->flags;
+                    entity_create_info.extra_flags      = entity_info->flags;
+
+                    s_entity_create_of_type(entity_info->archetype, &entity_create_info); 
+                }
+            }break;
+        }
+    }
+    else
+    {
+        c_arena_reset(&editor->redo_arena);
+    }
+}
 
 /* 
 =========================================================
@@ -322,7 +495,7 @@ EDITOR CONTROLS:
      SHIFT + LEFT MOUSE  = "Paint Tiles Within Area" (X)
      RIGHT MOUSE         = "Remove Painted Tile" (X)
      SHIFT + RIGHT MOUSE = "Remove Tiles Within Area" (X)
-     B                   = "Box mode"
+     O                   = "Box Outline mode"
      L                   = "Line mode"
 =========================================================
 */
@@ -357,6 +530,19 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
         editor->show_panel = !editor->show_panel;
     }
 
+    // NOTE(Sleepster): Undo 
+    if(InputStatePressed(undo->flags) && InputStateDown(lctrl->flags))
+    {
+        process_next_undo_event(editor);
+    }
+
+    // NOTE(Sleepster): Redo 
+    if(InputStatePressed(redo->flags) && InputStateDown(lctrl->flags))
+    {
+        process_next_redo_event(editor);
+    }
+
+#if 0
     // NOTE(Sleepster): Undo  
     if(InputStatePressed(undo->flags) && InputStateDown(lctrl->flags))
     {
@@ -492,6 +678,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
             c_arena_reset(&editor->redo_arena);
         }
     }
+#endif
 
     editor->camera.zoom     = editor->zoom;
     editor->camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
@@ -666,13 +853,15 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                     {
                         vec2_t tile_position = vec2_scale(world_to_tile(mouse_position), WORLD_TILE_SIZE);
                         entity_t *tile = s_entity_tile_create(game_state, tile_position, 0);
-                        editor_action_t action = {
-                            .type   = EDITOR_ACTION_TYPE_UNDO,
-                            .kind   = EDITOR_ACTION_ENTITY_CREATE,
-                            .entity = tile
-                        };
 
-                        s_editor_append_action(editor, &editor->first_undo_buffer, &action);
+                        entity_t **entities = c_arena_push_array(&editor->undo_arena, entity_t*, 1);
+                        entities[0] = tile;
+
+                        editor_event_t new_event = {};
+                        new_event.type             = EDITOR_EVENT_TYPE_CREATE_ENTITY;
+                        new_event.entities_created = {entities, 1};
+
+                        editor_append_event(&editor->first_undo_event_buffer, &new_event);
                     }
                 }
             }
@@ -688,10 +877,12 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
             {
                 editor->box_placing = false;
 
+                scratch_arena_t temp_arena = c_arena_begin_temporary_memory(&gc->temp_arena);
+                defer(c_arena_end_temporary_memory(&temp_arena));
+
                 u32 entities_created = 0;
-                editor_entity_action_info_t *entity_actions = c_arena_push_array(&editor->undo_arena, 
-                                                                                 editor_entity_action_info_t, 
-                                                                                 MAX_CHUNK_ENTITIES);
+                entity_t **temp_entity_array = c_arena_push_array(temp_arena.parent, entity_t*, MAX_CHUNK_ENTITIES);
+
                 entity_query_t spatial_query = s_entity_get_entities_within_position_range(game_state->entity_manager, min, max);
                 for(s32 tile_x = min_tile_position.x;
                     tile_x != max_tile_position.x;
@@ -714,25 +905,20 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
 
                         if(!collision)
                         {
-                            entity_t *entity = s_entity_tile_create(game_state, vec2(tile_x, tile_y), 0);
-
-                            editor_entity_action_info_t *entity_action = entity_actions + entities_created++;
-                            entity_action->archetype = ENTITY_ARCHETYPE_TILE;
-                            entity_action->position  = vec2(tile_x, tile_y);
-                            entity_action->entity    = entity;
+                            entity_t *tile = s_entity_tile_create(game_state, vec2(tile_x, tile_y), 0);
+                            temp_entity_array[entities_created++] = tile;
                         }
                     }
                 }
 
-                editor_action_t action = {
-                    .type             = EDITOR_ACTION_TYPE_PLACE_ENTITY,
-                    .kind             = EDITOR_ACTION_ENTITY_CREATE,
-                    .min              = min,
-                    .max              = max,
-                    .entities         = entity_actions,
-                    .entity_count     = entities_created
-                };
-                s_editor_append_action(editor, &editor->first_undo_buffer, &action);
+                entity_t **real_entity_array = c_arena_push_array(&editor->undo_arena, entity_t*, entities_created);
+                memcpy(real_entity_array, temp_entity_array, sizeof(entity_t*) * entities_created);
+
+                editor_event_t new_event = {};
+                new_event.type             = EDITOR_EVENT_TYPE_CREATE_ENTITY;
+                new_event.entities_created = {real_entity_array, (s32)entities_created};
+
+                editor_append_event(&editor->first_undo_event_buffer, &new_event);
             }
         }
 
@@ -760,15 +946,23 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
 
                     if(entity_destroyed)
                     {
-                        editor_action_t action = {
-                            .type = EDITOR_ACTION_TYPE_UNDO,
-                            .kind = EDITOR_ACTION_ENTITY_DESTROY,
-                            .entity_archetype = entity_destroyed->archetype,
-                            .entity_flags     = entity_destroyed->flags,
-                            .entity_position  = entity_destroyed->editor_position
-                        };
+                        // TODO(Sleepster): Allocating this as part of the editor arena may be bad
+                        // since this means that each undo will just append a bunch of data on to the
+                        // arena, eventually overflowing it with no way of freeing said data. A free list will
+                        // be needed here.
+                        array_t<entity_t> entities;
+                        entity_t *entity_data = c_arena_push_array(&editor->undo_arena, entity_t, 1);
 
-                        s_editor_append_action(editor, &editor->first_undo_buffer, &action);
+                        entities.items = entity_data;
+                        entities.count = 1;
+
+                        *entity_data = *entity_destroyed;
+
+                        editor_event_t new_event = {};
+                        new_event.type               = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                        new_event.entities_destroyed = entities;
+
+                        editor_append_event(&editor->first_undo_event_buffer, &new_event);
                         s_entity_destroy(game_state->entity_manager, entity_destroyed);
                     }
                 }
@@ -784,31 +978,23 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
             if(editor->box_removing)
             {
                 editor->box_removing = false;
+
                 entity_query_t spatial_query = s_entity_get_entities_within_position_range(game_state->entity_manager, min, max);
                 if(spatial_query.entity_count > 0)
                 {
-                    u32 action_index = 0;
-                    editor_entity_action_info_t *entity_actions = c_arena_push_array(&editor->undo_arena, 
-                                                                                     editor_entity_action_info_t, 
-                                                                                     spatial_query.entity_count);
+                    u32 entity_count = 0;
+                    entity_t *entity_data = c_arena_push_array(&editor->undo_arena, entity_t, spatial_query.entity_count);
                     for(entity_t *entity: spatial_query)
                     {
+                        entity_data[entity_count++] = *entity;
                         s_entity_destroy(game_state->entity_manager, entity);
-                        editor_entity_action_info_t *action = entity_actions + action_index++; 
-                        action->archetype = entity->archetype;
-                        action->position  = entity->editor_position;
-                        action->flags     = entity->flags;
                     }
 
-                    editor_action_t action = {
-                        .type             = EDITOR_ACTION_TYPE_PLACE_ENTITY,
-                        .kind             = EDITOR_ACTION_ENTITY_DESTROY,
-                        .min              = min,
-                        .max              = max,
-                        .entities         = entity_actions,
-                        .entity_count     = (u32)spatial_query.entity_count
-                    };
-                    s_editor_append_action(editor, &editor->first_undo_buffer, &action);
+                    editor_event_t new_event = {};
+                    new_event.type               = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                    new_event.entities_destroyed = {entity_data, (s32)entity_count};
+
+                    editor_append_event(&editor->first_undo_event_buffer, &new_event);
                 }
             }
         }

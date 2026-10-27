@@ -29,6 +29,8 @@ main(void)
     printf("Hello World!\n");
 
 #if 0 
+    asset_catalog_t<bitmap_t> bitmap_catalog;
+    asset_catalog_t<>
     
 #endif
 }

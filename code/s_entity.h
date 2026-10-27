@@ -24,7 +24,7 @@
 
 struct animation2D_t;
 
-#define MAX_CHUNK_ENTITIES (1000)
+constexpr u32 MAX_CHUNK_ENTITIES = 1000;
 
 constexpr u32 MAX_CHUNKS        = 4096;
 constexpr u32 CHUNK_WIDTH       = 320;

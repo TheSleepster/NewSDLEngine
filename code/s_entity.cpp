@@ -105,6 +105,7 @@ s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 arc
 void
 s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity)
 {
+    Assert(entity->flags & ENTITY_FLAG_IS_VALID)
     world_chunk_t *chunk = s_entity_manager_get_or_create_chunk(entity_manager, entity->position);
 
     s32 index = (s32)c_array_find(chunk->used_entity_slots, &entity->ID);

@@ -989,7 +989,7 @@ game_main(global_context_t *_global_context)
         global_test_textbox_string.data  = (byte*)c_alloc(256, ALLOCATOR_TAG_CACHE);
         global_test_textbox_string.count = 0;
 
-        game_state->editor = s_map_editor_create(input_manager, asset_manager, render_state);
+        game_state->editor = s_map_editor_create(game_state, input_manager, asset_manager, render_state);
 
         // GAME INIT
         s_entity_player_create(game_state, asset_manager, vec2(0, 0));

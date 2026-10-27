@@ -1636,12 +1636,12 @@ parse_singular_file(string_t filepath, dynarray_t<string_t> array)
 
     s32 option_count = additional_index + array.used;
     apollo_internal_state->working_TU = clang_parseTranslationUnit(apollo_internal_state->clang_index,
-                                                   C_STR(filepath),
-                                                   arguments, 
-                                                   option_count, 
-                                                   null,
-                                                   0,
-                                                   CXTranslationUnit_None);
+                                                                   C_STR(filepath),
+                                                                   arguments, 
+                                                                   option_count, 
+                                                                   null,
+                                                                   0,
+                                                                   CXTranslationUnit_None);
     if(apollo_internal_state->working_TU)
     {
         apollo_internal_state->TU_cursor = clang_getTranslationUnitCursor(apollo_internal_state->working_TU);

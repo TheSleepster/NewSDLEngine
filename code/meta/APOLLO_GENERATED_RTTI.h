@@ -282,48 +282,6 @@ struct type_info_jfd_package_entry_t {
 };
 extern const type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t;
 
-namespace MemberLists {
-enum class jfd_package_entry_t {
-	entry_header,
-	data_offset,
-	modtime,
-	filename,
-	fullpath,
-	asset_data,
-};
-}
-
-struct type_info_jfd_package_chunk_header_t {
-    const type_info_t info;
-    const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
-    union {
-        const type_info_member_t *member_array[7];
-        struct {
-			const type_info_member_t *magic_value;
-			const type_info_member_t *total_entry_size;
-			const type_info_member_t *asset_type;
-			const type_info_member_t *filename_size;
-			const type_info_member_t *fullpath_size;
-			const type_info_member_t *entry_data_size;
-			const type_info_member_t *modtime;
-		}members;
-	};
-};
-extern const type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t;
-
-namespace MemberLists {
-enum class jfd_package_chunk_header_t {
-	magic_value,
-	total_entry_size,
-	asset_type,
-	filename_size,
-	fullpath_size,
-	entry_data_size,
-	modtime,
-};
-}
-
 struct type_info_subtexture_data_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -787,15 +745,6 @@ struct type_info_jfd_file_header_t {
 	};
 };
 extern const type_info_jfd_file_header_t DEFAULT_jfd_file_header_t;
-
-namespace MemberLists {
-enum class jfd_file_header_t {
-	magic_value,
-	version,
-	flags,
-	entry_count,
-};
-}
 
 struct type_info_texture_atlas_registry_t {
     const type_info_t info;
@@ -2262,101 +2211,50 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file = {
 	.offset = 40,
 };
 
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_magic_value = {
-	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 0,
-};
-
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_total_entry_size = {
-	.info = { .name = "total_entry_size", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 4,
-};
-
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_asset_type = {
-	.info = { .name = "asset_type", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 8,
-};
-
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_filename_size = {
-	.info = { .name = "filename_size", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 12,
-};
-
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_fullpath_size = {
-	.info = { .name = "fullpath_size", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 16,
-};
-
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_entry_data_size = {
-	.info = { .name = "entry_data_size", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 20,
-};
-
-constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_modtime = {
-	.info = { .name = "modtime", .size = 8, .metatype = 0 },
-	.type_info = &DEFAULT_u64.info,
-	.offset = 24,
-};
-
-constexpr type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t = {
-	.info = { .name = "jfd_package_chunk_header_t", .size = 32, .metatype = 1 },
-	.member_count = 7,
-	.member_pointer = DEFAULT_jfd_package_chunk_header_t.member_array,
-	.members = {
-		.magic_value = &DEFAULT_member_jfd_package_chunk_header_t_magic_value,
-		.total_entry_size = &DEFAULT_member_jfd_package_chunk_header_t_total_entry_size,
-		.asset_type = &DEFAULT_member_jfd_package_chunk_header_t_asset_type,
-		.filename_size = &DEFAULT_member_jfd_package_chunk_header_t_filename_size,
-		.fullpath_size = &DEFAULT_member_jfd_package_chunk_header_t_fullpath_size,
-		.entry_data_size = &DEFAULT_member_jfd_package_chunk_header_t_entry_data_size,
-		.modtime = &DEFAULT_member_jfd_package_chunk_header_t_modtime,
-	},
-};
-
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_entry_header = {
-	.info = { .name = "entry_header", .size = 8, .metatype = 0 },
-	.type_info = &DEFAULT_jfd_package_chunk_header_t.info,
+	.info = { .name = "entry_header", .size = 0, .metatype = 0 },
 	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 0 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_data_offset = {
-	.info = { .name = "data_offset", .size = 8, .metatype = 0 },
-	.type_info = &DEFAULT_u64.info,
-	.offset = 8,
+	.info = { .name = "data_offset", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 1 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_modtime = {
-	.info = { .name = "modtime", .size = 8, .metatype = 0 },
-	.type_info = &DEFAULT_u64.info,
-	.offset = 16,
+	.info = { .name = "modtime", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 2 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_filename = {
-	.info = { .name = "filename", .size = 16, .metatype = 0 },
-	.type_info = &DEFAULT_string_t.info,
-	.offset = 24,
+	.info = { .name = "filename", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 3 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_fullpath = {
-	.info = { .name = "fullpath", .size = 16, .metatype = 0 },
-	.type_info = &DEFAULT_string_t.info,
-	.offset = 40,
+	.info = { .name = "fullpath", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 4 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_asset_data = {
-	.info = { .name = "asset_data", .size = 16, .metatype = 0 },
-	.type_info = &DEFAULT_string_t.info,
-	.offset = 56,
+	.info = { .name = "asset_data", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 5 },
 };
 
 constexpr type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t = {
-	.info = { .name = "jfd_package_entry_t", .size = 72, .metatype = 1 },
+	.info = { .name = "jfd_package_entry_t", .size = 0, .metatype = 2 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_jfd_package_entry_t.member_array,
 	.members = {
@@ -3070,31 +2968,35 @@ constexpr type_info_member_t DEFAULT_member_asset_file_data_t_raw_file_data = {
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_magic_value = {
-	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
+	.info = { .name = "magic_value", .size = 0, .metatype = 0 },
 	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 0 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_version = {
-	.info = { .name = "version", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 4,
+	.info = { .name = "version", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 1 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_flags = {
-	.info = { .name = "flags", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 8,
+	.info = { .name = "flags", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 2 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_entry_count = {
-	.info = { .name = "entry_count", .size = 4, .metatype = 0 },
-	.type_info = &DEFAULT_u32.info,
-	.offset = 12,
+	.info = { .name = "entry_count", .size = 0, .metatype = 0 },
+	.offset = 0,
+	.value_type = 2,
+	.value = { .int64_value = 3 },
 };
 
 constexpr type_info_jfd_file_header_t DEFAULT_jfd_file_header_t = {
-	.info = { .name = "jfd_file_header_t", .size = 16, .metatype = 1 },
+	.info = { .name = "jfd_file_header_t", .size = 0, .metatype = 2 },
 	.member_count = 4,
 	.member_pointer = DEFAULT_jfd_file_header_t.member_array,
 	.members = {
@@ -5504,7 +5406,6 @@ constexpr const type_info_t *const APOLLO_type_table[] = {
 	&DEFAULT_sys_handle_t.info,
 	&DEFAULT_bool8.info,
 	&DEFAULT_file_t.info,
-	&DEFAULT_jfd_package_chunk_header_t.info,
 	&DEFAULT_jfd_package_entry_t.info,
 	&DEFAULT_float32.info,
 	&DEFAULT_float2.info,
@@ -5631,13 +5532,6 @@ constexpr const type_info_t *const APOLLO_member_table[] = {
 	&DEFAULT_member_file_t_overlapping.info,
 	&DEFAULT_member_file_t_for_writing.info,
 	&DEFAULT_member_asset_slot_t_owner_asset_file.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_magic_value.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_total_entry_size.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_asset_type.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_filename_size.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_fullpath_size.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_entry_data_size.info,
-	&DEFAULT_member_jfd_package_chunk_header_t_modtime.info,
 	&DEFAULT_member_jfd_package_entry_t_entry_header.info,
 	&DEFAULT_member_jfd_package_entry_t_data_offset.info,
 	&DEFAULT_member_jfd_package_entry_t_modtime.info,

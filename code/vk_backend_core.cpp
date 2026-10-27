@@ -956,6 +956,11 @@ vk_backend_swapchain_create
 void
 vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
 {
+    // NOTE(Sleepster): Requery the surface capabilities in the case of a window resize. This is mostly
+    // for Cosmic Window Manager where this seems to not give us the correct capabilities on max swapchain
+    // extent on initial device selection, limiting us to whatever the window was sized at on startup.
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_context->gpu.device, vulkan_context->render_surface, &vulkan_context->gpu.surface_capabilities);
+
     VkSurfaceFormatKHR surface_format   = vk_backend_choose_surface_format(vulkan_context->gpu.valid_surface_formats);
     VkPresentModeKHR   present_mode     = vk_backend_choose_present_mode(vulkan_context->gpu.valid_present_modes);
     VkExtent2D         swapchain_extent = vk_backend_choose_swapchain_extent(&vulkan_context->gpu.surface_capabilities, vulkan_context->window);
