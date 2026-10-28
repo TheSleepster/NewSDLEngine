@@ -335,9 +335,9 @@ editor_read_next_event(editor_event_buffer_t *first_buffer)
 }
 
 internal_api void
-process_next_undo_event(map_editor_t *editor)
+process_next_editor_event(map_editor_t *editor, editor_event_buffer_t *source_event_buffer, editor_event_buffer_t *destination_event_buffer)
 {
-    editor_event_t *current_event = editor_read_next_event(&editor->first_undo_event_buffer);
+    editor_event_t *current_event = editor_read_next_event(source_event_buffer);
     if(current_event)
     {
         switch(current_event->type)
@@ -370,7 +370,7 @@ process_next_undo_event(map_editor_t *editor)
                  redo_event.type                = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
                  redo_event.entities_to_destroy = {entity_array, current_event->entities_to_create.count};
 
-                 editor_append_event(&editor->first_redo_event_buffer, &redo_event);
+                 editor_append_event(destination_event_buffer, &redo_event);
             }break;
             case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
             {
@@ -393,66 +393,13 @@ process_next_undo_event(map_editor_t *editor)
                  redo_event.type = EDITOR_EVENT_TYPE_CREATE_ENTITY;
                  redo_event.entities_to_create = {entity_array, current_event->entities_to_destroy.count};
 
-                 editor_append_event(&editor->first_redo_event_buffer, &redo_event);
+                 editor_append_event(destination_event_buffer, &redo_event);
             }break;
         }
     }
     else
     {
         c_arena_reset(&editor->undo_arena);
-    }
-}
-
-internal_api void
-process_next_redo_event(map_editor_t *editor)
-{
-    editor_event_t *current_event = editor_read_next_event(&editor->first_redo_event_buffer);
-    if(current_event)
-    {
-        switch(current_event->type)
-        {   
-            default: { InvalidCodePath }break;
-            case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
-            {                 
-                for(s32 entity_index = 0;
-                    entity_index < current_event->entities_to_destroy.count;
-                    ++entity_index)
-                {
-                    entity_t *entity_info = current_event->entities_to_destroy[entity_index];
-                    Assert(entity_info)
-
-                    if((entity_info->flags & ENTITY_FLAG_IS_VALID) != 0)
-                    {
-                        s_entity_destroy(editor->game_state->entity_manager, entity_info);
-                    }
-                }
-            }break;
-            case EDITOR_EVENT_TYPE_CREATE_ENTITY:
-            {
-                entity_create_info_t entity_create_info = {};
-                entity_create_info.game_state    = editor->game_state;
-                entity_create_info.asset_manager = editor->asset_manager;
-
-                for(s32 entity_index = 0;
-                    entity_index < current_event->entities_to_create.count;
-                    ++entity_index)
-                {
-                    entity_t *entity_info = current_event->entities_to_create + entity_index;
-
-                    entity_create_info.position         = entity_info->position;
-                    entity_create_info.initial_position = entity_info->editor_position;
-                    entity_create_info.size             = entity_info->size;
-                    entity_create_info.flags            = entity_info->flags;
-                    entity_create_info.extra_flags      = entity_info->flags;
-
-                    s_entity_create_of_type(entity_info->archetype, &entity_create_info); 
-                }
-            }break;
-        }
-    }
-    else
-    {
-        c_arena_reset(&editor->redo_arena);
     }
 }
 
@@ -521,152 +468,14 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
     // NOTE(Sleepster): Undo 
     if(InputStatePressed(undo->flags) && InputStateDown(lctrl->flags))
     {
-        process_next_undo_event(editor);
+        process_next_editor_event(editor, &editor->first_undo_event_buffer, &editor->first_redo_event_buffer);
     }
 
     // NOTE(Sleepster): Redo 
     if(InputStatePressed(redo->flags) && InputStateDown(lctrl->flags))
     {
-        process_next_redo_event(editor);
+        process_next_editor_event(editor, &editor->first_redo_event_buffer, &editor->first_undo_event_buffer);
     }
-
-#if 0
-    // NOTE(Sleepster): Undo  
-    if(InputStatePressed(undo->flags) && InputStateDown(lctrl->flags))
-    {
-        editor_action_buffer_t *undo_buffer = s_editor_get_last_action_buffer(&editor->first_undo_buffer);
-        if(undo_buffer->current_action_count != 0)
-        {
-            editor_action_t *undo_action = undo_buffer->actions + (undo_buffer->current_action_count - 1);
-            if(undo_action->kind == EDITOR_ACTION_ENTITY_CREATE)
-            {
-                if(undo_action->entities == null)
-                {
-                    if((undo_action->entity->flags & ENTITY_FLAG_IS_VALID) != 0)
-                    {
-                        editor_action_t action = {
-                            .type = EDITOR_ACTION_TYPE_REDO,
-                            .kind = EDITOR_ACTION_ENTITY_CREATE,
-                            .entity_archetype = undo_action->entity->archetype,
-                            .entity_flags     = undo_action->entity->flags,
-                            .entity_position  = undo_action->entity->position
-                        };
-                        s_editor_append_action(editor, &editor->first_redo_buffer, &action);
-                        s_entity_destroy(game_state->entity_manager, undo_action->entity);
-                    }
-                }
-                else
-                {
-#if 0
-                    editor_action_t action = {
-                        .type = EDITOR_ACTION_TYPE_REDO,
-                        .kind = EDITOR_ACTION_ENTITY_CREATE,
-                        .entity_archetype = undo_action->entity->archetype,
-                        .entity_flags     = undo_action->entity->flags,
-                        .entity_position  = undo_action->entity->position
-                    };
-                    s_editor_append_action(editor, &editor->first_redo_buffer, &action);
-#endif
-
-                    for(u32 entity_index = 0;
-                        entity_index < undo_action->entity_count;
-                        ++entity_index)
-                    {
-                        editor_entity_action_info_t *action_info = undo_action->entities + entity_index;
-                        if(action_info->entity && ((action_info->entity->flags & ENTITY_FLAG_IS_VALID) != 0))
-                        {
-                            s_entity_destroy(game_state->entity_manager, action_info->entity);
-                        }
-                    }
-
-                    undo_action->entities     = null;
-                    undo_action->entity_count = 0;
-                }
-            }
-            else if(undo_action->kind == EDITOR_ACTION_ENTITY_DESTROY)
-            {
-                // TODO(Sleepster): This can go away with the else { branch being the only
-                // code path here. We should just assume that if there is no array of entities that
-                // this is a single "destroy" rather than a grouped destroy command
-                if(undo_action->entities == null)
-                {
-                    entity_t *entity = null;
-                    // s_entity_create_from_editor_action(game_state, undo_action);
-
-                    editor_action_t action = {
-                        .type   = EDITOR_ACTION_TYPE_REDO,
-                        .kind   = EDITOR_ACTION_ENTITY_DESTROY,
-                        .entity = entity
-                    };
-                    s_editor_append_action(editor, &editor->first_redo_buffer, &action);
-                }
-                else
-                {
-                    entity_t *entity = null;
-                    for(u32 entity_index = 0;
-                        entity_index < undo_action->entity_count;
-                        ++entity_index)
-                    {
-                        editor_entity_action_info_t *entity_info = undo_action->entities + entity_index;
-                        switch(entity_info->archetype)
-                        {
-                            case ENTITY_ARCHETYPE_TILE:
-                            {
-                                entity = s_entity_tile_create(game_state, entity_info->position, entity_info->flags);
-                            }break;
-                        }
-                    }
-
-                    editor_action_t action = {
-                        .type   = EDITOR_ACTION_TYPE_REDO,
-                        .kind   = EDITOR_ACTION_ENTITY_DESTROY,
-                        .entity = entity
-                    };
-                    s_editor_append_action(editor, &editor->first_redo_buffer, &action);
-                }
-            }
-
-            undo_buffer->current_action_count--;
-            Assert(undo_buffer->current_action_count >= 0);
-        }
-        else
-        {
-            c_arena_reset(&editor->undo_arena);
-        }
-    }
-
-    // NOTE(Sleepster): Redo 
-    if(InputStatePressed(redo->flags) && InputStateDown(lctrl->flags))
-    {
-        editor_action_buffer_t *redo_buffer = s_editor_get_last_action_buffer(&editor->first_redo_buffer);
-        if(redo_buffer->current_action_count != 0)
-        {
-            editor_action_t *redo_action = redo_buffer->actions + (redo_buffer->current_action_count - 1);
-            if(redo_action->kind == EDITOR_ACTION_ENTITY_CREATE)
-            {
-                switch(redo_action->entity_archetype)
-                {
-                    case ENTITY_ARCHETYPE_TILE:
-                    {
-                        s_entity_tile_create(game_state, redo_action->entity_position, redo_action->entity_flags);
-                    }break;
-                }
-            }
-            else if(redo_action->kind == EDITOR_ACTION_ENTITY_DESTROY)
-            {
-                s_entity_destroy(game_state->entity_manager, redo_action->entity);
-            }
-
-            redo_buffer->current_action_count--;
-            Assert(redo_buffer->current_action_count >= 0);
-
-        }
-        else
-        {
-            c_arena_reset(&editor->redo_arena);
-        }
-    }
-#endif
 
     editor->camera.zoom     = editor->zoom;
     editor->camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
