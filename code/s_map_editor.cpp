@@ -13,23 +13,13 @@ enum editor_event_type_t
     EDITOR_EVENT_TYPE_DESTROY_ENTITY,
 };
 
-// NOTE(Sleepster): 
-//
-// Swap this out for entities_to_create and entities_to_destroy
-// Right now this is super confusing because placing entities adds a CREATE event
-// to the undo buffer which is wrong, very wrong. It should produce a DESTROY event
-// so that it better fits with the sentence:
-//
-// "To undo this create event, destroy these entities"
-//
-// Right now it's too confusing.
 struct editor_event_t 
 {
     u32               ID;
     u32               type;
     union {
-        array_t<entity_t*> entities_created;
-        array_t<entity_t>  entities_destroyed;
+        array_t<entity_t>  entities_to_create;
+        array_t<entity_t*> entities_to_destroy;
     };
 };
 
@@ -353,19 +343,19 @@ process_next_undo_event(map_editor_t *editor)
         switch(current_event->type)
         {   
             default: { InvalidCodePath; }break;
-            case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
+            case EDITOR_EVENT_TYPE_CREATE_ENTITY:
             {
                  entity_create_info_t entity_create_info = {};
                  entity_create_info.game_state    = editor->game_state;
                  entity_create_info.asset_manager = editor->asset_manager;
 
-                 entity_t *entity_array = c_arena_push_array(&editor->redo_arena, entity_t, current_event->entities_destroyed.count);
+                 entity_t **entity_array = c_arena_push_array(&editor->redo_arena, entity_t*, current_event->entities_to_destroy.count);
                  for(s32 entity_index = 0;
-                     entity_index < current_event->entities_destroyed.count;
+                     entity_index < current_event->entities_to_create.count;
                      ++entity_index)
                  {
-                     entity_t *entity_info = current_event->entities_destroyed + entity_index;
-                     entity_array[entity_index] = *entity_info;
+                     entity_t *entity_info = current_event->entities_to_create + entity_index;
+                     entity_array[entity_index] = entity_info;
 
                      entity_create_info.position         = entity_info->position;
                      entity_create_info.initial_position = entity_info->editor_position;
@@ -377,33 +367,31 @@ process_next_undo_event(map_editor_t *editor)
                  }
 
                  editor_event_t redo_event = {};
-                 redo_event.type = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
-                 redo_event.entities_destroyed = {entity_array, current_event->entities_destroyed.count};
+                 redo_event.type                = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                 redo_event.entities_to_destroy = {entity_array, current_event->entities_to_create.count};
 
                  editor_append_event(&editor->first_redo_event_buffer, &redo_event);
             }break;
-            case EDITOR_EVENT_TYPE_CREATE_ENTITY:
+            case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
             {
-                entity_t **entity_array = c_arena_push_array(&editor->redo_arena, entity_t*, current_event->entities_created.count);
+                entity_t *entity_array = c_arena_push_array(&editor->redo_arena, entity_t, current_event->entities_to_destroy.count);
                 for(s32 entity_index = 0;
-                    entity_index < current_event->entities_created.count;
+                    entity_index < current_event->entities_to_destroy.count;
                     ++entity_index)
                 {
-                    entity_t *entity_info = current_event->entities_created[entity_index];
+                    entity_t *entity_info = current_event->entities_to_destroy[entity_index];
                     Assert(entity_info)
 
                     if((entity_info->flags & ENTITY_FLAG_IS_VALID) != 0)
                     {
-                        entity_array[entity_index] = entity_info;
+                        entity_array[entity_index] = *entity_info;
                         s_entity_destroy(editor->game_state->entity_manager, entity_info);
                     }
                 }
 
-                 // NOTE(Sleepster): This outputs a create entity event because here we are UNDOING a creation, therefore
-                 // in order to redo this very same creation, we must output a create event into the redo buffer.
                  editor_event_t redo_event = {};
                  redo_event.type = EDITOR_EVENT_TYPE_CREATE_ENTITY;
-                 redo_event.entities_created = {entity_array, current_event->entities_created.count};
+                 redo_event.entities_to_create = {entity_array, current_event->entities_to_destroy.count};
 
                  editor_append_event(&editor->first_redo_event_buffer, &redo_event);
             }break;
@@ -427,10 +415,10 @@ process_next_redo_event(map_editor_t *editor)
             case EDITOR_EVENT_TYPE_DESTROY_ENTITY:
             {                 
                 for(s32 entity_index = 0;
-                    entity_index < current_event->entities_created.count;
+                    entity_index < current_event->entities_to_destroy.count;
                     ++entity_index)
                 {
-                    entity_t *entity_info = current_event->entities_created[entity_index];
+                    entity_t *entity_info = current_event->entities_to_destroy[entity_index];
                     Assert(entity_info)
 
                     if((entity_info->flags & ENTITY_FLAG_IS_VALID) != 0)
@@ -446,10 +434,10 @@ process_next_redo_event(map_editor_t *editor)
                 entity_create_info.asset_manager = editor->asset_manager;
 
                 for(s32 entity_index = 0;
-                    entity_index < current_event->entities_destroyed.count;
+                    entity_index < current_event->entities_to_create.count;
                     ++entity_index)
                 {
-                    entity_t *entity_info = current_event->entities_destroyed +entity_index;
+                    entity_t *entity_info = current_event->entities_to_create + entity_index;
 
                     entity_create_info.position         = entity_info->position;
                     entity_create_info.initial_position = entity_info->editor_position;
@@ -858,8 +846,8 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                         entities[0] = tile;
 
                         editor_event_t new_event = {};
-                        new_event.type             = EDITOR_EVENT_TYPE_CREATE_ENTITY;
-                        new_event.entities_created = {entities, 1};
+                        new_event.type                = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                        new_event.entities_to_destroy = {entities, 1};
 
                         editor_append_event(&editor->first_undo_event_buffer, &new_event);
                     }
@@ -915,8 +903,8 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                 memcpy(real_entity_array, temp_entity_array, sizeof(entity_t*) * entities_created);
 
                 editor_event_t new_event = {};
-                new_event.type             = EDITOR_EVENT_TYPE_CREATE_ENTITY;
-                new_event.entities_created = {real_entity_array, (s32)entities_created};
+                new_event.type                = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                new_event.entities_to_destroy = {real_entity_array, (s32)entities_created};
 
                 editor_append_event(&editor->first_undo_event_buffer, &new_event);
             }
@@ -959,8 +947,8 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                         *entity_data = *entity_destroyed;
 
                         editor_event_t new_event = {};
-                        new_event.type               = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
-                        new_event.entities_destroyed = entities;
+                        new_event.type               = EDITOR_EVENT_TYPE_CREATE_ENTITY;
+                        new_event.entities_to_create = entities;
 
                         editor_append_event(&editor->first_undo_event_buffer, &new_event);
                         s_entity_destroy(game_state->entity_manager, entity_destroyed);
@@ -991,8 +979,8 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                     }
 
                     editor_event_t new_event = {};
-                    new_event.type               = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
-                    new_event.entities_destroyed = {entity_data, (s32)entity_count};
+                    new_event.type               = EDITOR_EVENT_TYPE_CREATE_ENTITY;
+                    new_event.entities_to_create = {entity_data, (s32)entity_count};
 
                     editor_append_event(&editor->first_undo_event_buffer, &new_event);
                 }
