@@ -1619,7 +1619,9 @@ parse_singular_file(string_t filepath, dynarray_t<string_t> array)
     apollo_code_decl_list_t *result = &apollo_internal_state->code_declarations;
 
     apollo_internal_state->code_declarations.all.init(&apollo_internal_state->arena);
-    apollo_internal_state->clang_index = clang_createIndex(0, 1); 
+
+    // NOTE(Sleepster): Make the second parameter 1 for errors.  
+    apollo_internal_state->clang_index = clang_createIndex(0, 0);
     
     s32 default_argument_count = 2;
     const char **arguments = c_arena_push_array(&apollo_internal_state->arena, const char*, array.used + default_argument_count);
