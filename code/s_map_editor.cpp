@@ -349,13 +349,13 @@ process_next_editor_event(map_editor_t *editor, editor_event_buffer_t *source_ev
                  entity_create_info.game_state    = editor->game_state;
                  entity_create_info.asset_manager = editor->asset_manager;
 
+                 // TODO(Sleepster): Arenas here are honestly kinda dumb. We just need a history buffer 
                  entity_t **entity_array = c_arena_push_array(&editor->redo_arena, entity_t*, current_event->entities_to_destroy.count);
                  for(s32 entity_index = 0;
                      entity_index < current_event->entities_to_create.count;
                      ++entity_index)
                  {
                      entity_t *entity_info = current_event->entities_to_create + entity_index;
-                     entity_array[entity_index] = entity_info;
 
                      entity_create_info.position         = entity_info->position;
                      entity_create_info.initial_position = entity_info->editor_position;
@@ -363,7 +363,8 @@ process_next_editor_event(map_editor_t *editor, editor_event_buffer_t *source_ev
                      entity_create_info.flags            = entity_info->flags;
                      entity_create_info.extra_flags      = entity_info->flags;
 
-                     s_entity_create_of_type(entity_info->archetype, &entity_create_info); 
+                     entity_t *new_entity = s_entity_create_of_type(entity_info->archetype, &entity_create_info); 
+                     entity_array[entity_index] = new_entity;
                  }
 
                  editor_event_t redo_event = {};

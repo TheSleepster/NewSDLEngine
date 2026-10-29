@@ -465,7 +465,7 @@ struct entity_create_info_t {
 
     c_string_builder_sprintf(&entity_builder, "};\n");
     c_string_builder_sprintf(&entity_builder, "entity_t *s_entity_create_of_type(u32 entity_archetype, entity_create_info_t *create_info);\n");
-    c_string_builder_sprintf(&entity_builder, "\nentity_t *s_entity_create_of_type(u32 entity_archetype, entity_create_info_t *create_info) {\n\tswitch(entity_archetype) {\n");
+    c_string_builder_sprintf(&entity_builder, "\nentity_t *s_entity_create_of_type(u32 entity_archetype, entity_create_info_t *create_info) {\n\tentity_t *result = nullptr;\n\tswitch(entity_archetype) {\n");
     for(s32 member_index = 1;
         member_index < (archetype_declaration->members.used - 1);
         ++member_index)
@@ -475,7 +475,7 @@ struct entity_create_info_t {
 
         code_decl_procedure_t *procedure = tagged_procedures[member_index - 1];
 
-        c_string_builder_sprintf(&entity_builder, "\t\t\t%.*s(", fprint_string(procedure->identifier));
+        c_string_builder_sprintf(&entity_builder, "\t\t\tresult = %.*s(", fprint_string(procedure->identifier));
         for(s32 argument_index = 0;
             argument_index < procedure->arguments.used;
             ++argument_index)
@@ -490,7 +490,7 @@ struct entity_create_info_t {
         }
         c_string_builder_sprintf(&entity_builder, ");\n\t\t}break;\n");
     }
-    c_string_builder_sprintf(&entity_builder, "\t}\n\treturn(nullptr);\n}\n");
+    c_string_builder_sprintf(&entity_builder, "\t}\n\treturn(result);\n}\n");
 
     c_string_builder_dump_to_file(&entity_file, &entity_builder);
 }
