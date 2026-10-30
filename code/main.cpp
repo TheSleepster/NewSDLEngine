@@ -1060,11 +1060,6 @@ game_main(global_context_t *_global_context)
             {
                 handle_debug_ui_menu(main_ui, render_state->RHI_context, player_sprite);
             }
-
-            if(game_state->editor_opened)
-            {
-                s_map_editor_handle_ui(game_state->editor, main_ui, render_state->RHI_context);
-            }
         }
 
         game_state->game_camera.viewport = vec2(GAME_FRAMEBUFFER_WIDTH, GAME_FRAMEBUFFER_HEIGHT);
@@ -1080,7 +1075,7 @@ game_main(global_context_t *_global_context)
         // NOTE(Sleepster): Editor controls block 
         if(game_state->editor_opened)
         {
-            s_editor_update_state(game_state, game_state->editor, render_state, input_manager);
+            s_editor_update_state(game_state, main_ui, game_state->editor, render_state, input_manager);
         }
 
         // NOTE(Sleepster):} Simulate loop 

@@ -590,12 +590,14 @@ ui_state_begin_column(ui_state_t *ui_state, widget_t *parent)
 {
     ui_widget_set_layout(parent, UI_WIDGET_LAYOUT_STYLE_VERTICAL);
     ui_widget_push_parent(ui_state, parent);
+    ui_widget_seed(ui_state, parent->ID);
 }
 
 true_inline void
 ui_state_end_column(ui_state_t *ui_state)
 {
     ui_widget_pop_parent(ui_state);
+    ui_widget_seed(ui_state, 0);
 }
 
 true_inline void

@@ -3,6 +3,23 @@
 #include <code_generator/apollo/apollo_runtime.h>
 namespace Apollo {
 
+struct type_info_entity_archetype_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[5];
+        struct {
+			const type_info_member_t *ENTITY_ARCHETYPE_INVALID;
+			const type_info_member_t *ENTITY_ARCHETYPE_PLAYER;
+			const type_info_member_t *ENTITY_ARCHETYPE_COLLIDER;
+			const type_info_member_t *ENTITY_ARCHETYPE_TILE;
+			const type_info_member_t *ENTITY_ARCHETYPE_COUNT;
+		}members;
+	};
+};
+extern const type_info_entity_archetype_t DEFAULT_entity_archetype_t;
+
 struct type_info_RHI_pipeline_state_t {
     const type_info_t info;
     const unsigned long member_count;
@@ -281,6 +298,48 @@ struct type_info_jfd_package_entry_t {
 	};
 };
 extern const type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t;
+
+namespace MemberLists {
+enum class jfd_package_entry_t {
+	entry_header,
+	data_offset,
+	modtime,
+	filename,
+	fullpath,
+	asset_data,
+};
+}
+
+struct type_info_jfd_package_chunk_header_t {
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+    union {
+        const type_info_member_t *member_array[7];
+        struct {
+			const type_info_member_t *magic_value;
+			const type_info_member_t *total_entry_size;
+			const type_info_member_t *asset_type;
+			const type_info_member_t *filename_size;
+			const type_info_member_t *fullpath_size;
+			const type_info_member_t *entry_data_size;
+			const type_info_member_t *modtime;
+		}members;
+	};
+};
+extern const type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t;
+
+namespace MemberLists {
+enum class jfd_package_chunk_header_t {
+	magic_value,
+	total_entry_size,
+	asset_type,
+	filename_size,
+	fullpath_size,
+	entry_data_size,
+	modtime,
+};
+}
 
 struct type_info_subtexture_data_t {
     const type_info_t info;
@@ -745,6 +804,15 @@ struct type_info_jfd_file_header_t {
 	};
 };
 extern const type_info_jfd_file_header_t DEFAULT_jfd_file_header_t;
+
+namespace MemberLists {
+enum class jfd_file_header_t {
+	magic_value,
+	version,
+	flags,
+	entry_count,
+};
+}
 
 struct type_info_texture_atlas_registry_t {
     const type_info_t info;
@@ -1760,6 +1828,59 @@ enum class material_instance_t {
 };
 }
 
+constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_INVALID = {
+	.info = { .name = "ENTITY_ARCHETYPE_INVALID", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_entity_archetype_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_PLAYER = {
+	.info = { .name = "ENTITY_ARCHETYPE_PLAYER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_entity_archetype_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 1 },
+};
+
+constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COLLIDER = {
+	.info = { .name = "ENTITY_ARCHETYPE_COLLIDER", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_entity_archetype_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 2 },
+};
+
+constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_TILE = {
+	.info = { .name = "ENTITY_ARCHETYPE_TILE", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_entity_archetype_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 3 },
+};
+
+constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COUNT = {
+	.info = { .name = "ENTITY_ARCHETYPE_COUNT", .size = 0, .metatype = 0 },
+	.type_info = &DEFAULT_entity_archetype_t.info,
+	.offset = 0,
+	.value_type = 3,
+	.value = { .uint64_value = 4 },
+};
+
+constexpr type_info_entity_archetype_t DEFAULT_entity_archetype_t = {
+	.info = { .name = "entity_archetype_t", .size = 0, .metatype = 2 },
+	.member_count = 5,
+	.member_pointer = DEFAULT_entity_archetype_t.member_array,
+	.members = {
+		.ENTITY_ARCHETYPE_INVALID = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_INVALID,
+		.ENTITY_ARCHETYPE_PLAYER = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_PLAYER,
+		.ENTITY_ARCHETYPE_COLLIDER = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COLLIDER,
+		.ENTITY_ARCHETYPE_TILE = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_TILE,
+		.ENTITY_ARCHETYPE_COUNT = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COUNT,
+	},
+};
+
 constexpr type_info_bool32 DEFAULT_bool32 = { .info = { .name = "bool32", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_blend_enabled = {
@@ -2211,50 +2332,101 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file = {
 	.offset = 40,
 };
 
-constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_entry_header = {
-	.info = { .name = "entry_header", .size = 0, .metatype = 0 },
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_magic_value = {
+	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 0 },
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_total_entry_size = {
+	.info = { .name = "total_entry_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_asset_type = {
+	.info = { .name = "asset_type", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_filename_size = {
+	.info = { .name = "filename_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 12,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_fullpath_size = {
+	.info = { .name = "fullpath_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 16,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_entry_data_size = {
+	.info = { .name = "entry_data_size", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 20,
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_modtime = {
+	.info = { .name = "modtime", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 24,
+};
+
+constexpr type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t = {
+	.info = { .name = "jfd_package_chunk_header_t", .size = 32, .metatype = 1 },
+	.member_count = 7,
+	.member_pointer = DEFAULT_jfd_package_chunk_header_t.member_array,
+	.members = {
+		.magic_value = &DEFAULT_member_jfd_package_chunk_header_t_magic_value,
+		.total_entry_size = &DEFAULT_member_jfd_package_chunk_header_t_total_entry_size,
+		.asset_type = &DEFAULT_member_jfd_package_chunk_header_t_asset_type,
+		.filename_size = &DEFAULT_member_jfd_package_chunk_header_t_filename_size,
+		.fullpath_size = &DEFAULT_member_jfd_package_chunk_header_t_fullpath_size,
+		.entry_data_size = &DEFAULT_member_jfd_package_chunk_header_t_entry_data_size,
+		.modtime = &DEFAULT_member_jfd_package_chunk_header_t_modtime,
+	},
+};
+
+constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_entry_header = {
+	.info = { .name = "entry_header", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_jfd_package_chunk_header_t.info,
+	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_data_offset = {
-	.info = { .name = "data_offset", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 1 },
+	.info = { .name = "data_offset", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_modtime = {
-	.info = { .name = "modtime", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 2 },
+	.info = { .name = "modtime", .size = 8, .metatype = 0 },
+	.type_info = &DEFAULT_u64.info,
+	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_filename = {
-	.info = { .name = "filename", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 3 },
+	.info = { .name = "filename", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_fullpath = {
-	.info = { .name = "fullpath", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 4 },
+	.info = { .name = "fullpath", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_asset_data = {
-	.info = { .name = "asset_data", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 5 },
+	.info = { .name = "asset_data", .size = 16, .metatype = 0 },
+	.type_info = &DEFAULT_string_t.info,
+	.offset = 56,
 };
 
 constexpr type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t = {
-	.info = { .name = "jfd_package_entry_t", .size = 0, .metatype = 2 },
+	.info = { .name = "jfd_package_entry_t", .size = 72, .metatype = 1 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_jfd_package_entry_t.member_array,
 	.members = {
@@ -2968,35 +3140,31 @@ constexpr type_info_member_t DEFAULT_member_asset_file_data_t_raw_file_data = {
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_magic_value = {
-	.info = { .name = "magic_value", .size = 0, .metatype = 0 },
+	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 0 },
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_version = {
-	.info = { .name = "version", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 1 },
+	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_flags = {
-	.info = { .name = "flags", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 2 },
+	.info = { .name = "flags", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_entry_count = {
-	.info = { .name = "entry_count", .size = 0, .metatype = 0 },
-	.offset = 0,
-	.value_type = 2,
-	.value = { .int64_value = 3 },
+	.info = { .name = "entry_count", .size = 4, .metatype = 0 },
+	.type_info = &DEFAULT_u32.info,
+	.offset = 12,
 };
 
 constexpr type_info_jfd_file_header_t DEFAULT_jfd_file_header_t = {
-	.info = { .name = "jfd_file_header_t", .size = 0, .metatype = 2 },
+	.info = { .name = "jfd_file_header_t", .size = 16, .metatype = 1 },
 	.member_count = 4,
 	.member_pointer = DEFAULT_jfd_file_header_t.member_array,
 	.members = {
@@ -5394,6 +5562,7 @@ constexpr type_info_material_archetype_t DEFAULT_material_archetype_t = {
 };
 
 constexpr const type_info_t *const APOLLO_type_table[] = {
+	&DEFAULT_entity_archetype_t.info,
 	&DEFAULT_bool32.info,
 	&DEFAULT_u32.info,
 	&DEFAULT_RHI_pipeline_state_t.info,
@@ -5406,6 +5575,7 @@ constexpr const type_info_t *const APOLLO_type_table[] = {
 	&DEFAULT_sys_handle_t.info,
 	&DEFAULT_bool8.info,
 	&DEFAULT_file_t.info,
+	&DEFAULT_jfd_package_chunk_header_t.info,
 	&DEFAULT_jfd_package_entry_t.info,
 	&DEFAULT_float32.info,
 	&DEFAULT_float2.info,
@@ -5482,6 +5652,11 @@ constexpr const type_info_t *const APOLLO_type_table[] = {
 	nullptr,
 };
 constexpr const type_info_t *const APOLLO_member_table[] = {
+	&DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_INVALID.info,
+	&DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_PLAYER.info,
+	&DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COLLIDER.info,
+	&DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_TILE.info,
+	&DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COUNT.info,
 	&DEFAULT_member_RHI_pipeline_state_t_blend_enabled.info,
 	&DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode.info,
 	&DEFAULT_member_RHI_pipeline_state_t_dst_color_blend_mode.info,
@@ -5532,6 +5707,13 @@ constexpr const type_info_t *const APOLLO_member_table[] = {
 	&DEFAULT_member_file_t_overlapping.info,
 	&DEFAULT_member_file_t_for_writing.info,
 	&DEFAULT_member_asset_slot_t_owner_asset_file.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_magic_value.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_total_entry_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_asset_type.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_filename_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_fullpath_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_entry_data_size.info,
+	&DEFAULT_member_jfd_package_chunk_header_t_modtime.info,
 	&DEFAULT_member_jfd_package_entry_t_entry_header.info,
 	&DEFAULT_member_jfd_package_entry_t_data_offset.info,
 	&DEFAULT_member_jfd_package_entry_t_modtime.info,

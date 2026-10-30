@@ -8,7 +8,19 @@
 
 #define APOLLO_RUNTIME_H
 #include <string.h>
+#include <stdio.h>
+
 #define APOLLO_TAG(tag_type) [[clang::annotate((tag_type))]]
+
+#define APOLLO_ASSERT(cond) \
+do { \
+    if(!(cond)) \
+    { \
+        fprintf(stderr, "[%s], [%d]: Apollo Assert Condition failed...", \
+                __FILE__, __LINE__); \
+        (*(volatile char *)0 = 0); \
+    } \
+}while(0)
 
 namespace Apollo {
 
@@ -69,17 +81,19 @@ type_info(unsigned long index)
 inline const type_info_t *
 type_info(const char *name)
 {
+    const type_info_t *result = nullptr;
+
     for(const type_info_t *const *type = APOLLO_type_table;
         *type;
         ++type)
     {
         if(strcmp((*type)->name, name) == 0)
         {
-            return(*type);
+            result = *type;
         }
     }
 
-    return(nullptr);
+    return(result);
 }
 
 inline const type_info_member_t *
@@ -91,24 +105,36 @@ member(unsigned long index)
 inline const type_info_struct_t *
 as_structure(const type_info_t *info)
 {
+    APOLLO_ASSERT(info);
+    APOLLO_ASSERT(info->metatype == APOLLO_METATYPE_STRUCTURE || info->metatype == APOLLO_METATYPE_ENUM);
+
     return((const type_info_struct_t *)info);
 }
 
 inline const type_info_struct_t *
 as_structure(const type_info_member_t *member)
 {
+    APOLLO_ASSERT(member);
+    APOLLO_ASSERT(member->info.metatype == APOLLO_METATYPE_STRUCTURE || member->info.metatype == APOLLO_METATYPE_ENUM);
+
     return((const type_info_struct_t *)member->type_info);
 }
 
 inline const type_info_member_t *
 get_member(const type_info_struct_t *structure, unsigned long index)
 {
+    APOLLO_ASSERT(structure);
+    APOLLO_ASSERT(structure->info.metatype == APOLLO_METATYPE_STRUCTURE || structure->info.metatype == APOLLO_METATYPE_ENUM);
+
     return((const type_info_member_t *)structure->member_pointer[index]);
 }
 
 inline const type_info_member_t *
 get_member(const type_info_struct_t *structure, const char *name)
 {
+    APOLLO_ASSERT(structure);
+    APOLLO_ASSERT(structure->info.metatype == APOLLO_METATYPE_STRUCTURE || structure->info.metatype == APOLLO_METATYPE_ENUM);
+
     for(unsigned long index = 0;
         index < structure->member_count;
         ++index)

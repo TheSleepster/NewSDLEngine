@@ -437,7 +437,7 @@ EDITOR CONTROLS:
 */
 
 internal_api void
-s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_state_t *render_state, input_manager_t *input_manager)
+s_editor_update_state(game_state_t *game_state, ui_state_t *main_ui, map_editor_t *editor, render_state_t *render_state, input_manager_t *input_manager)
 {
     input_state_t *undo    = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_Z);
     input_state_t *redo    = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_Y);
@@ -494,6 +494,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
     input_state_t *mouse_scroll   = s_im_controller_get_input_state(editor->controller, INPUT_ARRAY_INPUT_AXIS_MOUSE_WHEEL);
 
     s_im_input_action_update_state(input_manager, editor->controller);
+    s_map_editor_handle_ui(game_state->editor, main_ui, render_state->RHI_context);
 
     // NOTE(Sleepster): Keyboard camera movement 
     float32 navigation_speed_modifier = expf(logf(2400.0f * gc->frame_time) + (editor->camera.zoom * 0.1));
@@ -571,13 +572,23 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
 
                 if(selected_entity)
                 {
-                    if(editor->selected_entity_count + 1 < editor->selected_entities.count)
+                    // NOTE(Sleepster): If shift is held, add to the list of selected entities 
+                    if(InputStateDown(lshift->flags))
                     {
-                        s32 result = c_array_add_if_unique(editor->selected_entities, &selected_entity, editor->selected_entity_count);
-                        if(result == -1)
+                        if(editor->selected_entity_count + 1 < editor->selected_entities.count)
                         {
-                            ++editor->selected_entity_count;
+                            s32 result = c_array_add_if_unique(editor->selected_entities, &selected_entity, editor->selected_entity_count);
+                            if(result == -1)
+                            {
+                                ++editor->selected_entity_count;
+                            }
                         }
+                    }
+                    else
+                    {
+                        // NOTE(Sleepster): Otherwise, override the currently selected entity 
+                        editor->selected_entities[0]  = selected_entity;
+                        editor->selected_entity_count = 1;
                     }
                 }
                 else if(!selected_entity && !InputStateDown(lshift->flags))
@@ -795,6 +806,47 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                     editor_append_event(&editor->first_undo_event_buffer, &new_event);
                 }
             }
+        }
+    }
+
+    // NOTE(Sleepster): Display information about the selected entity if there is only one entity selected.     
+    if(editor->selected_entity_count == 1)
+    {
+        entity_t *selected_entity = editor->selected_entities[0];
+        ui_signal_t entity_panel = ui_widget_panel(main_ui,
+                                                   STR("Entity Information Panel"),
+                                                   vec2_multiply(gc->RHI_context->window_size, vec2(-0.5, 0.5)), 
+                                                   vec2(20, 20), 
+                                                   vec2(10.0f, 20.0f), 
+                                                   vec4(10, 10, 20, 20), 
+                                                   vec4(0.4, 0.4, 0.4, 0.6),
+                                                   0);
+        if(rect2_point_in_rect(entity_panel.widget->state->widget_rect, main_ui->mouse_position))
+        {
+            main_ui->input_focused = true;
+        }
+        else
+        {
+            main_ui->input_focused = false;
+        }
+
+        ui_column(main_ui, entity_panel.widget)
+        {
+            // TODO(Sleepster): Have information about the entity properly displayed here and allow it to become modifiable. 
+            ui_widget_set_default_font_size(main_ui, 30);
+            const Apollo::type_info_t *archetype_data = Apollo::type_info("entity_archetype_t");
+            const Apollo::type_info_member_t *current_archetype = Apollo::get_member(archetype_data, selected_entity->archetype);
+
+            byte *buffer = c_arena_push_size(&gc->temp_arena, 2048);
+            s32 buffer_count = snprintf((char*)buffer, 2048, "%s", current_archetype->info.name);
+
+            string_t archetype_string = {
+                .data  = buffer,
+                .count = buffer_count
+            };
+
+            ui_widget_text(main_ui, STR("Entity Archetype:"));
+            ui_widget_text(main_ui, archetype_string);
         }
     }
 }
