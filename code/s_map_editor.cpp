@@ -834,8 +834,8 @@ s_editor_update_state(game_state_t *game_state, ui_state_t *main_ui, map_editor_
         {
             // TODO(Sleepster): Have information about the entity properly displayed here and allow it to become modifiable. 
             ui_widget_set_default_font_size(main_ui, 30);
-            const Apollo::type_info_t *archetype_data = Apollo::type_info("entity_archetype_t");
-            const Apollo::type_info_member_t *current_archetype = Apollo::get_member(archetype_data, selected_entity->archetype);
+            const type_info_t *archetype_data = Apollo::type_info("entity_archetype_t");
+            const type_info_member_t *current_archetype = Apollo::get_member(archetype_data, selected_entity->archetype);
 
             byte *buffer = c_arena_push_size(&gc->temp_arena, 2048);
             s32 buffer_count = snprintf((char*)buffer, 2048, "%s", current_archetype->info.name);

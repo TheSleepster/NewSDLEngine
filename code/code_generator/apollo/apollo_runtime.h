@@ -22,14 +22,6 @@ do { \
     } \
 }while(0)
 
-namespace Apollo {
-
-// TODO(Sleepster):  
-// The current functions like type_info() are very slow because it's just an O(N) linear search
-// which is stupid. In the future we should asign IDs to the generated structures so that binary
-// searching can be done which will be MUCH quicker. It doesn't really matter right now with like
-// ~10 type infos, but with hundreds it definitely will.
-
 enum metatype_t
 {
     APOLLO_METATYPE_PRIMITIVE,
@@ -44,6 +36,38 @@ struct type_info_t
     const unsigned long size;
     const unsigned long metatype;
 };
+
+struct type_info_member_t
+{
+    const type_info_t  info;
+    const type_info_t *type_info;
+    const unsigned long offset;
+    const unsigned long value_type;
+    union {
+        int                int32_value;
+        long long          int64_value;
+        unsigned long      uint32_value;
+        unsigned long long uint64_value;
+        float              float32_value;
+        double             float64_value;
+        const char        *string_value;
+    }value;
+};
+
+struct type_info_struct_t
+{
+    const type_info_t info;
+    const unsigned long member_count;
+    const type_info_member_t *const *member_pointer;
+};
+
+namespace Apollo {
+
+// TODO(Sleepster):  
+// The current functions like type_info() are very slow because it's just an O(N) linear search
+// which is stupid. In the future we should asign IDs to the generated structures so that binary
+// searching can be done which will be MUCH quicker. It doesn't really matter right now with like
+// ~10 type infos, but with hundreds it definitely will.
 
 // NOTE(Sleepster): Strip the reference and cv-qualifiers from a deduced type.
 template <typename T> struct remove_value_reference_t                       { using internal_type = T; };
@@ -99,30 +123,6 @@ constexpr const type_info_t *const APOLLO_primitive_type_table[] = {
 #undef APOLLO_PRIMITIVE_ENTRY
 #undef APOLLO_FUNDAMENTALS
     nullptr,
-};
-
-struct type_info_member_t
-{
-    const type_info_t  info;
-    const type_info_t *type_info;
-    const unsigned long offset;
-    const unsigned long value_type;
-    union {
-        int                int32_value;
-        long long          int64_value;
-        unsigned long      uint32_value;
-        unsigned long long uint64_value;
-        float              float32_value;
-        double             float64_value;
-        const char        *string_value;
-    }value;
-};
-
-struct type_info_struct_t
-{
-    const type_info_t info;
-    const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
 };
 
 extern const type_info_t *const APOLLO_type_table[];

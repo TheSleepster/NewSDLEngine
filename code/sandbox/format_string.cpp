@@ -8,29 +8,31 @@
 #include <c_string.h>
 #include <c_memory_arena.h>
 
-template <typename T> struct remove_reference      {using type = T;};
-template <typename T> struct remove_reference<T&>  {using type = T;};
-template <typename T> struct remove_reference<T&&> {using type = T;};
-
-template <typename T>
-internal_api constexpr T&&
-c_forward(typename remove_reference<T>::type &value)
-{
-    return((T&&)value);
-}
-
-template <typename T> T&&
-c_forward(typename remove_reference<T>::type &&value)
-{
-    return((T&&)value);
-}
+#include "code_generator/apollo/apollo_runtime.h"
+#include <meta/APOLLO_GENERATED_RTTI.h>
 
 template <typename T>
 internal_api s32 
 c_string_format_value(string_t *final_string, T &argument)
 {
-    (void)final_string;
-    (void)argument;
+    s32 result = 0;
+
+    const type_info_t *type_info = Apollo::type_info<T>();
+    switch(type_info->metatype)
+    {
+        default: { InvalidCodePath; }break;
+        case APOLLO_METATYPE_PRIMITIVE:
+        {
+        }break;
+        case APOLLO_METATYPE_STRUCTURE:
+        {
+        }break;
+        case APOLLO_METATYPE_ENUM:
+        {
+        }break;
+    }
+
+    return(result);
 }
 
 template<typename... Arguments>

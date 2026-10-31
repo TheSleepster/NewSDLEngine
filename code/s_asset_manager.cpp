@@ -153,17 +153,17 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
 
 // NOTE(Sleepster): We need to pass a pointer to the actual structure to actually store the file data
 ENGINE_API void
-material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *tokenizer, const Apollo::type_info_t *parent_type_data, token_data_t name_token)
+material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data, token_data_t name_token)
 {
     // NOTE(Sleepster): Eating the colon... 
     c_tokenizer_get_next_token(tokenizer);
     token_data_t value_token = c_tokenizer_get_next_token(tokenizer);
 
     // NOTE(Sleepster): Handle enums stuff. 
-    const Apollo::type_info_member_t *struct_member = Apollo::get_member(parent_type_data, name_token.string);
+    const type_info_member_t *struct_member = Apollo::get_member(parent_type_data, name_token.string);
 
-    const Apollo::type_info_struct_t *enum_data = null;
-    if(struct_member && struct_member->type_info->metatype == Apollo::APOLLO_METATYPE_ENUM)
+    const type_info_struct_t *enum_data = null;
+    if(struct_member && struct_member->type_info->metatype == APOLLO_METATYPE_ENUM)
     {
         enum_data = Apollo::as_structure(struct_member);
     }
@@ -182,7 +182,7 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
             // NOTE(Sleepster): rare instance of a do {}while(); loop being genuinely useful. We NEED this to happen at least once.
             token_data_t peek_token = c_tokenizer_peek_token(tokenizer);
             do {
-                const Apollo::type_info_member_t *enum_member = Apollo::get_member(enum_data, value_token.string);
+                const type_info_member_t *enum_member = Apollo::get_member(enum_data, value_token.string);
                 u32 *value = (u32*)data_ptr;
 
                 *value |= (u32)enum_member->value.uint64_value;
@@ -213,19 +213,19 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
 
         log_info("Valid members for structure of type name: '%s' are as follows:\n", parent_type_data->name);
 
-        const Apollo::type_info_struct_t *parent_struct = Apollo::as_structure(parent_type_data);
+        const type_info_struct_t *parent_struct = Apollo::as_structure(parent_type_data);
         for(u32 member_index = 0;
             member_index < parent_struct->member_count;
             ++member_index)
         {
-            const Apollo::type_info_member_t *member = Apollo::get_member(parent_struct, member_index);
+            const type_info_member_t *member = Apollo::get_member(parent_struct, member_index);
             log_info("[%d]: %s...\n", member_index, member->type_info->name);
         }
     }
 }
 
 ENGINE_API void 
-material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t *tokenizer, const Apollo::type_info_t *parent_type_data)
+material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data)
 {
     token_data_t token = c_tokenizer_get_next_token(tokenizer);
     while(token.type != TT_ClosingBrace)
@@ -246,10 +246,10 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                     // NOTE(Sleepster): Nested block. 
                     if(c_string_compare(token.string, STR("render_pipeline_state")))
                     {
-                        const Apollo::type_info_member_t *render_pipeline_info = Apollo::get_member(parent_type_data, STR("pipeline_state"));
+                        const type_info_member_t *render_pipeline_info = Apollo::get_member(parent_type_data, STR("pipeline_state"));
                         RHI_pipeline_state_t *state_data = (RHI_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
 
-                        const Apollo::type_info_t *type_data = Apollo::type_info(STR("RHI_pipeline_state_t"));
+                        const type_info_t *type_data = Apollo::type_info(STR("RHI_pipeline_state_t"));
                         material_file_parse_block_data(filename, state_data, tokenizer, type_data);
                     }
                     else
@@ -312,7 +312,7 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
                 else if(next_peeked.type == TT_OpeningBrace)
                 {
                     // parse_item_structure();
-                    const Apollo::type_info_t *struct_info = null;
+                    const type_info_t *struct_info = null;
                     if(c_string_compare(token.string, STR("material_archetype"))) 
                     {
                         struct_info = Apollo::type_info(STR("material_archetype_t"));

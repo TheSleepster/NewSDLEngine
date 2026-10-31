@@ -280,6 +280,28 @@ privDefer<F> defer_func(F f) {
 #define DEFER_2(x, y) DEFER_1(x, y)
 #define DEFER_3(x)    DEFER_2(x, __COUNTER__)
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
+
+// STD::FORWARD REPLACEMENT:
+template <typename T> struct remove_value_reference_t                       { using internal_type = T; };
+template <typename T> struct remove_value_reference_t<T&>                   { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<T&&>                  { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<const T>              { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<volatile T>           { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<const volatile T>     { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+
+template <typename T>
+internal_api constexpr T&&
+c_forward(typename remove_value_reference_t<T>::type &value)
+{
+    return((T&&)value);
+}
+
+template <typename T> 
+T&&
+c_forward(typename remove_value_reference_t<T>::type &&value)
+{
+    return((T&&)value);
+}
 #endif // __cplusplus
 
 // NOTE(Sleepster): Thanks Ryan Fluery 

@@ -106,7 +106,9 @@ create_forward_declaration(CXCursor cursor, string_t expression, const char *key
 {
     s32 namespace_count = 0;
     s32 offset = 0;
-    for(s32 index = 0; index + 1 < expression.count; ++index)
+    for(s32 index = 0; 
+        index + 1 < expression.count; 
+        ++index)
     {
         if(expression.data[index] == ':' && expression.data[index + 1] == ':')
         {
@@ -155,12 +157,13 @@ create_type_mapping(code_decl_t *declaration)
                           (declaration_kind == CXCursor_EnumDecl)   ? "enum"   : null;
 
     bool8 is_enum = (declaration_kind == CXCursor_EnumDecl);
-    bool8 is_nested = parent_kind == CXCursor_StructDecl || parent_kind == CXCursor_ClassDecl ||
-                      parent_kind == CXCursor_UnionDecl;
+    bool8 is_nested = parent_kind == CXCursor_StructDecl || parent_kind == CXCursor_ClassDecl || parent_kind == CXCursor_UnionDecl;
     bool8 is_template = !is_enum && !clang_Cursor_isNull(clang_getSpecializedCursorTemplate(type_declaration));
 
     // NOTE(Sleepster): Only a top-level, non-template record with a spellable name can be declared.
-    if(!keyword || clang_Cursor_isAnonymous(type_declaration) || is_nested || is_template ||
+    if(!keyword || clang_Cursor_isAnonymous(type_declaration) || 
+       is_nested || 
+       is_template ||
        memchr(expression.data, '(', expression.count) ||
        memchr(expression.data, '<', expression.count) ||
        type_mapping_table.find(expression))
