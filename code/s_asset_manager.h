@@ -58,7 +58,7 @@ struct asset_manager_t;
 struct dynamic_render_font_t;
 struct asset_catalog_t;
 
-typedef enum asset_type
+typedef enum asset_type : u32
 {
     AT_Invalid,
     AT_Bitmap,
@@ -69,7 +69,7 @@ typedef enum asset_type
     AT_Count
 }asset_type_t;
 
-typedef enum asset_slot_state
+typedef enum asset_slot_state : u32
 {
     ASLS_Invalid,
     ASLS_Unloaded,
@@ -80,7 +80,7 @@ typedef enum asset_slot_state
     ASLS_Count
 }asset_slot_load_status_t;
 
-typedef enum bitmap_format
+typedef enum bitmap_format : u32
 {
     BMF_Invalid,
     BMF_R8,
@@ -295,7 +295,7 @@ typedef struct material_archetype
     material_instance_t base_instance;
 }material_archetype_t;
 
-typedef enum stored_material_type
+typedef enum stored_material_type : u32
 {
     SMT_Invalid,
     SMT_Instance,

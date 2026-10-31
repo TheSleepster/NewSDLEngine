@@ -49,7 +49,7 @@ struct camera_matrices_t
 // GPU BUFFERS 
 ////////////////////
 
-enum RHI_render_buffer_type_t
+enum RHI_render_buffer_type_t : u32
 {
     RHI_RENDER_BUFFER_TYPE_INVALID       = BIT(0),
     RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER = BIT(1),
@@ -62,7 +62,7 @@ enum RHI_render_buffer_advance_rate_t
     RHI_RENDER_BUFFER_ADVANCE_RATE_PER_INSTANCE = BIT(1),
 };
 
-enum RHI_render_buffer_memory_type_t
+enum RHI_render_buffer_memory_type_t : u32
 {
     RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED   = BIT(0),
     RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY = BIT(1),
@@ -173,7 +173,7 @@ struct RHI_geometry_data_t
 };
 #endif
 
-enum RHI_command_type_t
+enum RHI_command_type_t : u32
 {
     RHI_RENDER_COMMAND_TYPE_INVALID,
     RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
@@ -367,7 +367,7 @@ struct RHI_command_t
     void                *data;
 };
 
-enum RHI_command_list_type_t 
+enum RHI_command_list_type_t : u32
 {
     RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
     RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
@@ -420,7 +420,7 @@ struct RHI_command_list_t
 // RENDER TARGETS 
 ////////////////////
 
-enum RHI_renderpass_attachment_access_t
+enum RHI_renderpass_attachment_access_t : u32
 {
     RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID     = BIT(0),
     RHI_RENDERPASS_ATTACHMENT_ACCESS_READ       = BIT(1),
@@ -428,14 +428,14 @@ enum RHI_renderpass_attachment_access_t
     RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE = RHI_RENDERPASS_ATTACHMENT_ACCESS_READ|RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE,
 };
 
-enum RHI_renderpass_attachment_load_operation_t
+enum RHI_renderpass_attachment_load_operation_t : u32
 {
     RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID = BIT(0),
     RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR   = BIT(1),
     RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD    = BIT(2)
 };
 
-enum RHI_renderpass_attachment_store_operation_t
+enum RHI_renderpass_attachment_store_operation_t : u32
 {
     RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID   = BIT(0),
     RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE     = BIT(1),

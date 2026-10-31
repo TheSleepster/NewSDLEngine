@@ -40,7 +40,7 @@ struct entity_t;
     X(ENTITY_ARCHETYPE_TILE, "ENTITY_ARCHETYPE_TILE", s_entity_tile_create) 
 #endif
 
-enum [[Game_Entity]] entity_archetype_t
+enum [[Game_Entity]] entity_archetype_t : u32
 {
     ENTITY_ARCHETYPE_INVALID,
     ENTITY_ARCHETYPE_PLAYER,

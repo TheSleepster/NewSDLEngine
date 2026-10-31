@@ -11,9 +11,11 @@
 
 static apollo_hash_table_t<string_t, bool8, 2048> dictionary_table;
 static apollo_hash_table_t<string_t, bool8, 2048> definition_table;
+static apollo_hash_table_t<string_t, bool8, 2048> type_mapping_table;
 static memory_arena_t *type_arena;
 
 static string_builder_t header_builder;
+static string_builder_t forward_builder;
 static string_builder_t dictionary_builder;
 static string_builder_t definition_builder;
 static string_builder_t template_builder;
@@ -98,6 +100,80 @@ get_member_typename(const code_decl_member_t &member)
     return(result);
 }
 
+// NOTE(Sleepster): Reopen the namespaces so the name doesn't depend on them already being declared.
+internal_api void
+create_forward_declaration(CXCursor cursor, string_t expression, const char *keyword, bool8 is_enum)
+{
+    s32 namespace_count = 0;
+    s32 offset = 0;
+    for(s32 index = 0; index + 1 < expression.count; ++index)
+    {
+        if(expression.data[index] == ':' && expression.data[index + 1] == ':')
+        {
+            c_string_builder_sprintf(&forward_builder, "namespace %.*s { ",
+                                     index - offset, (char *)(expression.data + offset));
+            offset = index + 2;
+            ++index;
+            ++namespace_count;
+        }
+    }
+
+    c_string_builder_sprintf(&forward_builder, "%s %.*s", keyword,
+                             (s32)(expression.count - offset),
+                             (char *)(expression.data + offset));
+
+    if(is_enum)
+    {
+        // NOTE(Sleepster): The definition must agree with this declaration's underlying type.
+        string_t underlying = convert(clang_getTypeSpelling(clang_getCanonicalType(clang_getEnumDeclIntegerType(cursor))));
+        c_string_builder_sprintf(&forward_builder, " : %.*s", fprint_string(underlying));
+    }
+    c_string_builder_sprintf(&forward_builder, ";");
+
+    while(namespace_count--)
+    {
+        c_string_builder_sprintf(&forward_builder, " }");
+    }
+    c_string_builder_sprintf(&forward_builder, "\n");
+}
+
+// NOTE(Sleepster): Point a reflected type at its metadata using its canonical spelling, so a
+// typedef lands on the real declaration and the keyword keeps a function like vec2() from
+// hiding the record.
+internal_api void
+create_type_mapping(code_decl_t *declaration)
+{
+    CXType canonical = clang_getCanonicalType(declaration->code_type);
+    CXCursor type_declaration = clang_getTypeDeclaration(canonical);
+    CXCursorKind declaration_kind = clang_getCursorKind(type_declaration);
+    CXCursorKind parent_kind = clang_getCursorKind(clang_getCursorSemanticParent(type_declaration));
+    string_t expression = convert(clang_getTypeSpelling(canonical));
+
+    const char *keyword = (declaration_kind == CXCursor_StructDecl) ? "struct" :
+                          (declaration_kind == CXCursor_ClassDecl)  ? "class"  :
+                          (declaration_kind == CXCursor_UnionDecl)  ? "union"  :
+                          (declaration_kind == CXCursor_EnumDecl)   ? "enum"   : null;
+
+    bool8 is_enum = (declaration_kind == CXCursor_EnumDecl);
+    bool8 is_nested = parent_kind == CXCursor_StructDecl || parent_kind == CXCursor_ClassDecl ||
+                      parent_kind == CXCursor_UnionDecl;
+    bool8 is_template = !is_enum && !clang_Cursor_isNull(clang_getSpecializedCursorTemplate(type_declaration));
+
+    // NOTE(Sleepster): Only a top-level, non-template record with a spellable name can be declared.
+    if(!keyword || clang_Cursor_isAnonymous(type_declaration) || is_nested || is_template ||
+       memchr(expression.data, '(', expression.count) ||
+       memchr(expression.data, '<', expression.count) ||
+       type_mapping_table.find(expression))
+    {
+        return;
+    }
+    type_mapping_table.add(true, expression);
+
+    create_forward_declaration(type_declaration, expression, keyword, is_enum);
+    c_string_builder_sprintf(&template_builder, "template <> constexpr const type_info_t *type_info_value<%s %.*s> = &DEFAULT_%.*s.info;\n",
+                             keyword, fprint_string(expression), fprint_string(get_type_identifier(declaration)));
+}
+
 internal_api void
 create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typename_string)
 {
@@ -111,6 +187,7 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
 
             dynarray_t<code_decl_member_t> *members = null;
             const char *count_name = null;
+            const char *pointer_name = null;
             const char *array_name = null;
             const char *items_name = null;
 
@@ -120,6 +197,7 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(code_declaration);
                 members = &structure->members;
                 count_name = "member_count";
+                pointer_name = "member_pointer";
                 array_name = "member_array";
                 items_name = "members";
             }
@@ -128,6 +206,7 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(code_declaration);
                 members = &procedure->arguments;
                 count_name = "argument_count";
+                pointer_name = "argument_pointer";
                 array_name = "argument_array";
                 items_name = "arguments";
             }
@@ -146,7 +225,8 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 c_string_builder_sprintf(&dictionary_builder, R"(struct type_info_%.*s {
     const type_info_t info;
     const unsigned long %s;
-)", fprint_string(identifier), count_name);
+    const type_info_member_t *const *%s;
+)", fprint_string(identifier), count_name, pointer_name);
 
                 if(member_count > 0)
                 {
@@ -216,6 +296,8 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 
             dynarray_t<code_decl_member_t> *members = null;
             const char *member_count_name = null;
+            const char *member_pointer_name = null;
+            const char *member_array_name = null;
             const char *members_name = null;
 
             if(type_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
@@ -224,20 +306,20 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                 code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(type_declaration);
                 members = &structure->members;
                 member_count_name = "member_count";
+                member_pointer_name = "member_pointer";
+                member_array_name = "member_array";
                 members_name = "members";
 
-                c_string_builder_sprintf(&template_builder, "template <> constexpr const type_info_t *type_info_value<%.*s> = &DEFAULT_%.*s.info;\n",
-                                         fprint_string(identifier), fprint_string(identifier));
+                create_type_mapping(type_declaration);
             }
             else if(type_declaration->metatype == CODE_DECL_METATYPE_PROCEDURE)
             {
                 code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(type_declaration);
                 members = &procedure->arguments;
                 member_count_name = "argument_count";
+                member_pointer_name = "argument_pointer";
+                member_array_name = "argument_array";
                 members_name = "arguments";
-            }
-            else
-            {
             }
 
             if(members)
@@ -321,7 +403,9 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 
                 if(member_count > 0)
                 {
-                    c_string_builder_sprintf(&definition_builder, "\t.%s = {\n", members_name);
+                    c_string_builder_sprintf(&definition_builder, "\t.%s = DEFAULT_%.*s.%s,\n\t.%s = {\n",
+                                             member_pointer_name, fprint_string(identifier), member_array_name,
+                                             members_name);
                     for(const auto &member: *members)
                     {
                         if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
@@ -332,6 +416,10 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                         }
                     }
                     c_string_builder_sprintf(&definition_builder, "\t},\n");
+                }
+                else
+                {
+                    c_string_builder_sprintf(&definition_builder, "\t.%s = nullptr,\n", member_pointer_name);
                 }
 
                 c_string_builder_sprintf(&definition_builder, "};\n\n");
@@ -345,7 +433,7 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 
             c_string_builder_sprintf(&type_table_builder, "\t&DEFAULT_%.*s.info,\n", fprint_string(identifier));
         }
- }
+    }
 }
 
 internal_api void
@@ -355,8 +443,10 @@ generate_apollo_structure_type_info_header(apollo_code_decl_list_t *declarations
 
     dictionary_table.init(arena);
     definition_table.init(arena);
+    type_mapping_table.init(arena);
 
     c_string_builder_init(&header_builder,       MB(2));
+    c_string_builder_init(&forward_builder,      MB(2));
     c_string_builder_init(&dictionary_builder,   MB(2));
     c_string_builder_init(&definition_builder,   MB(2));
     c_string_builder_init(&template_builder,     MB(2));
@@ -367,51 +457,9 @@ generate_apollo_structure_type_info_header(apollo_code_decl_list_t *declarations
     c_string_builder_sprintf(&header_builder, R"(// THIS FILE IS GENERATED BY THE sandbox/apollo_test.cpp FILE
 #if !defined(APOLLO_GENERATED_STRUCTURES)
 #include <code_generator/apollo/apollo_runtime.h>
-namespace Apollo {
-
-template <typename T> struct remove_value_reference_t      { using internal_type = T; };
-template <typename T> struct remove_value_reference_t<T&>  { using internal_type = typename remove_value_reference_t<T>::internal_type; };
-template <typename T> struct remove_value_reference_t<T&&> { using internal_type = typename remove_value_reference_t<T>::internal_type; };
-
-template <typename T> constexpr const type_info_t *type_info_value = nullptr;
-
-template <typename T> 
-constexpr const type_info_t *
-type_info()
-{
-    return(type_info_value<typename remove_value_reference_t<T>::internal_type>);
-}
-
-// NOTE(Sleepster): The fundamental types have no declaration cursor, so they are
-// registered here once.
-#define APOLLO_FUNDAMENTAL(id, cpp_type, size_value)                                                    \
-struct type_info_##id { const type_info_t info; };                                                      \
-constexpr type_info_##id DEFAULT_##id = { .info = {#cpp_type, size_value, APOLLO_METATYPE_PRIMITIVE} }; \
-template <> constexpr const type_info_t *type_info_value<cpp_type> = &DEFAULT_##id.info;
-
-APOLLO_FUNDAMENTAL(void,               void,               0)
-APOLLO_FUNDAMENTAL(bool,               bool,               sizeof(bool))
-APOLLO_FUNDAMENTAL(char,               char,               sizeof(char))
-APOLLO_FUNDAMENTAL(schar,              signed char,        sizeof(signed char))
-APOLLO_FUNDAMENTAL(uchar,              unsigned char,      sizeof(unsigned char))
-APOLLO_FUNDAMENTAL(short,              short,              sizeof(short))
-APOLLO_FUNDAMENTAL(ushort,             unsigned short,     sizeof(unsigned short))
-APOLLO_FUNDAMENTAL(int,                int,                sizeof(int))
-APOLLO_FUNDAMENTAL(uint,               unsigned int,       sizeof(unsigned int))
-APOLLO_FUNDAMENTAL(long,               long,               sizeof(long))
-APOLLO_FUNDAMENTAL(ulong,              unsigned long,      sizeof(unsigned long))
-APOLLO_FUNDAMENTAL(longlong,           long long,          sizeof(long long))
-APOLLO_FUNDAMENTAL(ulonglong,          unsigned long long, sizeof(unsigned long long))
-APOLLO_FUNDAMENTAL(float,              float,              sizeof(float))
-APOLLO_FUNDAMENTAL(double,             double,             sizeof(double))
-APOLLO_FUNDAMENTAL(longdouble,         long double,        sizeof(long double))
-APOLLO_FUNDAMENTAL(wchar,              wchar_t,            sizeof(wchar_t))
-APOLLO_FUNDAMENTAL(char16,             char16_t,           sizeof(char16_t))
-APOLLO_FUNDAMENTAL(char32,             char32_t,           sizeof(char32_t))
-
-#undef APOLLO_FUNDAMENTAL
 
 )");
+    c_string_builder_sprintf(&dictionary_builder, "namespace Apollo {\n\n");
     dictionary_table.add(true, STR("void"));
     dictionary_table.add(true, STR("bool"));
     dictionary_table.add(true, STR("char"));
@@ -457,10 +505,8 @@ APOLLO_FUNDAMENTAL(char32,             char32_t,           sizeof(char32_t))
     dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Apollo::type_info"));
     for(const auto &call: calls)
     {
-        // NOTE(Sleepster): A type_info call can hand us the type itself
-        // (Apollo::type_info<Foo>()) or the name of one (Apollo::type_info(STR("Foo"))),
-        // so we try the argument's name first and then its type. Whichever one resolves is
-        // enough, the create_declaration_type_*() functions ignore anything already written out.
+        // NOTE(Sleepster): A call can pass the type or its name, so try both; the
+        // create_declaration_type_* functions ignore anything already written.
         for(const auto &argument: call.arguments)
         {
             create_declaration_type_info(declarations, argument.identifier);
@@ -476,6 +522,7 @@ APOLLO_FUNDAMENTAL(char32,             char32_t,           sizeof(char32_t))
     c_string_builder_sprintf(&member_table_builder, "#endif // APOLLO_GENERATED_STRUCTURES");
 
     c_string_builder_dump_to_file(&out_file, &header_builder);
+    c_string_builder_dump_to_file(&out_file, &forward_builder);
     c_string_builder_dump_to_file(&out_file, &dictionary_builder);
     c_string_builder_dump_to_file(&out_file, &definition_builder);
     c_string_builder_dump_to_file(&out_file, &template_builder);

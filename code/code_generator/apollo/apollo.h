@@ -1481,8 +1481,9 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
     *enum_info = {};
 
     enum_info->metatype  = CODE_DECL_METATYPE_ENUM;
-    enum_info->code_type = clang_getCursorType(cursor);
+    enum_info->code_type = clang_getCanonicalType(clang_getCursorType(cursor));
     enum_info->decl      = cursor;
+    enum_info->size      = clang_Type_getSizeOf(enum_info->code_type);
     enum_info->identifier = convert(clang_getCursorSpelling(cursor));
 
     collect_attributes(cursor, code_decl);

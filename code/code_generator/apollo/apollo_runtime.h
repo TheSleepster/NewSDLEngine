@@ -45,6 +45,62 @@ struct type_info_t
     const unsigned long metatype;
 };
 
+// NOTE(Sleepster): Strip the reference and cv-qualifiers from a deduced type.
+template <typename T> struct remove_value_reference_t                       { using internal_type = T; };
+template <typename T> struct remove_value_reference_t<T&>                   { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<T&&>                  { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<const T>              { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<volatile T>           { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<const volatile T>     { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+
+template <typename T> constexpr const type_info_t *type_info_value = nullptr;
+
+template <typename T>
+constexpr const type_info_t *
+type_info()
+{
+    return(type_info_value<typename remove_value_reference_t<T>::internal_type>);
+}
+
+// NOTE(Sleepster): Fundamental types have no declaration cursor, so register them here.
+#define APOLLO_FUNDAMENTALS(X)                              \
+    X(void,               void,               0)            \
+    X(bool,               bool,               sizeof(bool)) \
+    X(char,               char,               sizeof(char)) \
+    X(schar,              signed char,        sizeof(signed char)) \
+    X(uchar,              unsigned char,      sizeof(unsigned char)) \
+    X(short,              short,              sizeof(short)) \
+    X(ushort,             unsigned short,     sizeof(unsigned short)) \
+    X(int,                int,                sizeof(int)) \
+    X(uint,               unsigned int,       sizeof(unsigned int)) \
+    X(long,               long,               sizeof(long)) \
+    X(ulong,              unsigned long,      sizeof(unsigned long)) \
+    X(longlong,           long long,          sizeof(long long)) \
+    X(ulonglong,          unsigned long long, sizeof(unsigned long long)) \
+    X(float,              float,              sizeof(float)) \
+    X(double,             double,             sizeof(double)) \
+    X(longdouble,         long double,        sizeof(long double)) \
+    X(wchar,              wchar_t,            sizeof(wchar_t)) \
+    X(char16,             char16_t,           sizeof(char16_t)) \
+    X(char32,             char32_t,           sizeof(char32_t))
+
+#define APOLLO_FUNDAMENTAL(id, cpp_type, size_value)                                                    \
+struct type_info_##id { const type_info_t info; };                                                      \
+constexpr type_info_##id DEFAULT_##id = { .info = {#cpp_type, size_value, APOLLO_METATYPE_PRIMITIVE} }; \
+template <> constexpr const type_info_t *type_info_value<cpp_type> = &DEFAULT_##id.info;
+
+APOLLO_FUNDAMENTALS(APOLLO_FUNDAMENTAL)
+
+#undef APOLLO_FUNDAMENTAL
+
+constexpr const type_info_t *const APOLLO_primitive_type_table[] = {
+#define APOLLO_PRIMITIVE_ENTRY(id, cpp_type, size_value) &DEFAULT_##id.info,
+    APOLLO_FUNDAMENTALS(APOLLO_PRIMITIVE_ENTRY)
+#undef APOLLO_PRIMITIVE_ENTRY
+#undef APOLLO_FUNDAMENTALS
+    nullptr,
+};
+
 struct type_info_member_t
 {
     const type_info_t  info;
@@ -82,6 +138,16 @@ inline const type_info_t *
 type_info(const char *name)
 {
     const type_info_t *result = nullptr;
+
+    for(const type_info_t *const *type = APOLLO_primitive_type_table;
+        *type;
+        ++type)
+    {
+        if(strcmp((*type)->name, name) == 0)
+        {
+            result = *type;
+        }
+    }
 
     for(const type_info_t *const *type = APOLLO_type_table;
         *type;
@@ -179,6 +245,16 @@ get_member(const type_info_t *info, T index)
 inline const type_info_t *
 type_info(string_t name)
 {
+    for(const type_info_t *const *type = APOLLO_primitive_type_table;
+        *type;
+        ++type)
+    {
+        if(c_string_compare(STR((*type)->name), name))
+        {
+            return(*type);
+        }
+    }
+
     for(const type_info_t *const *type = APOLLO_type_table;
         *type;
         ++type)

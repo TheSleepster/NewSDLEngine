@@ -19,14 +19,14 @@
 // NOTE(Sleepster): 
 // The invalid states are meant to help us know if the create_info is 
 // valid or should be ignored completely. 
-enum RHI_image_filter_type_t 
+enum RHI_image_filter_type_t : u32
 {
     RHI_IMAGE_FILTER_TYPE_INVALID,
     RHI_IMAGE_FILTER_TYPE_NEAREST,
     RHI_IMAGE_FILTER_TYPE_LINEAR,
 };
 
-enum RHI_image_wrapping_type_t 
+enum RHI_image_wrapping_type_t : u32
 {
     RHI_IMAGE_WRAPPING_INVALID,
     RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
@@ -34,7 +34,7 @@ enum RHI_image_wrapping_type_t
     RHI_IMAGE_WRAPPING_REPEAT,
 };
 
-enum RHI_image_usage_t 
+enum RHI_image_usage_t : u32
 {
     RHI_IMAGE_USAGE_INVALID                     = BIT(0),
     RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = BIT(1),
