@@ -41,6 +41,8 @@
 #include <s_ui_core.h>
 #include <s_entity.h>
 
+#include <asset_file_packer/jfd_asset_file.h>
+
 //#include <meta/GENERATED_program_RTTI.h>
 #include <meta/APOLLO_GENERATED_RTTI.h>
 

@@ -3,10 +3,51 @@
 #include <code_generator/apollo/apollo_runtime.h>
 namespace Apollo {
 
+template <typename T> struct remove_value_reference_t      { using internal_type = T; };
+template <typename T> struct remove_value_reference_t<T&>  { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<T&&> { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+
+template <typename T> constexpr const type_info_t *type_info_value = nullptr;
+
+template <typename T> 
+constexpr const type_info_t *
+type_info()
+{
+    return(type_info_value<typename remove_value_reference_t<T>::internal_type>);
+}
+
+// NOTE(Sleepster): The fundamental types have no declaration cursor, so they are
+// registered here once.
+#define APOLLO_FUNDAMENTAL(id, cpp_type, size_value)                                                    \
+struct type_info_##id { const type_info_t info; };                                                      \
+constexpr type_info_##id DEFAULT_##id = { .info = {#cpp_type, size_value, APOLLO_METATYPE_PRIMITIVE} }; \
+template <> constexpr const type_info_t *type_info_value<cpp_type> = &DEFAULT_##id.info;
+
+APOLLO_FUNDAMENTAL(void,               void,               0)
+APOLLO_FUNDAMENTAL(bool,               bool,               sizeof(bool))
+APOLLO_FUNDAMENTAL(char,               char,               sizeof(char))
+APOLLO_FUNDAMENTAL(schar,              signed char,        sizeof(signed char))
+APOLLO_FUNDAMENTAL(uchar,              unsigned char,      sizeof(unsigned char))
+APOLLO_FUNDAMENTAL(short,              short,              sizeof(short))
+APOLLO_FUNDAMENTAL(ushort,             unsigned short,     sizeof(unsigned short))
+APOLLO_FUNDAMENTAL(int,                int,                sizeof(int))
+APOLLO_FUNDAMENTAL(uint,               unsigned int,       sizeof(unsigned int))
+APOLLO_FUNDAMENTAL(long,               long,               sizeof(long))
+APOLLO_FUNDAMENTAL(ulong,              unsigned long,      sizeof(unsigned long))
+APOLLO_FUNDAMENTAL(longlong,           long long,          sizeof(long long))
+APOLLO_FUNDAMENTAL(ulonglong,          unsigned long long, sizeof(unsigned long long))
+APOLLO_FUNDAMENTAL(float,              float,              sizeof(float))
+APOLLO_FUNDAMENTAL(double,             double,             sizeof(double))
+APOLLO_FUNDAMENTAL(longdouble,         long double,        sizeof(long double))
+APOLLO_FUNDAMENTAL(wchar,              wchar_t,            sizeof(wchar_t))
+APOLLO_FUNDAMENTAL(char16,             char16_t,           sizeof(char16_t))
+APOLLO_FUNDAMENTAL(char32,             char32_t,           sizeof(char32_t))
+
+#undef APOLLO_FUNDAMENTAL
+
 struct type_info_entity_archetype_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[5];
         struct {
@@ -23,7 +64,6 @@ extern const type_info_entity_archetype_t DEFAULT_entity_archetype_t;
 struct type_info_RHI_pipeline_state_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[15];
         struct {
@@ -76,7 +116,6 @@ extern const type_info_u32 DEFAULT_u32;
 struct type_info_material_archetype_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -108,7 +147,6 @@ extern const type_info_u64 DEFAULT_u64;
 struct type_info_string_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -135,7 +173,6 @@ extern const type_info_s64 DEFAULT_s64;
 struct type_info_asset_handle_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -164,7 +201,6 @@ enum class asset_handle_t {
 struct type_info_asset_slot_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[13];
         struct {
@@ -207,7 +243,6 @@ enum class asset_slot_t {
 struct type_info_asset_slot_load_status_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[7];
         struct {
@@ -226,7 +261,6 @@ extern const type_info_asset_slot_load_status_t DEFAULT_asset_slot_load_status_t
 struct type_info_asset_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[7];
         struct {
@@ -245,7 +279,6 @@ extern const type_info_asset_type_t DEFAULT_asset_type_t;
 struct type_info_file_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[8];
         struct {
@@ -284,7 +317,6 @@ extern const type_info_bool8 DEFAULT_bool8;
 struct type_info_jfd_package_entry_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -313,7 +345,6 @@ enum class jfd_package_entry_t {
 struct type_info_jfd_package_chunk_header_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[7];
         struct {
@@ -344,7 +375,6 @@ enum class jfd_package_chunk_header_t {
 struct type_info_subtexture_data_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[8];
         struct {
@@ -377,7 +407,6 @@ enum class subtexture_data_t {
 struct type_info_float2 {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[4];
         struct {
@@ -405,7 +434,6 @@ extern const type_info_float32 DEFAULT_float32;
 struct type_info_texture_atlas_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[12];
         struct {
@@ -446,7 +474,6 @@ enum class texture_atlas_t {
 struct type_info_texture2D_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -469,7 +496,6 @@ enum class texture2D_t {
 struct type_info_bitmap_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[5];
         struct {
@@ -496,7 +522,6 @@ enum class bitmap_t {
 struct type_info_RHI_image_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -519,7 +544,6 @@ enum class RHI_image_t {
 struct type_info_RHI_image_create_info_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -548,7 +572,6 @@ enum class RHI_image_create_info_t {
 struct type_info_RHI_image_usage_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -566,7 +589,6 @@ extern const type_info_RHI_image_usage_t DEFAULT_RHI_image_usage_t;
 struct type_info_RHI_sampler_create_info_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[8];
         struct {
@@ -599,7 +621,6 @@ enum class RHI_sampler_create_info_t {
 struct type_info_RHI_image_filter_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -614,7 +635,6 @@ extern const type_info_RHI_image_filter_type_t DEFAULT_RHI_image_filter_type_t;
 struct type_info_RHI_image_wrapping_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[4];
         struct {
@@ -630,7 +650,6 @@ extern const type_info_RHI_image_wrapping_type_t DEFAULT_RHI_image_wrapping_type
 struct type_info_backend_image_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -648,16 +667,12 @@ enum class backend_image_t {
 };
 }
 
-struct type_info_void { const type_info_t info; };
-extern const type_info_void DEFAULT_void;
-
 struct type_info_s32 { const type_info_t info; };
 extern const type_info_s32 DEFAULT_s32;
 
 struct type_info_asset_manager_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[20];
         struct {
@@ -714,7 +729,6 @@ enum class asset_manager_t {
 struct type_info_memory_arena_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -740,13 +754,9 @@ enum class memory_arena_t {
 };
 }
 
-struct type_info_int { const type_info_t info; };
-extern const type_info_int DEFAULT_int;
-
 struct type_info_asset_file_data_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[13];
         struct {
@@ -792,7 +802,6 @@ extern const type_info_volatile_u32 DEFAULT_volatile_u32;
 struct type_info_jfd_file_header_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[4];
         struct {
@@ -817,7 +826,6 @@ enum class jfd_file_header_t {
 struct type_info_texture_atlas_registry_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -838,7 +846,6 @@ enum class texture_atlas_registry_t {
 struct type_info_zone_allocator_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[5];
         struct {
@@ -865,7 +872,6 @@ enum class zone_allocator_t {
 struct type_info_sys_mutex_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[1];
         struct {
@@ -890,7 +896,6 @@ extern const type_info_u8 DEFAULT_u8;
 struct type_info_zone_allocator_block_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -919,7 +924,6 @@ enum class zone_allocator_block_t {
 struct type_info_asset_catalog_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -948,7 +952,6 @@ enum class asset_catalog_t {
 struct type_info_font_manager_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -969,7 +972,6 @@ enum class font_manager_t {
 struct type_info_dynamic_render_font_page_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[13];
         struct {
@@ -1012,7 +1014,6 @@ enum class dynamic_render_font_page_t {
 struct type_info_dynamic_render_font_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1035,7 +1036,6 @@ enum class dynamic_render_font_t {
 struct type_info_dynamic_render_font_varient_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[13];
         struct {
@@ -1081,7 +1081,6 @@ extern const type_info_float64 DEFAULT_float64;
 struct type_info_temporary_glyph_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -1110,7 +1109,6 @@ enum class temporary_glyph_t {
 struct type_info_glyph_metric_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[12];
         struct {
@@ -1151,7 +1149,6 @@ enum class glyph_metric_t {
 struct type_info_RHI_context_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[18];
         struct {
@@ -1204,7 +1201,6 @@ enum class RHI_context_t {
 struct type_info_SDL_Window {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
 };
 extern const type_info_SDL_Window DEFAULT_SDL_Window;
 
@@ -1214,7 +1210,6 @@ extern const type_info_backend_render_context_t DEFAULT_backend_render_context_t
 struct type_info_RHI_command_list_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[25];
         struct {
@@ -1281,7 +1276,6 @@ enum class RHI_command_list_t {
 struct type_info_RHI_command_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -1302,7 +1296,6 @@ enum class RHI_command_t {
 struct type_info_RHI_command_header_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1325,7 +1318,6 @@ enum class RHI_command_header_t {
 struct type_info_RHI_command_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[26];
         struct {
@@ -1366,7 +1358,6 @@ extern const type_info_const_char DEFAULT_const_char;
 struct type_info_RHI_index_buffer_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -1395,7 +1386,6 @@ enum class RHI_index_buffer_t {
 struct type_info_RHI_render_buffer_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[10];
         struct {
@@ -1432,7 +1422,6 @@ enum class RHI_render_buffer_t {
 struct type_info_RHI_render_buffer_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1447,7 +1436,6 @@ extern const type_info_RHI_render_buffer_type_t DEFAULT_RHI_render_buffer_type_t
 struct type_info_RHI_render_buffer_memory_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -1464,7 +1452,6 @@ extern const type_info_backend_buffer_t DEFAULT_backend_buffer_t;
 struct type_info_RHI_renderpass_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[14];
         struct {
@@ -1509,7 +1496,6 @@ enum class RHI_renderpass_t {
 struct type_info_RHI_renderpass_key_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[1];
         struct {
@@ -1528,7 +1514,6 @@ enum class RHI_renderpass_key_t {
 struct type_info_bitmap_format_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[13];
         struct {
@@ -1553,7 +1538,6 @@ extern const type_info_bitmap_format_t DEFAULT_bitmap_format_t;
 struct type_info_RHI_renderpass_desc_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[6];
         struct {
@@ -1582,7 +1566,6 @@ enum class RHI_renderpass_desc_t {
 struct type_info_RHI_renderpass_attachment_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[5];
         struct {
@@ -1609,7 +1592,6 @@ enum class RHI_renderpass_attachment_t {
 struct type_info_RHI_renderpass_attachment_access_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[4];
         struct {
@@ -1625,7 +1607,6 @@ extern const type_info_RHI_renderpass_attachment_access_t DEFAULT_RHI_renderpass
 struct type_info_RHI_renderpass_attachment_load_operation_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1640,7 +1621,6 @@ extern const type_info_RHI_renderpass_attachment_load_operation_t DEFAULT_RHI_re
 struct type_info_RHI_renderpass_attachment_store_operation_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1655,7 +1635,6 @@ extern const type_info_RHI_renderpass_attachment_store_operation_t DEFAULT_RHI_r
 struct type_info_RHI_clear_value_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[5];
         struct {
@@ -1682,14 +1661,12 @@ enum class RHI_clear_value_t {
 struct type_info_float4 {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
 };
 extern const type_info_float4 DEFAULT_float4;
 
 struct type_info_ivec4_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
 };
 extern const type_info_ivec4_t DEFAULT_ivec4_t;
 
@@ -1702,7 +1679,6 @@ extern const type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_
 struct type_info_RHI_command_list_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -1719,7 +1695,6 @@ extern const type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t
 struct type_info_RHI_command_present_frame_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[1];
         struct {
@@ -1738,7 +1713,6 @@ enum class RHI_command_present_frame_t {
 struct type_info_RHI_shader_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[2];
         struct {
@@ -1762,7 +1736,6 @@ extern const type_info_backend_shader_t DEFAULT_backend_shader_t;
 struct type_info_material_data_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1785,7 +1758,6 @@ enum class material_data_t {
 struct type_info_stored_material_type_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[3];
         struct {
@@ -1800,7 +1772,6 @@ extern const type_info_stored_material_type_t DEFAULT_stored_material_type_t;
 struct type_info_material_instance_t {
     const type_info_t info;
     const unsigned long member_count;
-    const type_info_member_t *const *member_pointer;
     union {
         const type_info_member_t *member_array[7];
         struct {
@@ -1871,7 +1842,6 @@ constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_
 constexpr type_info_entity_archetype_t DEFAULT_entity_archetype_t = {
 	.info = { .name = "entity_archetype_t", .size = 0, .metatype = 2 },
 	.member_count = 5,
-	.member_pointer = DEFAULT_entity_archetype_t.member_array,
 	.members = {
 		.ENTITY_ARCHETYPE_INVALID = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_INVALID,
 		.ENTITY_ARCHETYPE_PLAYER = &DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_PLAYER,
@@ -2008,7 +1978,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_primitive_type 
 constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {
 	.info = { .name = "RHI_pipeline_state_t", .size = 60, .metatype = 1 },
 	.member_count = 15,
-	.member_pointer = DEFAULT_RHI_pipeline_state_t.member_array,
 	.members = {
 		.blend_enabled = &DEFAULT_member_RHI_pipeline_state_t_blend_enabled,
 		.src_color_blend_mode = &DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode,
@@ -2061,7 +2030,6 @@ constexpr type_info_member_t DEFAULT_member_string_t_count = {
 constexpr type_info_string_t DEFAULT_string_t = {
 	.info = { .name = "string_t", .size = 16, .metatype = 1 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_string_t.member_array,
 	.members = {
 		.data = &DEFAULT_member_string_t_data,
 		.count = &DEFAULT_member_string_t_count,
@@ -2151,7 +2119,6 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Count 
 constexpr type_info_asset_slot_load_status_t DEFAULT_asset_slot_load_status_t = {
 	.info = { .name = "asset_slot_load_status_t", .size = 0, .metatype = 2 },
 	.member_count = 7,
-	.member_pointer = DEFAULT_asset_slot_load_status_t.member_array,
 	.members = {
 		.ASLS_Invalid = &DEFAULT_member_asset_slot_load_status_t_ASLS_Invalid,
 		.ASLS_Unloaded = &DEFAULT_member_asset_slot_load_status_t_ASLS_Unloaded,
@@ -2228,7 +2195,6 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Count = {
 constexpr type_info_asset_type_t DEFAULT_asset_type_t = {
 	.info = { .name = "asset_type_t", .size = 0, .metatype = 2 },
 	.member_count = 7,
-	.member_pointer = DEFAULT_asset_type_t.member_array,
 	.members = {
 		.AT_Invalid = &DEFAULT_member_asset_type_t_AT_Invalid,
 		.AT_Bitmap = &DEFAULT_member_asset_type_t_AT_Bitmap,
@@ -2313,7 +2279,6 @@ constexpr type_info_member_t DEFAULT_member_file_t_for_writing = {
 constexpr type_info_file_t DEFAULT_file_t = {
 	.info = { .name = "file_t", .size = 72, .metatype = 1 },
 	.member_count = 8,
-	.member_pointer = DEFAULT_file_t.member_array,
 	.members = {
 		.handle = &DEFAULT_member_file_t_handle,
 		.file_name = &DEFAULT_member_file_t_file_name,
@@ -2377,7 +2342,6 @@ constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_modtime =
 constexpr type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t = {
 	.info = { .name = "jfd_package_chunk_header_t", .size = 32, .metatype = 1 },
 	.member_count = 7,
-	.member_pointer = DEFAULT_jfd_package_chunk_header_t.member_array,
 	.members = {
 		.magic_value = &DEFAULT_member_jfd_package_chunk_header_t_magic_value,
 		.total_entry_size = &DEFAULT_member_jfd_package_chunk_header_t_total_entry_size,
@@ -2428,7 +2392,6 @@ constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_asset_data = {
 constexpr type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t = {
 	.info = { .name = "jfd_package_entry_t", .size = 72, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_jfd_package_entry_t.member_array,
 	.members = {
 		.entry_header = &DEFAULT_member_jfd_package_entry_t_entry_header,
 		.data_offset = &DEFAULT_member_jfd_package_entry_t_data_offset,
@@ -2474,7 +2437,6 @@ constexpr type_info_member_t DEFAULT_member_float2_xy = {
 constexpr type_info_float2 DEFAULT_float2 = {
 	.info = { .name = "float2", .size = 8, .metatype = 1 },
 	.member_count = 4,
-	.member_pointer = DEFAULT_float2.member_array,
 	.members = {
 		.elements = &DEFAULT_member_float2_elements,
 		.x = &DEFAULT_member_float2_x,
@@ -2558,7 +2520,6 @@ constexpr type_info_member_t DEFAULT_member_bitmap_t_pixels = {
 constexpr type_info_bitmap_t DEFAULT_bitmap_t = {
 	.info = { .name = "bitmap_t", .size = 32, .metatype = 1 },
 	.member_count = 5,
-	.member_pointer = DEFAULT_bitmap_t.member_array,
 	.members = {
 		.width = &DEFAULT_member_bitmap_t_width,
 		.height = &DEFAULT_member_bitmap_t_height,
@@ -2655,7 +2616,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BL
 constexpr type_info_RHI_image_usage_t DEFAULT_RHI_image_usage_t = {
 	.info = { .name = "RHI_image_usage_t", .size = 0, .metatype = 2 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_RHI_image_usage_t.member_array,
 	.members = {
 		.RHI_IMAGE_USAGE_INVALID = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_INVALID,
 		.RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = &DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT,
@@ -2699,7 +2659,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FI
 constexpr type_info_RHI_image_filter_type_t DEFAULT_RHI_image_filter_type_t = {
 	.info = { .name = "RHI_image_filter_type_t", .size = 0, .metatype = 2 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_RHI_image_filter_type_t.member_array,
 	.members = {
 		.RHI_IMAGE_FILTER_TYPE_INVALID = &DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_INVALID,
 		.RHI_IMAGE_FILTER_TYPE_NEAREST = &DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_NEAREST,
@@ -2760,7 +2719,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_
 constexpr type_info_RHI_image_wrapping_type_t DEFAULT_RHI_image_wrapping_type_t = {
 	.info = { .name = "RHI_image_wrapping_type_t", .size = 0, .metatype = 2 },
 	.member_count = 4,
-	.member_pointer = DEFAULT_RHI_image_wrapping_type_t.member_array,
 	.members = {
 		.RHI_IMAGE_WRAPPING_INVALID = &DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_INVALID,
 		.RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE = &DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
@@ -2802,7 +2760,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_use_normal
 constexpr type_info_RHI_sampler_create_info_t DEFAULT_RHI_sampler_create_info_t = {
 	.info = { .name = "RHI_sampler_create_info_t", .size = 32, .metatype = 1 },
 	.member_count = 8,
-	.member_pointer = DEFAULT_RHI_sampler_create_info_t.member_array,
 	.members = {
 		.filtering = &DEFAULT_member_RHI_sampler_create_info_t_filtering,
 		.anisotropy_enabled = &DEFAULT_member_RHI_sampler_create_info_t_anisotropy_enabled,
@@ -2824,7 +2781,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_sampler_info
 constexpr type_info_RHI_image_create_info_t DEFAULT_RHI_image_create_info_t = {
 	.info = { .name = "RHI_image_create_info_t", .size = 64, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_RHI_image_create_info_t.member_array,
 	.members = {
 		.data = &DEFAULT_member_RHI_image_create_info_t_data,
 		.width = &DEFAULT_member_RHI_image_create_info_t_width,
@@ -2847,8 +2803,6 @@ constexpr type_info_member_t DEFAULT_member_backend_image_t_is_valid = {
 	.offset = 0,
 };
 
-constexpr type_info_void DEFAULT_void = { .info = { .name = "void", .size = 0, .metatype = 0 } };
-
 constexpr type_info_member_t DEFAULT_member_backend_image_t_handle = {
 	.info = { .name = "handle", .size = 8, .metatype = 0 },
 	.type_info = &DEFAULT_void.info,
@@ -2858,7 +2812,6 @@ constexpr type_info_member_t DEFAULT_member_backend_image_t_handle = {
 constexpr type_info_backend_image_t DEFAULT_backend_image_t = {
 	.info = { .name = "backend_image_t", .size = 16, .metatype = 1 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_backend_image_t.member_array,
 	.members = {
 		.is_valid = &DEFAULT_member_backend_image_t_is_valid,
 		.handle = &DEFAULT_member_backend_image_t_handle,
@@ -2874,7 +2827,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_t_backend_image = {
 constexpr type_info_RHI_image_t DEFAULT_RHI_image_t = {
 	.info = { .name = "RHI_image_t", .size = 88, .metatype = 1 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_RHI_image_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_RHI_image_t_ID,
 		.create_info = &DEFAULT_member_RHI_image_t_create_info,
@@ -2891,7 +2843,6 @@ constexpr type_info_member_t DEFAULT_member_texture2D_t_gpu_data = {
 constexpr type_info_texture2D_t DEFAULT_texture2D_t = {
 	.info = { .name = "texture2D_t", .size = 128, .metatype = 1 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_texture2D_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_texture2D_t_ID,
 		.bitmap = &DEFAULT_member_texture2D_t_bitmap,
@@ -2974,7 +2925,6 @@ constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_size = {
 constexpr type_info_texture_atlas_t DEFAULT_texture_atlas_t = {
 	.info = { .name = "texture_atlas_t", .size = 1, .metatype = 1 },
 	.member_count = 12,
-	.member_pointer = DEFAULT_texture_atlas_t.member_array,
 	.members = {
 		.texture = &DEFAULT_member_texture_atlas_t_texture,
 		.bitmap_data = &DEFAULT_member_texture_atlas_t_bitmap_data,
@@ -3006,7 +2956,6 @@ constexpr type_info_member_t DEFAULT_member_subtexture_data_t_packed_asset = {
 constexpr type_info_subtexture_data_t DEFAULT_subtexture_data_t = {
 	.info = { .name = "subtexture_data_t", .size = 72, .metatype = 1 },
 	.member_count = 8,
-	.member_pointer = DEFAULT_subtexture_data_t.member_array,
 	.members = {
 		.uv_min = &DEFAULT_member_subtexture_data_t_uv_min,
 		.uv_max = &DEFAULT_member_subtexture_data_t_uv_max,
@@ -3070,7 +3019,6 @@ constexpr type_info_member_t DEFAULT_member_memory_arena_t_scratch_arena_count =
 constexpr type_info_memory_arena_t DEFAULT_memory_arena_t = {
 	.info = { .name = "memory_arena_t", .size = 40, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_memory_arena_t.member_array,
 	.members = {
 		.is_initialized = &DEFAULT_member_memory_arena_t_is_initialized,
 		.base = &DEFAULT_member_memory_arena_t_base,
@@ -3086,8 +3034,6 @@ constexpr type_info_member_t DEFAULT_member_asset_manager_t_manager_arena = {
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
-
-constexpr type_info_int DEFAULT_int = { .info = { .name = "int", .size = 4, .metatype = 0 } };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_freetype_handle = {
 	.info = { .name = "freetype_handle", .size = 4, .metatype = 0 },
@@ -3166,7 +3112,6 @@ constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_entry_count = {
 constexpr type_info_jfd_file_header_t DEFAULT_jfd_file_header_t = {
 	.info = { .name = "jfd_file_header_t", .size = 16, .metatype = 1 },
 	.member_count = 4,
-	.member_pointer = DEFAULT_jfd_file_header_t.member_array,
 	.members = {
 		.magic_value = &DEFAULT_member_jfd_file_header_t_magic_value,
 		.version = &DEFAULT_member_jfd_file_header_t_version,
@@ -3212,7 +3157,6 @@ constexpr type_info_member_t DEFAULT_member_asset_file_data_t_header_data = {
 constexpr type_info_asset_file_data_t DEFAULT_asset_file_data_t = {
 	.info = { .name = "asset_file_data_t", .size = 1, .metatype = 1 },
 	.member_count = 13,
-	.member_pointer = DEFAULT_asset_file_data_t.member_array,
 	.members = {
 		.is_initialized = &DEFAULT_member_asset_file_data_t_is_initialized,
 		.ID = &DEFAULT_member_asset_file_data_t_ID,
@@ -3286,7 +3230,6 @@ constexpr type_info_member_t DEFAULT_member_texture_atlas_registry_t_current_atl
 constexpr type_info_texture_atlas_registry_t DEFAULT_texture_atlas_registry_t = {
 	.info = { .name = "texture_atlas_registry_t", .size = 1, .metatype = 1 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_texture_atlas_registry_t.member_array,
 	.members = {
 		.atlases = &DEFAULT_member_texture_atlas_registry_t_atlases,
 		.current_atlas_count = &DEFAULT_member_texture_atlas_registry_t_current_atlas_count,
@@ -3310,7 +3253,6 @@ constexpr type_info_member_t DEFAULT_member_sys_mutex_t_handle = {
 constexpr type_info_sys_mutex_t DEFAULT_sys_mutex_t = {
 	.info = { .name = "sys_mutex_t", .size = 8, .metatype = 1 },
 	.member_count = 1,
-	.member_pointer = DEFAULT_sys_mutex_t.member_array,
 	.members = {
 		.handle = &DEFAULT_member_sys_mutex_t_handle,
 	},
@@ -3373,7 +3315,6 @@ constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_prev_block = 
 constexpr type_info_zone_allocator_block_t DEFAULT_zone_allocator_block_t = {
 	.info = { .name = "zone_allocator_block_t", .size = 40, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_zone_allocator_block_t.member_array,
 	.members = {
 		.block_id = &DEFAULT_member_zone_allocator_block_t_block_id,
 		.is_allocated = &DEFAULT_member_zone_allocator_block_t_is_allocated,
@@ -3399,7 +3340,6 @@ constexpr type_info_member_t DEFAULT_member_zone_allocator_t_cursor = {
 constexpr type_info_zone_allocator_t DEFAULT_zone_allocator_t = {
 	.info = { .name = "zone_allocator_t", .size = 72, .metatype = 1 },
 	.member_count = 5,
-	.member_pointer = DEFAULT_zone_allocator_t.member_array,
 	.members = {
 		.mutex = &DEFAULT_member_zone_allocator_t_mutex,
 		.capacity = &DEFAULT_member_zone_allocator_t_capacity,
@@ -3452,7 +3392,6 @@ constexpr type_info_member_t DEFAULT_member_asset_catalog_t_loaded_assets = {
 constexpr type_info_asset_catalog_t DEFAULT_asset_catalog_t = {
 	.info = { .name = "asset_catalog_t", .size = 1, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_asset_catalog_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_asset_catalog_t_ID,
 		.catalog_type = &DEFAULT_member_asset_catalog_t_catalog_type,
@@ -3531,7 +3470,6 @@ constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_varients = {
 constexpr type_info_dynamic_render_font_t DEFAULT_dynamic_render_font_t = {
 	.info = { .name = "dynamic_render_font_t", .size = 1, .metatype = 1 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_dynamic_render_font_t.member_array,
 	.members = {
 		.font_arena = &DEFAULT_member_dynamic_render_font_t_font_arena,
 		.font_face = &DEFAULT_member_dynamic_render_font_t_font_face,
@@ -3628,7 +3566,6 @@ constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_first_
 constexpr type_info_dynamic_render_font_varient_t DEFAULT_dynamic_render_font_varient_t = {
 	.info = { .name = "dynamic_render_font_varient_t", .size = 80, .metatype = 1 },
 	.member_count = 13,
-	.member_pointer = DEFAULT_dynamic_render_font_varient_t.member_array,
 	.members = {
 		.font_size = &DEFAULT_member_dynamic_render_font_varient_t_font_size,
 		.size_to_pixels = &DEFAULT_member_dynamic_render_font_varient_t_size_to_pixels,
@@ -3750,7 +3687,6 @@ constexpr type_info_member_t DEFAULT_member_glyph_metric_t_synthetic_texture_han
 constexpr type_info_glyph_metric_t DEFAULT_glyph_metric_t = {
 	.info = { .name = "glyph_metric_t", .size = 80, .metatype = 1 },
 	.member_count = 12,
-	.member_pointer = DEFAULT_glyph_metric_t.member_array,
 	.members = {
 		.is_valid = &DEFAULT_member_glyph_metric_t_is_valid,
 		.is_fetched = &DEFAULT_member_glyph_metric_t_is_fetched,
@@ -3800,7 +3736,6 @@ constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_cursor_y = {
 constexpr type_info_temporary_glyph_t DEFAULT_temporary_glyph_t = {
 	.info = { .name = "temporary_glyph_t", .size = 32, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_temporary_glyph_t.member_array,
 	.members = {
 		.utf32_codepoint = &DEFAULT_member_temporary_glyph_t_utf32_codepoint,
 		.metrics = &DEFAULT_member_temporary_glyph_t_metrics,
@@ -3850,7 +3785,6 @@ constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_next_page
 constexpr type_info_dynamic_render_font_page_t DEFAULT_dynamic_render_font_page_t = {
 	.info = { .name = "dynamic_render_font_page_t", .size = 1, .metatype = 1 },
 	.member_count = 13,
-	.member_pointer = DEFAULT_dynamic_render_font_page_t.member_array,
 	.members = {
 		.is_dirty = &DEFAULT_member_dynamic_render_font_page_t_is_dirty,
 		.is_full = &DEFAULT_member_dynamic_render_font_page_t_is_full,
@@ -3883,7 +3817,6 @@ constexpr type_info_member_t DEFAULT_member_font_manager_t_pages_queued = {
 constexpr type_info_font_manager_t DEFAULT_font_manager_t = {
 	.info = { .name = "font_manager_t", .size = 88, .metatype = 1 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_font_manager_t.member_array,
 	.members = {
 		.pages_to_update = &DEFAULT_member_font_manager_t_pages_to_update,
 		.pages_queued = &DEFAULT_member_font_manager_t_pages_queued,
@@ -3899,7 +3832,6 @@ constexpr type_info_member_t DEFAULT_member_asset_manager_t_font_manager = {
 constexpr type_info_SDL_Window DEFAULT_SDL_Window = {
 	.info = { .name = "SDL_Window", .size = 0, .metatype = 1 },
 	.member_count = 0,
-	.member_pointer = nullptr,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_window = {
@@ -4163,7 +4095,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 constexpr type_info_RHI_command_type_t DEFAULT_RHI_command_type_t = {
 	.info = { .name = "RHI_command_type_t", .size = 0, .metatype = 2 },
 	.member_count = 26,
-	.member_pointer = DEFAULT_RHI_command_type_t.member_array,
 	.members = {
 		.RHI_RENDER_COMMAND_TYPE_INVALID = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_INVALID,
 		.RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET = &DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
@@ -4217,7 +4148,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_filename = {
 constexpr type_info_RHI_command_header_t DEFAULT_RHI_command_header_t = {
 	.info = { .name = "RHI_command_header_t", .size = 16, .metatype = 1 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_RHI_command_header_t.member_array,
 	.members = {
 		.command_type = &DEFAULT_member_RHI_command_header_t_command_type,
 		.line_number = &DEFAULT_member_RHI_command_header_t_line_number,
@@ -4240,7 +4170,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_t_data = {
 constexpr type_info_RHI_command_t DEFAULT_RHI_command_t = {
 	.info = { .name = "RHI_command_t", .size = 24, .metatype = 1 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_RHI_command_t.member_array,
 	.members = {
 		.header = &DEFAULT_member_RHI_command_t_header,
 		.data = &DEFAULT_member_RHI_command_t_data,
@@ -4327,7 +4256,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_
 constexpr type_info_RHI_render_buffer_type_t DEFAULT_RHI_render_buffer_type_t = {
 	.info = { .name = "RHI_render_buffer_type_t", .size = 0, .metatype = 2 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_RHI_render_buffer_type_t.member_array,
 	.members = {
 		.RHI_RENDER_BUFFER_TYPE_INVALID = &DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INVALID,
 		.RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER = &DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER,
@@ -4360,7 +4288,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_
 constexpr type_info_RHI_render_buffer_memory_type_t DEFAULT_RHI_render_buffer_memory_type_t = {
 	.info = { .name = "RHI_render_buffer_memory_type_t", .size = 0, .metatype = 2 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_RHI_render_buffer_memory_type_t.member_array,
 	.members = {
 		.RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED = &DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED,
 		.RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY = &DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY,
@@ -4426,7 +4353,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_info = {
 constexpr type_info_RHI_render_buffer_t DEFAULT_RHI_render_buffer_t = {
 	.info = { .name = "RHI_render_buffer_t", .size = 56, .metatype = 1 },
 	.member_count = 10,
-	.member_pointer = DEFAULT_RHI_render_buffer_t.member_array,
 	.members = {
 		.type = &DEFAULT_member_RHI_render_buffer_t_type,
 		.allocation_type = &DEFAULT_member_RHI_render_buffer_t_allocation_type,
@@ -4480,7 +4406,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_instance_offset =
 constexpr type_info_RHI_index_buffer_t DEFAULT_RHI_index_buffer_t = {
 	.info = { .name = "RHI_index_buffer_t", .size = 80, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_RHI_index_buffer_t.member_array,
 	.members = {
 		.buffer_data = &DEFAULT_member_RHI_index_buffer_t_buffer_data,
 		.index_data = &DEFAULT_member_RHI_index_buffer_t_index_data,
@@ -4628,7 +4553,6 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Count = {
 constexpr type_info_bitmap_format_t DEFAULT_bitmap_format_t = {
 	.info = { .name = "bitmap_format_t", .size = 0, .metatype = 2 },
 	.member_count = 13,
-	.member_pointer = DEFAULT_bitmap_format_t.member_array,
 	.members = {
 		.BMF_Invalid = &DEFAULT_member_bitmap_format_t_BMF_Invalid,
 		.BMF_R8 = &DEFAULT_member_bitmap_format_t_BMF_R8,
@@ -4655,7 +4579,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_key_t_attachment_form
 constexpr type_info_RHI_renderpass_key_t DEFAULT_RHI_renderpass_key_t = {
 	.info = { .name = "RHI_renderpass_key_t", .size = 40, .metatype = 1 },
 	.member_count = 1,
-	.member_pointer = DEFAULT_RHI_renderpass_key_t.member_array,
 	.members = {
 		.attachment_formats = &DEFAULT_member_RHI_renderpass_key_t_attachment_formats,
 	},
@@ -4726,7 +4649,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_R
 constexpr type_info_RHI_renderpass_attachment_access_t DEFAULT_RHI_renderpass_attachment_access_t = {
 	.info = { .name = "RHI_renderpass_attachment_access_t", .size = 0, .metatype = 2 },
 	.member_count = 4,
-	.member_pointer = DEFAULT_RHI_renderpass_attachment_access_t.member_array,
 	.members = {
 		.RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID = &DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID,
 		.RHI_RENDERPASS_ATTACHMENT_ACCESS_READ = &DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ,
@@ -4768,7 +4690,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_opera
 constexpr type_info_RHI_renderpass_attachment_load_operation_t DEFAULT_RHI_renderpass_attachment_load_operation_t = {
 	.info = { .name = "RHI_renderpass_attachment_load_operation_t", .size = 0, .metatype = 2 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_RHI_renderpass_attachment_load_operation_t.member_array,
 	.members = {
 		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID = &DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID,
 		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR = &DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR,
@@ -4809,7 +4730,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_oper
 constexpr type_info_RHI_renderpass_attachment_store_operation_t DEFAULT_RHI_renderpass_attachment_store_operation_t = {
 	.info = { .name = "RHI_renderpass_attachment_store_operation_t", .size = 0, .metatype = 2 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_RHI_renderpass_attachment_store_operation_t.member_array,
 	.members = {
 		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID = &DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID,
 		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE = &DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE,
@@ -4832,7 +4752,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_image = 
 constexpr type_info_float4 DEFAULT_float4 = {
 	.info = { .name = "float4", .size = 1, .metatype = 1 },
 	.member_count = 0,
-	.member_pointer = nullptr,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_float_color = {
@@ -4844,7 +4763,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_float_color = {
 constexpr type_info_ivec4_t DEFAULT_ivec4_t = {
 	.info = { .name = "ivec4_t", .size = 1, .metatype = 1 },
 	.member_count = 0,
-	.member_pointer = nullptr,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_int_color = {
@@ -4874,7 +4792,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_stencil = {
 constexpr type_info_RHI_clear_value_t DEFAULT_RHI_clear_value_t = {
 	.info = { .name = "RHI_clear_value_t", .size = 16, .metatype = 1 },
 	.member_count = 5,
-	.member_pointer = DEFAULT_RHI_clear_value_t.member_array,
 	.members = {
 		.float_color = &DEFAULT_member_RHI_clear_value_t_float_color,
 		.int_color = &DEFAULT_member_RHI_clear_value_t_int_color,
@@ -4893,7 +4810,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_clear_va
 constexpr type_info_RHI_renderpass_attachment_t DEFAULT_RHI_renderpass_attachment_t = {
 	.info = { .name = "RHI_renderpass_attachment_t", .size = 40, .metatype = 1 },
 	.member_count = 5,
-	.member_pointer = DEFAULT_RHI_renderpass_attachment_t.member_array,
 	.members = {
 		.access = &DEFAULT_member_RHI_renderpass_attachment_t_access,
 		.load_operation = &DEFAULT_member_RHI_renderpass_attachment_t_load_operation,
@@ -4918,7 +4834,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_depth_stencil_
 constexpr type_info_RHI_renderpass_desc_t DEFAULT_RHI_renderpass_desc_t = {
 	.info = { .name = "RHI_renderpass_desc_t", .size = 456, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_RHI_renderpass_desc_t.member_array,
 	.members = {
 		.render_width = &DEFAULT_member_RHI_renderpass_desc_t_render_width,
 		.render_height = &DEFAULT_member_RHI_renderpass_desc_t_render_height,
@@ -5008,7 +4923,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_resize_with_window 
 constexpr type_info_RHI_renderpass_t DEFAULT_RHI_renderpass_t = {
 	.info = { .name = "RHI_renderpass_t", .size = 1136, .metatype = 1 },
 	.member_count = 14,
-	.member_pointer = DEFAULT_RHI_renderpass_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_RHI_renderpass_t_ID,
 		.renderpass_key = &DEFAULT_member_RHI_renderpass_t_renderpass_key,
@@ -5082,7 +4996,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_C
 constexpr type_info_RHI_command_list_type_t DEFAULT_RHI_command_list_type_t = {
 	.info = { .name = "RHI_command_list_type_t", .size = 0, .metatype = 2 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_RHI_command_list_type_t.member_array,
 	.members = {
 		.RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS = &DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
 		.RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE = &DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
@@ -5106,7 +5019,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_backend_command_b
 constexpr type_info_RHI_command_list_t DEFAULT_RHI_command_list_t = {
 	.info = { .name = "RHI_command_list_t", .size = 1, .metatype = 1 },
 	.member_count = 25,
-	.member_pointer = DEFAULT_RHI_command_list_t.member_array,
 	.members = {
 		.is_initialized = &DEFAULT_member_RHI_command_list_t_is_initialized,
 		.RHI_context = &DEFAULT_member_RHI_command_list_t_RHI_context,
@@ -5223,7 +5135,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_present_frame_t_presenta
 constexpr type_info_RHI_command_present_frame_t DEFAULT_RHI_command_present_frame_t = {
 	.info = { .name = "RHI_command_present_frame_t", .size = 8, .metatype = 1 },
 	.member_count = 1,
-	.member_pointer = DEFAULT_RHI_command_present_frame_t.member_array,
 	.members = {
 		.presentation_source = &DEFAULT_member_RHI_command_present_frame_t_presentation_source,
 	},
@@ -5238,7 +5149,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_context_t_present_command = {
 constexpr type_info_RHI_context_t DEFAULT_RHI_context_t = {
 	.info = { .name = "RHI_context_t", .size = 1, .metatype = 1 },
 	.member_count = 18,
-	.member_pointer = DEFAULT_RHI_context_t.member_array,
 	.members = {
 		.window = &DEFAULT_member_RHI_context_t_window,
 		.backend_render_context = &DEFAULT_member_RHI_context_t_backend_render_context,
@@ -5270,7 +5180,6 @@ constexpr type_info_member_t DEFAULT_member_asset_manager_t_RHI_context = {
 constexpr type_info_asset_manager_t DEFAULT_asset_manager_t = {
 	.info = { .name = "asset_manager_t", .size = 1, .metatype = 1 },
 	.member_count = 20,
-	.member_pointer = DEFAULT_asset_manager_t.member_array,
 	.members = {
 		.is_initialized = &DEFAULT_member_asset_manager_t_is_initialized,
 		.manager_arena = &DEFAULT_member_asset_manager_t_manager_arena,
@@ -5328,7 +5237,6 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file_index 
 constexpr type_info_asset_slot_t DEFAULT_asset_slot_t = {
 	.info = { .name = "asset_slot_t", .size = 160, .metatype = 1 },
 	.member_count = 13,
-	.member_pointer = DEFAULT_asset_slot_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_asset_slot_t_ID,
 		.slot_state = &DEFAULT_member_asset_slot_t_slot_state,
@@ -5375,7 +5283,6 @@ constexpr type_info_member_t DEFAULT_member_RHI_shader_t_shader_data = {
 constexpr type_info_RHI_shader_t DEFAULT_RHI_shader_t = {
 	.info = { .name = "RHI_shader_t", .size = 16, .metatype = 1 },
 	.member_count = 2,
-	.member_pointer = DEFAULT_RHI_shader_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_RHI_shader_t_ID,
 		.shader_data = &DEFAULT_member_RHI_shader_t_shader_data,
@@ -5415,7 +5322,6 @@ constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Archetype
 constexpr type_info_stored_material_type_t DEFAULT_stored_material_type_t = {
 	.info = { .name = "stored_material_type_t", .size = 0, .metatype = 2 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_stored_material_type_t.member_array,
 	.members = {
 		.SMT_Invalid = &DEFAULT_member_stored_material_type_t_SMT_Invalid,
 		.SMT_Instance = &DEFAULT_member_stored_material_type_t_SMT_Instance,
@@ -5480,7 +5386,6 @@ constexpr type_info_member_t DEFAULT_member_material_instance_t_archetype = {
 constexpr type_info_material_instance_t DEFAULT_material_instance_t = {
 	.info = { .name = "material_instance_t", .size = 112, .metatype = 1 },
 	.member_count = 7,
-	.member_pointer = DEFAULT_material_instance_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_material_instance_t_ID,
 		.version = &DEFAULT_member_material_instance_t_version,
@@ -5501,7 +5406,6 @@ constexpr type_info_member_t DEFAULT_member_material_data_t_instance = {
 constexpr type_info_material_data_t DEFAULT_material_data_t = {
 	.info = { .name = "material_data_t", .size = 192, .metatype = 1 },
 	.member_count = 3,
-	.member_pointer = DEFAULT_material_data_t.member_array,
 	.members = {
 		.material_type = &DEFAULT_member_material_data_t_material_type,
 		.archetype = &DEFAULT_member_material_data_t_archetype,
@@ -5524,7 +5428,6 @@ constexpr type_info_member_t DEFAULT_member_asset_handle_t_dynamic_render_font =
 constexpr type_info_asset_handle_t DEFAULT_asset_handle_t = {
 	.info = { .name = "asset_handle_t", .size = 24, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_asset_handle_t.member_array,
 	.members = {
 		.is_valid = &DEFAULT_member_asset_handle_t_is_valid,
 		.slot = &DEFAULT_member_asset_handle_t_slot,
@@ -5550,7 +5453,6 @@ constexpr type_info_member_t DEFAULT_member_material_archetype_t_base_instance =
 constexpr type_info_material_archetype_t DEFAULT_material_archetype_t = {
 	.info = { .name = "material_archetype_t", .size = 184, .metatype = 1 },
 	.member_count = 6,
-	.member_pointer = DEFAULT_material_archetype_t.member_array,
 	.members = {
 		.ID = &DEFAULT_member_material_archetype_t_ID,
 		.version = &DEFAULT_member_material_archetype_t_version,
@@ -5561,6 +5463,71 @@ constexpr type_info_material_archetype_t DEFAULT_material_archetype_t = {
 	},
 };
 
+template <> constexpr const type_info_t *type_info_value<entity_archetype_t> = &DEFAULT_entity_archetype_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_pipeline_state_t> = &DEFAULT_RHI_pipeline_state_t.info;
+template <> constexpr const type_info_t *type_info_value<material_archetype_t> = &DEFAULT_material_archetype_t.info;
+template <> constexpr const type_info_t *type_info_value<string_t> = &DEFAULT_string_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_handle_t> = &DEFAULT_asset_handle_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_slot_t> = &DEFAULT_asset_slot_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_slot_load_status_t> = &DEFAULT_asset_slot_load_status_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_type_t> = &DEFAULT_asset_type_t.info;
+template <> constexpr const type_info_t *type_info_value<file_t> = &DEFAULT_file_t.info;
+template <> constexpr const type_info_t *type_info_value<jfd_package_entry_t> = &DEFAULT_jfd_package_entry_t.info;
+template <> constexpr const type_info_t *type_info_value<jfd_package_chunk_header_t> = &DEFAULT_jfd_package_chunk_header_t.info;
+template <> constexpr const type_info_t *type_info_value<subtexture_data_t> = &DEFAULT_subtexture_data_t.info;
+template <> constexpr const type_info_t *type_info_value<float2> = &DEFAULT_float2.info;
+template <> constexpr const type_info_t *type_info_value<texture_atlas_t> = &DEFAULT_texture_atlas_t.info;
+template <> constexpr const type_info_t *type_info_value<texture2D_t> = &DEFAULT_texture2D_t.info;
+template <> constexpr const type_info_t *type_info_value<bitmap_t> = &DEFAULT_bitmap_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_image_t> = &DEFAULT_RHI_image_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_image_create_info_t> = &DEFAULT_RHI_image_create_info_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_image_usage_t> = &DEFAULT_RHI_image_usage_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_sampler_create_info_t> = &DEFAULT_RHI_sampler_create_info_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_image_filter_type_t> = &DEFAULT_RHI_image_filter_type_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_image_wrapping_type_t> = &DEFAULT_RHI_image_wrapping_type_t.info;
+template <> constexpr const type_info_t *type_info_value<backend_image_t> = &DEFAULT_backend_image_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_manager_t> = &DEFAULT_asset_manager_t.info;
+template <> constexpr const type_info_t *type_info_value<memory_arena_t> = &DEFAULT_memory_arena_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_file_data_t> = &DEFAULT_asset_file_data_t.info;
+template <> constexpr const type_info_t *type_info_value<jfd_file_header_t> = &DEFAULT_jfd_file_header_t.info;
+template <> constexpr const type_info_t *type_info_value<texture_atlas_registry_t> = &DEFAULT_texture_atlas_registry_t.info;
+template <> constexpr const type_info_t *type_info_value<zone_allocator_t> = &DEFAULT_zone_allocator_t.info;
+template <> constexpr const type_info_t *type_info_value<sys_mutex_t> = &DEFAULT_sys_mutex_t.info;
+template <> constexpr const type_info_t *type_info_value<zone_allocator_block_t> = &DEFAULT_zone_allocator_block_t.info;
+template <> constexpr const type_info_t *type_info_value<asset_catalog_t> = &DEFAULT_asset_catalog_t.info;
+template <> constexpr const type_info_t *type_info_value<font_manager_t> = &DEFAULT_font_manager_t.info;
+template <> constexpr const type_info_t *type_info_value<dynamic_render_font_page_t> = &DEFAULT_dynamic_render_font_page_t.info;
+template <> constexpr const type_info_t *type_info_value<dynamic_render_font_t> = &DEFAULT_dynamic_render_font_t.info;
+template <> constexpr const type_info_t *type_info_value<dynamic_render_font_varient_t> = &DEFAULT_dynamic_render_font_varient_t.info;
+template <> constexpr const type_info_t *type_info_value<temporary_glyph_t> = &DEFAULT_temporary_glyph_t.info;
+template <> constexpr const type_info_t *type_info_value<glyph_metric_t> = &DEFAULT_glyph_metric_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_context_t> = &DEFAULT_RHI_context_t.info;
+template <> constexpr const type_info_t *type_info_value<SDL_Window> = &DEFAULT_SDL_Window.info;
+template <> constexpr const type_info_t *type_info_value<RHI_command_list_t> = &DEFAULT_RHI_command_list_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_command_t> = &DEFAULT_RHI_command_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_command_header_t> = &DEFAULT_RHI_command_header_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_command_type_t> = &DEFAULT_RHI_command_type_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_index_buffer_t> = &DEFAULT_RHI_index_buffer_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_render_buffer_t> = &DEFAULT_RHI_render_buffer_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_render_buffer_type_t> = &DEFAULT_RHI_render_buffer_type_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_render_buffer_memory_type_t> = &DEFAULT_RHI_render_buffer_memory_type_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_t> = &DEFAULT_RHI_renderpass_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_key_t> = &DEFAULT_RHI_renderpass_key_t.info;
+template <> constexpr const type_info_t *type_info_value<bitmap_format_t> = &DEFAULT_bitmap_format_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_desc_t> = &DEFAULT_RHI_renderpass_desc_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_attachment_t> = &DEFAULT_RHI_renderpass_attachment_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_attachment_access_t> = &DEFAULT_RHI_renderpass_attachment_access_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_attachment_load_operation_t> = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_renderpass_attachment_store_operation_t> = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_clear_value_t> = &DEFAULT_RHI_clear_value_t.info;
+template <> constexpr const type_info_t *type_info_value<float4> = &DEFAULT_float4.info;
+template <> constexpr const type_info_t *type_info_value<ivec4_t> = &DEFAULT_ivec4_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_command_list_type_t> = &DEFAULT_RHI_command_list_type_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_command_present_frame_t> = &DEFAULT_RHI_command_present_frame_t.info;
+template <> constexpr const type_info_t *type_info_value<RHI_shader_t> = &DEFAULT_RHI_shader_t.info;
+template <> constexpr const type_info_t *type_info_value<material_data_t> = &DEFAULT_material_data_t.info;
+template <> constexpr const type_info_t *type_info_value<stored_material_type_t> = &DEFAULT_stored_material_type_t.info;
+template <> constexpr const type_info_t *type_info_value<material_instance_t> = &DEFAULT_material_instance_t.info;
 constexpr const type_info_t *const APOLLO_type_table[] = {
 	&DEFAULT_entity_archetype_t.info,
 	&DEFAULT_bool32.info,
@@ -5585,7 +5552,6 @@ constexpr const type_info_t *const APOLLO_type_table[] = {
 	&DEFAULT_RHI_image_wrapping_type_t.info,
 	&DEFAULT_RHI_sampler_create_info_t.info,
 	&DEFAULT_RHI_image_create_info_t.info,
-	&DEFAULT_void.info,
 	&DEFAULT_backend_image_t.info,
 	&DEFAULT_RHI_image_t.info,
 	&DEFAULT_texture2D_t.info,
@@ -5593,7 +5559,6 @@ constexpr const type_info_t *const APOLLO_type_table[] = {
 	&DEFAULT_texture_atlas_t.info,
 	&DEFAULT_subtexture_data_t.info,
 	&DEFAULT_memory_arena_t.info,
-	&DEFAULT_int.info,
 	&DEFAULT_volatile_u32.info,
 	&DEFAULT_jfd_file_header_t.info,
 	&DEFAULT_asset_file_data_t.info,

@@ -16,6 +16,7 @@ static memory_arena_t *type_arena;
 static string_builder_t header_builder;
 static string_builder_t dictionary_builder;
 static string_builder_t definition_builder;
+static string_builder_t template_builder;
 static string_builder_t type_table_builder;
 static string_builder_t member_table_builder;
 
@@ -110,7 +111,6 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
 
             dynarray_t<code_decl_member_t> *members = null;
             const char *count_name = null;
-            const char *pointer_name = null;
             const char *array_name = null;
             const char *items_name = null;
 
@@ -120,7 +120,6 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(code_declaration);
                 members = &structure->members;
                 count_name = "member_count";
-                pointer_name = "member_pointer";
                 array_name = "member_array";
                 items_name = "members";
             }
@@ -129,7 +128,6 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(code_declaration);
                 members = &procedure->arguments;
                 count_name = "argument_count";
-                pointer_name = "argument_pointer";
                 array_name = "argument_array";
                 items_name = "arguments";
             }
@@ -148,8 +146,7 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
                 c_string_builder_sprintf(&dictionary_builder, R"(struct type_info_%.*s {
     const type_info_t info;
     const unsigned long %s;
-    const type_info_member_t *const *%s;
-)", fprint_string(identifier), count_name, pointer_name);
+)", fprint_string(identifier), count_name);
 
                 if(member_count > 0)
                 {
@@ -215,16 +212,10 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
         {
             definition_table.add(true, identifier);
 
-            s32 size = type_declaration->size;
-            if(size < 0)
-            {
-                size = 0;
-            }
+            s32 size = Max(type_declaration->size, 0);
 
             dynarray_t<code_decl_member_t> *members = null;
             const char *member_count_name = null;
-            const char *member_pointer_name = null;
-            const char *member_array_name = null;
             const char *members_name = null;
 
             if(type_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
@@ -233,18 +224,20 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                 code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(type_declaration);
                 members = &structure->members;
                 member_count_name = "member_count";
-                member_pointer_name = "member_pointer";
-                member_array_name = "member_array";
                 members_name = "members";
+
+                c_string_builder_sprintf(&template_builder, "template <> constexpr const type_info_t *type_info_value<%.*s> = &DEFAULT_%.*s.info;\n",
+                                         fprint_string(identifier), fprint_string(identifier));
             }
             else if(type_declaration->metatype == CODE_DECL_METATYPE_PROCEDURE)
             {
                 code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(type_declaration);
                 members = &procedure->arguments;
                 member_count_name = "argument_count";
-                member_pointer_name = "argument_pointer";
-                member_array_name = "argument_array";
                 members_name = "arguments";
+            }
+            else
+            {
             }
 
             if(members)
@@ -277,7 +270,6 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                     }
 
                     c_string_builder_sprintf(&definition_builder, "\t.offset = %u,\n", member.offset);
-
                     if(member.has_value)
                     {
                         s32 value_type = member.value.type;
@@ -329,9 +321,7 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 
                 if(member_count > 0)
                 {
-                    c_string_builder_sprintf(&definition_builder, "\t.%s = DEFAULT_%.*s.%s,\n\t.%s = {\n",
-                                             member_pointer_name, fprint_string(identifier), member_array_name,
-                                             members_name);
+                    c_string_builder_sprintf(&definition_builder, "\t.%s = {\n", members_name);
                     for(const auto &member: *members)
                     {
                         if(member.metatype != CODE_DECL_METATYPE_PROCEDURE)
@@ -342,10 +332,6 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                         }
                     }
                     c_string_builder_sprintf(&definition_builder, "\t},\n");
-                }
-                else
-                {
-                    c_string_builder_sprintf(&definition_builder, "\t.%s = nullptr,\n", member_pointer_name);
                 }
 
                 c_string_builder_sprintf(&definition_builder, "};\n\n");
@@ -359,7 +345,7 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 
             c_string_builder_sprintf(&type_table_builder, "\t&DEFAULT_%.*s.info,\n", fprint_string(identifier));
         }
-    }
+ }
 }
 
 internal_api void
@@ -373,6 +359,7 @@ generate_apollo_structure_type_info_header(apollo_code_decl_list_t *declarations
     c_string_builder_init(&header_builder,       MB(2));
     c_string_builder_init(&dictionary_builder,   MB(2));
     c_string_builder_init(&definition_builder,   MB(2));
+    c_string_builder_init(&template_builder,     MB(2));
     c_string_builder_init(&type_table_builder,   MB(2));
     c_string_builder_init(&member_table_builder, MB(2));
 
@@ -382,7 +369,89 @@ generate_apollo_structure_type_info_header(apollo_code_decl_list_t *declarations
 #include <code_generator/apollo/apollo_runtime.h>
 namespace Apollo {
 
+template <typename T> struct remove_value_reference_t      { using internal_type = T; };
+template <typename T> struct remove_value_reference_t<T&>  { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+template <typename T> struct remove_value_reference_t<T&&> { using internal_type = typename remove_value_reference_t<T>::internal_type; };
+
+template <typename T> constexpr const type_info_t *type_info_value = nullptr;
+
+template <typename T> 
+constexpr const type_info_t *
+type_info()
+{
+    return(type_info_value<typename remove_value_reference_t<T>::internal_type>);
+}
+
+// NOTE(Sleepster): The fundamental types have no declaration cursor, so they are
+// registered here once.
+#define APOLLO_FUNDAMENTAL(id, cpp_type, size_value)                                                    \
+struct type_info_##id { const type_info_t info; };                                                      \
+constexpr type_info_##id DEFAULT_##id = { .info = {#cpp_type, size_value, APOLLO_METATYPE_PRIMITIVE} }; \
+template <> constexpr const type_info_t *type_info_value<cpp_type> = &DEFAULT_##id.info;
+
+APOLLO_FUNDAMENTAL(void,               void,               0)
+APOLLO_FUNDAMENTAL(bool,               bool,               sizeof(bool))
+APOLLO_FUNDAMENTAL(char,               char,               sizeof(char))
+APOLLO_FUNDAMENTAL(schar,              signed char,        sizeof(signed char))
+APOLLO_FUNDAMENTAL(uchar,              unsigned char,      sizeof(unsigned char))
+APOLLO_FUNDAMENTAL(short,              short,              sizeof(short))
+APOLLO_FUNDAMENTAL(ushort,             unsigned short,     sizeof(unsigned short))
+APOLLO_FUNDAMENTAL(int,                int,                sizeof(int))
+APOLLO_FUNDAMENTAL(uint,               unsigned int,       sizeof(unsigned int))
+APOLLO_FUNDAMENTAL(long,               long,               sizeof(long))
+APOLLO_FUNDAMENTAL(ulong,              unsigned long,      sizeof(unsigned long))
+APOLLO_FUNDAMENTAL(longlong,           long long,          sizeof(long long))
+APOLLO_FUNDAMENTAL(ulonglong,          unsigned long long, sizeof(unsigned long long))
+APOLLO_FUNDAMENTAL(float,              float,              sizeof(float))
+APOLLO_FUNDAMENTAL(double,             double,             sizeof(double))
+APOLLO_FUNDAMENTAL(longdouble,         long double,        sizeof(long double))
+APOLLO_FUNDAMENTAL(wchar,              wchar_t,            sizeof(wchar_t))
+APOLLO_FUNDAMENTAL(char16,             char16_t,           sizeof(char16_t))
+APOLLO_FUNDAMENTAL(char32,             char32_t,           sizeof(char32_t))
+
+#undef APOLLO_FUNDAMENTAL
+
 )");
+    dictionary_table.add(true, STR("void"));
+    dictionary_table.add(true, STR("bool"));
+    dictionary_table.add(true, STR("char"));
+    dictionary_table.add(true, STR("signed char"));
+    dictionary_table.add(true, STR("unsigned char"));
+    dictionary_table.add(true, STR("short"));
+    dictionary_table.add(true, STR("unsigned short"));
+    dictionary_table.add(true, STR("int"));
+    dictionary_table.add(true, STR("unsigned int"));
+    dictionary_table.add(true, STR("long"));
+    dictionary_table.add(true, STR("unsigned long"));
+    dictionary_table.add(true, STR("long long"));
+    dictionary_table.add(true, STR("unsigned long long"));
+    dictionary_table.add(true, STR("float"));
+    dictionary_table.add(true, STR("double"));
+    dictionary_table.add(true, STR("long double"));
+    dictionary_table.add(true, STR("wchar_t"));
+    dictionary_table.add(true, STR("char16_t"));
+    dictionary_table.add(true, STR("char32_t"));
+
+    definition_table.add(true, STR("void"));
+    definition_table.add(true, STR("bool"));
+    definition_table.add(true, STR("char"));
+    definition_table.add(true, STR("signed char"));
+    definition_table.add(true, STR("unsigned char"));
+    definition_table.add(true, STR("short"));
+    definition_table.add(true, STR("unsigned short"));
+    definition_table.add(true, STR("int"));
+    definition_table.add(true, STR("unsigned int"));
+    definition_table.add(true, STR("long"));
+    definition_table.add(true, STR("unsigned long"));
+    definition_table.add(true, STR("long long"));
+    definition_table.add(true, STR("unsigned long long"));
+    definition_table.add(true, STR("float"));
+    definition_table.add(true, STR("double"));
+    definition_table.add(true, STR("long double"));
+    definition_table.add(true, STR("wchar_t"));
+    definition_table.add(true, STR("char16_t"));
+    definition_table.add(true, STR("char32_t"));
+
     c_string_builder_sprintf(&type_table_builder,   "constexpr const type_info_t *const APOLLO_type_table[] = {\n");
     c_string_builder_sprintf(&member_table_builder, "constexpr const type_info_t *const APOLLO_member_table[] = {\n");
     dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Apollo::type_info"));
@@ -409,6 +478,7 @@ namespace Apollo {
     c_string_builder_dump_to_file(&out_file, &header_builder);
     c_string_builder_dump_to_file(&out_file, &dictionary_builder);
     c_string_builder_dump_to_file(&out_file, &definition_builder);
+    c_string_builder_dump_to_file(&out_file, &template_builder);
     c_string_builder_dump_to_file(&out_file, &type_table_builder);
     c_string_builder_dump_to_file(&out_file, &member_table_builder);
 }

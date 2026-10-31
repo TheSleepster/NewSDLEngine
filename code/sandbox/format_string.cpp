@@ -8,14 +8,9 @@
 #include <c_string.h>
 #include <c_memory_arena.h>
 
-template <typename T>
-struct remove_reference      {using type = T;};
-
-template <typename T>
-struct remove_reference<T&>  {using type = T;};
-
-template <typename T>
-struct remove_reference<T&&> {using type = T;};
+template <typename T> struct remove_reference      {using type = T;};
+template <typename T> struct remove_reference<T&>  {using type = T;};
+template <typename T> struct remove_reference<T&&> {using type = T;};
 
 template <typename T>
 internal_api constexpr T&&

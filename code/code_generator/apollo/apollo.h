@@ -341,7 +341,7 @@ struct apollo_hash_table_t
     // Actually a very valid and true complaint which is why we just take this by value here. We'll need an actual
     // solution if we use this table elsewhere.
     void 
-    add(ValueType value, KeyType &key)
+    add(ValueType value, KeyType key)
     {
         apollo_hash_element_t<ValueType, KeyType> *element = get_or_create_hash_element(key);
 
