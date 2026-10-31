@@ -112,7 +112,8 @@ s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity)
     if(index != -1)
     {
         c_array_remove(chunk->used_entity_slots, index, chunk->chunk_entity_count);
-        entity->flags &= ~ENTITY_FLAG_IS_VALID;
+        entity->flags = 0;
+        entity->archetype = ENTITY_ARCHETYPE_INVALID;
 
         --chunk->chunk_entity_count;
         Assert(chunk->chunk_entity_count >= 0);

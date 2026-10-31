@@ -720,14 +720,17 @@ s_editor_update_state(game_state_t *game_state, ui_state_t *main_ui, map_editor_
                     }
                 }
 
-                entity_t **real_entity_array = c_arena_push_array(&editor->undo_arena, entity_t*, entities_created);
-                memcpy(real_entity_array, temp_entity_array, sizeof(entity_t*) * entities_created);
+                if(entities_created > 0)
+                {
+                    entity_t **real_entity_array = c_arena_push_array(&editor->undo_arena, entity_t*, entities_created);
+                    memcpy(real_entity_array, temp_entity_array, sizeof(entity_t*) * entities_created);
 
-                editor_event_t new_event = {};
-                new_event.type                = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
-                new_event.entities_to_destroy = {real_entity_array, (s32)entities_created};
+                    editor_event_t new_event = {};
+                    new_event.type                = EDITOR_EVENT_TYPE_DESTROY_ENTITY;
+                    new_event.entities_to_destroy = {real_entity_array, (s32)entities_created};
 
-                editor_append_event(&editor->first_undo_event_buffer, &new_event);
+                    editor_append_event(&editor->first_undo_event_buffer, &new_event);
+                }
             }
         }
 

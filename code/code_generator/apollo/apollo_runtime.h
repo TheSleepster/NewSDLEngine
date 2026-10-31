@@ -24,7 +24,13 @@ do { \
 
 enum metatype_t
 {
-    APOLLO_METATYPE_PRIMITIVE,
+    APOLLO_METATYPE_VOID,
+    APOLLO_METATYPE_POINTER,
+    APOLLO_METATYPE_ARRAY,
+    APOLLO_METATYPE_INTEGER,
+    APOLLO_METATYPE_FLOAT,
+    APOLLO_METATYPE_BOOL,
+    APOLLO_METATYPE_STRING,
     APOLLO_METATYPE_STRUCTURE,
     APOLLO_METATYPE_ENUM,
     APOLLO_METATYPE_PROCEDURE,
@@ -88,29 +94,29 @@ type_info()
 
 // NOTE(Sleepster): Fundamental types have no declaration cursor, so register them here.
 #define APOLLO_FUNDAMENTALS(X)                              \
-    X(void,               void,               0)            \
-    X(bool,               bool,               sizeof(bool)) \
-    X(char,               char,               sizeof(char)) \
-    X(schar,              signed char,        sizeof(signed char)) \
-    X(uchar,              unsigned char,      sizeof(unsigned char)) \
-    X(short,              short,              sizeof(short)) \
-    X(ushort,             unsigned short,     sizeof(unsigned short)) \
-    X(int,                int,                sizeof(int)) \
-    X(uint,               unsigned int,       sizeof(unsigned int)) \
-    X(long,               long,               sizeof(long)) \
-    X(ulong,              unsigned long,      sizeof(unsigned long)) \
-    X(longlong,           long long,          sizeof(long long)) \
-    X(ulonglong,          unsigned long long, sizeof(unsigned long long)) \
-    X(float,              float,              sizeof(float)) \
-    X(double,             double,             sizeof(double)) \
-    X(longdouble,         long double,        sizeof(long double)) \
-    X(wchar,              wchar_t,            sizeof(wchar_t)) \
-    X(char16,             char16_t,           sizeof(char16_t)) \
-    X(char32,             char32_t,           sizeof(char32_t))
+    X(void,               void,               0,                          APOLLO_METATYPE_VOID)    \
+    X(bool,               bool,               sizeof(bool),               APOLLO_METATYPE_BOOL)    \
+    X(char,               char,               sizeof(char),               APOLLO_METATYPE_INTEGER) \
+    X(schar,              signed char,        sizeof(signed char),        APOLLO_METATYPE_INTEGER) \
+    X(uchar,              unsigned char,      sizeof(unsigned char),      APOLLO_METATYPE_INTEGER) \
+    X(short,              short,              sizeof(short),              APOLLO_METATYPE_INTEGER) \
+    X(ushort,             unsigned short,     sizeof(unsigned short),     APOLLO_METATYPE_INTEGER) \
+    X(int,                int,                sizeof(int),                APOLLO_METATYPE_INTEGER) \
+    X(uint,               unsigned int,       sizeof(unsigned int),       APOLLO_METATYPE_INTEGER) \
+    X(long,               long,               sizeof(long),               APOLLO_METATYPE_INTEGER) \
+    X(ulong,              unsigned long,      sizeof(unsigned long),      APOLLO_METATYPE_INTEGER) \
+    X(longlong,           long long,          sizeof(long long),          APOLLO_METATYPE_INTEGER) \
+    X(ulonglong,          unsigned long long, sizeof(unsigned long long), APOLLO_METATYPE_INTEGER) \
+    X(float,              float,              sizeof(float),              APOLLO_METATYPE_FLOAT)   \
+    X(double,             double,             sizeof(double),             APOLLO_METATYPE_FLOAT)   \
+    X(longdouble,         long double,        sizeof(long double),        APOLLO_METATYPE_FLOAT)   \
+    X(wchar,              wchar_t,            sizeof(wchar_t),            APOLLO_METATYPE_INTEGER) \
+    X(char16,             char16_t,           sizeof(char16_t),           APOLLO_METATYPE_INTEGER) \
+    X(char32,             char32_t,           sizeof(char32_t),           APOLLO_METATYPE_INTEGER)
 
-#define APOLLO_FUNDAMENTAL(id, cpp_type, size_value)                                                    \
-struct type_info_##id { const type_info_t info; };                                                      \
-constexpr type_info_##id DEFAULT_##id = { .info = {#cpp_type, size_value, APOLLO_METATYPE_PRIMITIVE} }; \
+#define APOLLO_FUNDAMENTAL(id, cpp_type, size_value, metatype)                         \
+struct type_info_##id { const type_info_t info; };                                     \
+constexpr type_info_##id DEFAULT_##id = { .info = {#cpp_type, size_value, metatype} }; \
 template <> constexpr const type_info_t *type_info_value<cpp_type> = &DEFAULT_##id.info;
 
 APOLLO_FUNDAMENTALS(APOLLO_FUNDAMENTAL)
@@ -118,7 +124,7 @@ APOLLO_FUNDAMENTALS(APOLLO_FUNDAMENTAL)
 #undef APOLLO_FUNDAMENTAL
 
 constexpr const type_info_t *const APOLLO_primitive_type_table[] = {
-#define APOLLO_PRIMITIVE_ENTRY(id, cpp_type, size_value) &DEFAULT_##id.info,
+#define APOLLO_PRIMITIVE_ENTRY(id, cpp_type, size_value, metatype) &DEFAULT_##id.info,
     APOLLO_FUNDAMENTALS(APOLLO_PRIMITIVE_ENTRY)
 #undef APOLLO_PRIMITIVE_ENTRY
 #undef APOLLO_FUNDAMENTALS

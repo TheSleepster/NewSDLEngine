@@ -21,16 +21,18 @@ c_string_format_value(string_t *final_string, T &argument)
     switch(type_info->metatype)
     {
         default: { InvalidCodePath; }break;
-        case APOLLO_METATYPE_PRIMITIVE:
-        {
-        }break;
         case APOLLO_METATYPE_STRUCTURE:
         {
+            InvalidCodePath;
         }break;
         case APOLLO_METATYPE_ENUM:
         {
+            InvalidCodePath;
         }break;
     }
+
+    (void)final_string;
+    (void)argument;
 
     return(result);
 }
