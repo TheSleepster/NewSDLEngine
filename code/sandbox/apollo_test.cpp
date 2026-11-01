@@ -222,7 +222,6 @@ create_declaration_type_info(apollo_code_decl_list_t *declarations, string_t typ
             const char *pointer_name = null;
             const char *array_name = null;
             const char *items_name = null;
-
             if(code_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
                code_declaration->metatype == CODE_DECL_METATYPE_ENUM)
             {

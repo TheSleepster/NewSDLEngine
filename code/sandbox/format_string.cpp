@@ -15,66 +15,70 @@ template <typename T>
 internal_api s32
 c_string_format_primitive(string_t *string, const type_info_t *info, T &value)
 {
+    (void)string;
+
     // NOTE(Sleepster): Not entirely correct because a number like "10" passed as an integer
     // will only be 2 bytes, not four. But this is just testing code.
-    s32 result = info->size;
-    if(string)
+    char buffer[9] = {};
+
+    s32 result = 0;
+    s32 element_size = info->size;
+
+    // NOTE(Sleepster): Only print if there is a string... 
+    switch(info->metatype)
     {
-        // NOTE(Sleepster): Only print if there is a string... 
-        switch(info->metatype)
+        case APOLLO_METATYPE_INTEGER:
         {
-            case APOLLO_METATYPE_INTEGER:
+            // NOTE(Sleepster): Char 
+            if(element_size == 1)
             {
-                // NOTE(Sleepster): Char 
-                if(result == 1)
-                {
-                }
-                // NOTE(Sleepster): Short 
-                else if(result == 2)
-                {
-                }
-                // NOTE(Sleepster): Int 
-                else if(result == 4)
-                {
-                }
-                // NOTE(Sleepster): Long 
-                else if(result == 8)
-                {
-                }
-                else 
-                {
-                    InvalidCodePath;
-                }
-            }break;
-            case APOLLO_METATYPE_FLOAT:
+                result += snprintf(buffer, sizeof(buffer), "%c", (char)value);
+            }
+            // NOTE(Sleepster): Short 
+            else if(element_size == 2)
             {
-                if(result == 4)
-                {
-                }
-                else if(result == 8)
-                {
-                }
-                else 
-                {
-                    InvalidCodePath;
-                }
-            }break;
-            case APOLLO_METATYPE_BOOL:
+                result += snprintf(buffer, sizeof(buffer), "%hd", (s16)value);
+            }
+            // NOTE(Sleepster): Int 
+            else if(element_size == 4)
             {
-                byte current_value = static_cast<byte>(value);
-                if(current_value)
-                {
-                    // NOTE(Sleepster): True 
-                }
-                else
-                {
-                    // NOTE(Sleepster): False 
-                }
-            }break;
-            case APOLLO_METATYPE_STRING:
+                result += snprintf(buffer, sizeof(buffer), "%d", (s32)value);
+            }
+            // NOTE(Sleepster): Long 
+            else if(element_size == 8)
             {
-            }break;
-        }
+                result += snprintf(buffer, sizeof(buffer), "%ld", (s64)value);
+            }
+            else 
+            {
+                InvalidCodePath;
+            }
+        }break;
+        case APOLLO_METATYPE_FLOAT:
+        {
+            if(element_size == 4)
+            {
+                result += snprintf(buffer, sizeof(buffer), "%f", (float32)value);
+            }
+            else if(element_size == 8)
+            {
+                result += snprintf(buffer, sizeof(buffer), "%lf", (float64)value);
+            }
+            else 
+            {
+                InvalidCodePath;
+            }
+        }break;
+        case APOLLO_METATYPE_BOOL:
+        {
+            byte current_value = static_cast<byte>(value);
+            result += snprintf(buffer, sizeof(buffer), "%s", current_value > 0 ? "True" : "False");
+        }break;
+        case APOLLO_METATYPE_STRING:
+        {
+            const char *string_value = (char *)&value;
+            result += snprintf(buffer, sizeof(buffer), "%s", string_value);
+        }break;
     }
 
     return(result);
