@@ -1889,7 +1889,7 @@ enum class material_instance_t {
 }
 
 constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_INVALID = {
-	.info = { .name = "ENTITY_ARCHETYPE_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "ENTITY_ARCHETYPE_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_entity_archetype_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -1897,7 +1897,7 @@ constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_
 };
 
 constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_PLAYER = {
-	.info = { .name = "ENTITY_ARCHETYPE_PLAYER", .size = 0, .metatype = 0 },
+	.info = { .name = "ENTITY_ARCHETYPE_PLAYER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_entity_archetype_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -1905,7 +1905,7 @@ constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_
 };
 
 constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COLLIDER = {
-	.info = { .name = "ENTITY_ARCHETYPE_COLLIDER", .size = 0, .metatype = 0 },
+	.info = { .name = "ENTITY_ARCHETYPE_COLLIDER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_entity_archetype_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -1913,7 +1913,7 @@ constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_
 };
 
 constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_TILE = {
-	.info = { .name = "ENTITY_ARCHETYPE_TILE", .size = 0, .metatype = 0 },
+	.info = { .name = "ENTITY_ARCHETYPE_TILE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_entity_archetype_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -1921,7 +1921,7 @@ constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_
 };
 
 constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_COUNT = {
-	.info = { .name = "ENTITY_ARCHETYPE_COUNT", .size = 0, .metatype = 0 },
+	.info = { .name = "ENTITY_ARCHETYPE_COUNT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_entity_archetype_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -1929,7 +1929,7 @@ constexpr type_info_member_t DEFAULT_member_entity_archetype_t_ENTITY_ARCHETYPE_
 };
 
 constexpr type_info_entity_archetype_t DEFAULT_entity_archetype_t = {
-	.info = { .name = "entity_archetype_t", .size = 4, .metatype = 2 },
+	.info = { .name = "entity_archetype_t", .size = 4, .metatype = 8 },
 	.member_count = 5,
 	.member_pointer = DEFAULT_entity_archetype_t.member_array,
 	.members = {
@@ -1941,20 +1941,20 @@ constexpr type_info_entity_archetype_t DEFAULT_entity_archetype_t = {
 	},
 };
 
-constexpr type_info_bool32 DEFAULT_bool32 = { .info = { .name = "bool32", .size = 4, .metatype = 0 } };
+constexpr type_info_bool32 DEFAULT_bool32 = { .info = { .name = "bool32", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_blend_enabled = {
-	.info = { .name = "blend_enabled", .size = 4, .metatype = 0 },
+	.info = { .name = "blend_enabled", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 	.value_type = 2,
 	.value = { .int64_value = 1 },
 };
 
-constexpr type_info_u32 DEFAULT_u32 = { .info = { .name = "u32", .size = 4, .metatype = 0 } };
+constexpr type_info_u32 DEFAULT_u32 = { .info = { .name = "u32", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_color_blend_mode = {
-	.info = { .name = "src_color_blend_mode", .size = 4, .metatype = 0 },
+	.info = { .name = "src_color_blend_mode", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 4,
 	.value_type = 3,
@@ -1962,7 +1962,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_color_blend
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_dst_color_blend_mode = {
-	.info = { .name = "dst_color_blend_mode", .size = 4, .metatype = 0 },
+	.info = { .name = "dst_color_blend_mode", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 	.value_type = 3,
@@ -1970,7 +1970,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_dst_color_blend
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_alpha_blend_mode = {
-	.info = { .name = "src_alpha_blend_mode", .size = 4, .metatype = 0 },
+	.info = { .name = "src_alpha_blend_mode", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 12,
 	.value_type = 3,
@@ -1978,7 +1978,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_src_alpha_blend
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_dst_alpha_blend_mode = {
-	.info = { .name = "dst_alpha_blend_mode", .size = 4, .metatype = 0 },
+	.info = { .name = "dst_alpha_blend_mode", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 16,
 	.value_type = 3,
@@ -1986,7 +1986,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_dst_alpha_blend
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_color_blend_op = {
-	.info = { .name = "color_blend_op", .size = 4, .metatype = 0 },
+	.info = { .name = "color_blend_op", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 20,
 	.value_type = 3,
@@ -1994,7 +1994,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_color_blend_op 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_alpha_blend_op = {
-	.info = { .name = "alpha_blend_op", .size = 4, .metatype = 0 },
+	.info = { .name = "alpha_blend_op", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 24,
 	.value_type = 3,
@@ -2002,7 +2002,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_alpha_blend_op 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_testing_enabled = {
-	.info = { .name = "depth_testing_enabled", .size = 4, .metatype = 0 },
+	.info = { .name = "depth_testing_enabled", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 28,
 	.value_type = 2,
@@ -2010,7 +2010,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_testing_e
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_writing_enabled = {
-	.info = { .name = "depth_writing_enabled", .size = 4, .metatype = 0 },
+	.info = { .name = "depth_writing_enabled", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 32,
 	.value_type = 2,
@@ -2018,7 +2018,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_writing_e
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_func = {
-	.info = { .name = "depth_func", .size = 4, .metatype = 0 },
+	.info = { .name = "depth_func", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 36,
 	.value_type = 3,
@@ -2026,7 +2026,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_depth_func = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_enabled = {
-	.info = { .name = "stencil_enabled", .size = 4, .metatype = 0 },
+	.info = { .name = "stencil_enabled", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 40,
 	.value_type = 2,
@@ -2034,7 +2034,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_enabled
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_state = {
-	.info = { .name = "stencil_state", .size = 4, .metatype = 0 },
+	.info = { .name = "stencil_state", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 44,
 	.value_type = 3,
@@ -2042,7 +2042,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_state =
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_keep = {
-	.info = { .name = "stencil_keep", .size = 4, .metatype = 0 },
+	.info = { .name = "stencil_keep", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 48,
 	.value_type = 3,
@@ -2050,7 +2050,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_stencil_keep = 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_polygon_mode = {
-	.info = { .name = "polygon_mode", .size = 4, .metatype = 0 },
+	.info = { .name = "polygon_mode", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 52,
 	.value_type = 3,
@@ -2058,7 +2058,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_polygon_mode = 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_primitive_type = {
-	.info = { .name = "primitive_type", .size = 4, .metatype = 0 },
+	.info = { .name = "primitive_type", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 56,
 	.value_type = 3,
@@ -2066,7 +2066,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_pipeline_state_t_primitive_type 
 };
 
 constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {
-	.info = { .name = "RHI_pipeline_state_t", .size = 60, .metatype = 1 },
+	.info = { .name = "RHI_pipeline_state_t", .size = 60, .metatype = 7 },
 	.member_count = 15,
 	.member_pointer = DEFAULT_RHI_pipeline_state_t.member_array,
 	.members = {
@@ -2088,38 +2088,38 @@ constexpr type_info_RHI_pipeline_state_t DEFAULT_RHI_pipeline_state_t = {
 	},
 };
 
-constexpr type_info_u64 DEFAULT_u64 = { .info = { .name = "u64", .size = 8, .metatype = 0 } };
+constexpr type_info_u64 DEFAULT_u64 = { .info = { .name = "u64", .size = 8, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_ID = {
-	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.info = { .name = "ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_version = {
-	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.info = { .name = "version", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
-constexpr type_info_byte DEFAULT_byte = { .info = { .name = "byte", .size = 1, .metatype = 0 } };
+constexpr type_info_byte DEFAULT_byte = { .info = { .name = "byte", .size = 1, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_string_t_data = {
-	.info = { .name = "data", .size = 8, .metatype = 0 },
+	.info = { .name = "data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_byte.info },
 	.type_info = &DEFAULT_byte.info,
 	.offset = 0,
 };
 
-constexpr type_info_s64 DEFAULT_s64 = { .info = { .name = "s64", .size = 8, .metatype = 0 } };
+constexpr type_info_s64 DEFAULT_s64 = { .info = { .name = "s64", .size = 8, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_string_t_count = {
-	.info = { .name = "count", .size = 8, .metatype = 0 },
+	.info = { .name = "count", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_s64.info,
 	.offset = 8,
 };
 
 constexpr type_info_string_t DEFAULT_string_t = {
-	.info = { .name = "string_t", .size = 16, .metatype = 1 },
+	.info = { .name = "string_t", .size = 16, .metatype = 7 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_string_t.member_array,
 	.members = {
@@ -2129,31 +2129,31 @@ constexpr type_info_string_t DEFAULT_string_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_name = {
-	.info = { .name = "name", .size = 16, .metatype = 0 },
+	.info = { .name = "name", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_shader_binary_name = {
-	.info = { .name = "shader_binary_name", .size = 16, .metatype = 0 },
+	.info = { .name = "shader_binary_name", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 32,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_handle_t_is_valid = {
-	.info = { .name = "is_valid", .size = 8, .metatype = 0 },
+	.info = { .name = "is_valid", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_bool32.info },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_ID = {
-	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.info = { .name = "ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Invalid = {
-	.info = { .name = "ASLS_Invalid", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_Invalid", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2161,7 +2161,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Invali
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Unloaded = {
-	.info = { .name = "ASLS_Unloaded", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_Unloaded", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2169,7 +2169,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Unload
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_LoadQueued = {
-	.info = { .name = "ASLS_LoadQueued", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_LoadQueued", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2177,7 +2177,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_LoadQu
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Loaded = {
-	.info = { .name = "ASLS_Loaded", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_Loaded", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2185,7 +2185,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Loaded
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldUnload = {
-	.info = { .name = "ASLS_ShouldUnload", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_ShouldUnload", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2193,7 +2193,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Should
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_ShouldReload = {
-	.info = { .name = "ASLS_ShouldReload", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_ShouldReload", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2201,7 +2201,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Should
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Count = {
-	.info = { .name = "ASLS_Count", .size = 0, .metatype = 0 },
+	.info = { .name = "ASLS_Count", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2209,7 +2209,7 @@ constexpr type_info_member_t DEFAULT_member_asset_slot_load_status_t_ASLS_Count 
 };
 
 constexpr type_info_asset_slot_load_status_t DEFAULT_asset_slot_load_status_t = {
-	.info = { .name = "asset_slot_load_status_t", .size = 4, .metatype = 2 },
+	.info = { .name = "asset_slot_load_status_t", .size = 4, .metatype = 8 },
 	.member_count = 7,
 	.member_pointer = DEFAULT_asset_slot_load_status_t.member_array,
 	.members = {
@@ -2224,13 +2224,13 @@ constexpr type_info_asset_slot_load_status_t DEFAULT_asset_slot_load_status_t = 
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_slot_state = {
-	.info = { .name = "slot_state", .size = 4, .metatype = 0 },
+	.info = { .name = "slot_state", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Invalid = {
-	.info = { .name = "AT_Invalid", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Invalid", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2238,7 +2238,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Invalid = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Bitmap = {
-	.info = { .name = "AT_Bitmap", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Bitmap", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2246,7 +2246,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Bitmap = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Shader = {
-	.info = { .name = "AT_Shader", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Shader", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2254,7 +2254,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Shader = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Material = {
-	.info = { .name = "AT_Material", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Material", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2262,7 +2262,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Material = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Font = {
-	.info = { .name = "AT_Font", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Font", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2270,7 +2270,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Font = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Sound = {
-	.info = { .name = "AT_Sound", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Sound", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2278,7 +2278,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Sound = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Count = {
-	.info = { .name = "AT_Count", .size = 0, .metatype = 0 },
+	.info = { .name = "AT_Count", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2286,7 +2286,7 @@ constexpr type_info_member_t DEFAULT_member_asset_type_t_AT_Count = {
 };
 
 constexpr type_info_asset_type_t DEFAULT_asset_type_t = {
-	.info = { .name = "asset_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "asset_type_t", .size = 4, .metatype = 8 },
 	.member_count = 7,
 	.member_pointer = DEFAULT_asset_type_t.member_array,
 	.members = {
@@ -2301,77 +2301,77 @@ constexpr type_info_asset_type_t DEFAULT_asset_type_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_type = {
-	.info = { .name = "type", .size = 4, .metatype = 0 },
+	.info = { .name = "type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 12,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_is_valid_for_handles = {
-	.info = { .name = "is_valid_for_handles", .size = 4, .metatype = 0 },
+	.info = { .name = "is_valid_for_handles", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_name = {
-	.info = { .name = "name", .size = 16, .metatype = 0 },
+	.info = { .name = "name", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 24,
 };
 
-constexpr type_info_sys_handle_t DEFAULT_sys_handle_t = { .info = { .name = "sys_handle_t", .size = 4, .metatype = 0 } };
+constexpr type_info_sys_handle_t DEFAULT_sys_handle_t = { .info = { .name = "sys_handle_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_file_t_handle = {
-	.info = { .name = "handle", .size = 4, .metatype = 0 },
+	.info = { .name = "handle", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_sys_handle_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_file_t_file_name = {
-	.info = { .name = "file_name", .size = 16, .metatype = 0 },
+	.info = { .name = "file_name", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_file_t_filepath = {
-	.info = { .name = "filepath", .size = 16, .metatype = 0 },
+	.info = { .name = "filepath", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_file_t_file_size = {
-	.info = { .name = "file_size", .size = 8, .metatype = 0 },
+	.info = { .name = "file_size", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_file_t_current_read_offset = {
-	.info = { .name = "current_read_offset", .size = 8, .metatype = 0 },
+	.info = { .name = "current_read_offset", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 48,
 };
 
 constexpr type_info_member_t DEFAULT_member_file_t_current_write_offset = {
-	.info = { .name = "current_write_offset", .size = 8, .metatype = 0 },
+	.info = { .name = "current_write_offset", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 56,
 };
 
-constexpr type_info_bool8 DEFAULT_bool8 = { .info = { .name = "bool8", .size = 1, .metatype = 0 } };
+constexpr type_info_bool8 DEFAULT_bool8 = { .info = { .name = "bool8", .size = 1, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_file_t_overlapping = {
-	.info = { .name = "overlapping", .size = 1, .metatype = 0 },
+	.info = { .name = "overlapping", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 64,
 };
 
 constexpr type_info_member_t DEFAULT_member_file_t_for_writing = {
-	.info = { .name = "for_writing", .size = 1, .metatype = 0 },
+	.info = { .name = "for_writing", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 65,
 };
 
 constexpr type_info_file_t DEFAULT_file_t = {
-	.info = { .name = "file_t", .size = 72, .metatype = 1 },
+	.info = { .name = "file_t", .size = 72, .metatype = 7 },
 	.member_count = 8,
 	.member_pointer = DEFAULT_file_t.member_array,
 	.members = {
@@ -2387,55 +2387,55 @@ constexpr type_info_file_t DEFAULT_file_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file = {
-	.info = { .name = "owner_asset_file", .size = 72, .metatype = 0 },
+	.info = { .name = "owner_asset_file", .size = 72, .metatype = 7 },
 	.type_info = &DEFAULT_file_t.info,
 	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_magic_value = {
-	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
+	.info = { .name = "magic_value", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_total_entry_size = {
-	.info = { .name = "total_entry_size", .size = 4, .metatype = 0 },
+	.info = { .name = "total_entry_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_asset_type = {
-	.info = { .name = "asset_type", .size = 4, .metatype = 0 },
+	.info = { .name = "asset_type", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_filename_size = {
-	.info = { .name = "filename_size", .size = 4, .metatype = 0 },
+	.info = { .name = "filename_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 12,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_fullpath_size = {
-	.info = { .name = "fullpath_size", .size = 4, .metatype = 0 },
+	.info = { .name = "fullpath_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_entry_data_size = {
-	.info = { .name = "entry_data_size", .size = 4, .metatype = 0 },
+	.info = { .name = "entry_data_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 20,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_chunk_header_t_modtime = {
-	.info = { .name = "modtime", .size = 8, .metatype = 0 },
+	.info = { .name = "modtime", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 24,
 };
 
 constexpr type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_t = {
-	.info = { .name = "jfd_package_chunk_header_t", .size = 32, .metatype = 1 },
+	.info = { .name = "jfd_package_chunk_header_t", .size = 32, .metatype = 7 },
 	.member_count = 7,
 	.member_pointer = DEFAULT_jfd_package_chunk_header_t.member_array,
 	.members = {
@@ -2450,43 +2450,43 @@ constexpr type_info_jfd_package_chunk_header_t DEFAULT_jfd_package_chunk_header_
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_entry_header = {
-	.info = { .name = "entry_header", .size = 8, .metatype = 0 },
+	.info = { .name = "entry_header", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_jfd_package_chunk_header_t.info },
 	.type_info = &DEFAULT_jfd_package_chunk_header_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_data_offset = {
-	.info = { .name = "data_offset", .size = 8, .metatype = 0 },
+	.info = { .name = "data_offset", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_modtime = {
-	.info = { .name = "modtime", .size = 8, .metatype = 0 },
+	.info = { .name = "modtime", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_filename = {
-	.info = { .name = "filename", .size = 16, .metatype = 0 },
+	.info = { .name = "filename", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_fullpath = {
-	.info = { .name = "fullpath", .size = 16, .metatype = 0 },
+	.info = { .name = "fullpath", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_package_entry_t_asset_data = {
-	.info = { .name = "asset_data", .size = 16, .metatype = 0 },
+	.info = { .name = "asset_data", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 56,
 };
 
 constexpr type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t = {
-	.info = { .name = "jfd_package_entry_t", .size = 72, .metatype = 1 },
+	.info = { .name = "jfd_package_entry_t", .size = 72, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_jfd_package_entry_t.member_array,
 	.members = {
@@ -2500,39 +2500,53 @@ constexpr type_info_jfd_package_entry_t DEFAULT_jfd_package_entry_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_package_entry = {
-	.info = { .name = "package_entry", .size = 8, .metatype = 0 },
+	.info = { .name = "package_entry", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_jfd_package_entry_t.info },
 	.type_info = &DEFAULT_jfd_package_entry_t.info,
 	.offset = 112,
 };
 
-constexpr type_info_float32 DEFAULT_float32 = { .info = { .name = "float32", .size = 4, .metatype = 0 } };
+constexpr type_info_float32 DEFAULT_float32 = { .info = { .name = "float32", .size = 4, .metatype = 4 } };
+
+constexpr unsigned long DEFAULT_dimensions_float2_elements[] = { 2, };
+constexpr type_info_array_t DEFAULT_array_float2_elements = {
+	.array_type = &DEFAULT_float32.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_float2_elements,
+};
 
 constexpr type_info_member_t DEFAULT_member_float2_elements = {
-	.info = { .name = "elements", .size = 8, .metatype = 0 },
+	.info = { .name = "elements", .size = 8, .metatype = 2, .array = &DEFAULT_array_float2_elements },
 	.type_info = &DEFAULT_float32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_float2_x = {
-	.info = { .name = "x", .size = 4, .metatype = 0 },
+	.info = { .name = "x", .size = 4, .metatype = 4 },
 	.type_info = &DEFAULT_float32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_float2_y = {
-	.info = { .name = "y", .size = 4, .metatype = 0 },
+	.info = { .name = "y", .size = 4, .metatype = 4 },
 	.type_info = &DEFAULT_float32.info,
 	.offset = 4,
 };
 
+constexpr unsigned long DEFAULT_dimensions_float2_xy[] = { 2, };
+constexpr type_info_array_t DEFAULT_array_float2_xy = {
+	.array_type = &DEFAULT_float32.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_float2_xy,
+};
+
 constexpr type_info_member_t DEFAULT_member_float2_xy = {
-	.info = { .name = "xy", .size = 8, .metatype = 0 },
+	.info = { .name = "xy", .size = 8, .metatype = 2, .array = &DEFAULT_array_float2_xy },
 	.type_info = &DEFAULT_float32.info,
 	.offset = 0,
 };
 
 constexpr type_info_float2 DEFAULT_float2 = {
-	.info = { .name = "float2", .size = 8, .metatype = 1 },
+	.info = { .name = "float2", .size = 8, .metatype = 7 },
 	.member_count = 4,
 	.member_pointer = DEFAULT_float2.member_array,
 	.members = {
@@ -2544,79 +2558,79 @@ constexpr type_info_float2 DEFAULT_float2 = {
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_uv_min = {
-	.info = { .name = "uv_min", .size = 8, .metatype = 0 },
+	.info = { .name = "uv_min", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_uv_max = {
-	.info = { .name = "uv_max", .size = 8, .metatype = 0 },
+	.info = { .name = "uv_max", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_offset = {
-	.info = { .name = "offset", .size = 8, .metatype = 0 },
+	.info = { .name = "offset", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_size = {
-	.info = { .name = "size", .size = 8, .metatype = 0 },
+	.info = { .name = "size", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_atlased_generation = {
-	.info = { .name = "atlased_generation", .size = 4, .metatype = 0 },
+	.info = { .name = "atlased_generation", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 32,
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_atlas_subtexture_index = {
-	.info = { .name = "atlas_subtexture_index", .size = 4, .metatype = 0 },
+	.info = { .name = "atlas_subtexture_index", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 36,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture2D_t_ID = {
-	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.info = { .name = "ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_t_width = {
-	.info = { .name = "width", .size = 4, .metatype = 0 },
+	.info = { .name = "width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_t_height = {
-	.info = { .name = "height", .size = 4, .metatype = 0 },
+	.info = { .name = "height", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_t_channels = {
-	.info = { .name = "channels", .size = 4, .metatype = 0 },
+	.info = { .name = "channels", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_t_format = {
-	.info = { .name = "format", .size = 4, .metatype = 0 },
+	.info = { .name = "format", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 12,
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_t_pixels = {
-	.info = { .name = "pixels", .size = 16, .metatype = 0 },
+	.info = { .name = "pixels", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 16,
 };
 
 constexpr type_info_bitmap_t DEFAULT_bitmap_t = {
-	.info = { .name = "bitmap_t", .size = 32, .metatype = 1 },
+	.info = { .name = "bitmap_t", .size = 32, .metatype = 7 },
 	.member_count = 5,
 	.member_pointer = DEFAULT_bitmap_t.member_array,
 	.members = {
@@ -2629,43 +2643,43 @@ constexpr type_info_bitmap_t DEFAULT_bitmap_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_texture2D_t_bitmap = {
-	.info = { .name = "bitmap", .size = 32, .metatype = 0 },
+	.info = { .name = "bitmap", .size = 32, .metatype = 7 },
 	.type_info = &DEFAULT_bitmap_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_t_ID = {
-	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.info = { .name = "ID", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_data = {
-	.info = { .name = "data", .size = 16, .metatype = 0 },
+	.info = { .name = "data", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_width = {
-	.info = { .name = "width", .size = 4, .metatype = 0 },
+	.info = { .name = "width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_height = {
-	.info = { .name = "height", .size = 4, .metatype = 0 },
+	.info = { .name = "height", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 20,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_format = {
-	.info = { .name = "format", .size = 4, .metatype = 0 },
+	.info = { .name = "format", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_INVALID = {
-	.info = { .name = "RHI_IMAGE_USAGE_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_USAGE_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2673,7 +2687,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_IN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = {
-	.info = { .name = "RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2681,7 +2695,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RE
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT = {
-	.info = { .name = "RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2689,7 +2703,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_RE
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE = {
-	.info = { .name = "RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2697,7 +2711,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_SH
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_SOURCE = {
-	.info = { .name = "RHI_IMAGE_USAGE_BLIT_SOURCE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_USAGE_BLIT_SOURCE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2705,7 +2719,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BL
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BLIT_DESTINATION = {
-	.info = { .name = "RHI_IMAGE_USAGE_BLIT_DESTINATION", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_USAGE_BLIT_DESTINATION", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2713,7 +2727,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_usage_t_RHI_IMAGE_USAGE_BL
 };
 
 constexpr type_info_RHI_image_usage_t DEFAULT_RHI_image_usage_t = {
-	.info = { .name = "RHI_image_usage_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_image_usage_t", .size = 4, .metatype = 8 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_RHI_image_usage_t.member_array,
 	.members = {
@@ -2727,13 +2741,13 @@ constexpr type_info_RHI_image_usage_t DEFAULT_RHI_image_usage_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_usage = {
-	.info = { .name = "usage", .size = 4, .metatype = 0 },
+	.info = { .name = "usage", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_usage_t.info,
 	.offset = 28,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_INVALID = {
-	.info = { .name = "RHI_IMAGE_FILTER_TYPE_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_FILTER_TYPE_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2741,7 +2755,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FI
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_NEAREST = {
-	.info = { .name = "RHI_IMAGE_FILTER_TYPE_NEAREST", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_FILTER_TYPE_NEAREST", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2749,7 +2763,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FI
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FILTER_TYPE_LINEAR = {
-	.info = { .name = "RHI_IMAGE_FILTER_TYPE_LINEAR", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_FILTER_TYPE_LINEAR", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2757,7 +2771,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_filter_type_t_RHI_IMAGE_FI
 };
 
 constexpr type_info_RHI_image_filter_type_t DEFAULT_RHI_image_filter_type_t = {
-	.info = { .name = "RHI_image_filter_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_image_filter_type_t", .size = 4, .metatype = 8 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_RHI_image_filter_type_t.member_array,
 	.members = {
@@ -2768,25 +2782,25 @@ constexpr type_info_RHI_image_filter_type_t DEFAULT_RHI_image_filter_type_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_filtering = {
-	.info = { .name = "filtering", .size = 4, .metatype = 0 },
+	.info = { .name = "filtering", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_filter_type_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_anisotropy_enabled = {
-	.info = { .name = "anisotropy_enabled", .size = 4, .metatype = 0 },
+	.info = { .name = "anisotropy_enabled", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_max_anisotropy = {
-	.info = { .name = "max_anisotropy", .size = 4, .metatype = 0 },
+	.info = { .name = "max_anisotropy", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_INVALID = {
-	.info = { .name = "RHI_IMAGE_WRAPPING_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_WRAPPING_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2794,7 +2808,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE = {
-	.info = { .name = "RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2802,7 +2816,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER = {
-	.info = { .name = "RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2810,7 +2824,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_WRAPPING_REPEAT = {
-	.info = { .name = "RHI_IMAGE_WRAPPING_REPEAT", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_IMAGE_WRAPPING_REPEAT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -2818,7 +2832,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_image_wrapping_type_t_RHI_IMAGE_
 };
 
 constexpr type_info_RHI_image_wrapping_type_t DEFAULT_RHI_image_wrapping_type_t = {
-	.info = { .name = "RHI_image_wrapping_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_image_wrapping_type_t", .size = 4, .metatype = 8 },
 	.member_count = 4,
 	.member_pointer = DEFAULT_RHI_image_wrapping_type_t.member_array,
 	.members = {
@@ -2830,37 +2844,37 @@ constexpr type_info_RHI_image_wrapping_type_t DEFAULT_RHI_image_wrapping_type_t 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_wrapu = {
-	.info = { .name = "wrapu", .size = 4, .metatype = 0 },
+	.info = { .name = "wrapu", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
 	.offset = 12,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_wrapv = {
-	.info = { .name = "wrapv", .size = 4, .metatype = 0 },
+	.info = { .name = "wrapv", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_image_wrapping_type_t.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_compare_operation = {
-	.info = { .name = "compare_operation", .size = 4, .metatype = 0 },
+	.info = { .name = "compare_operation", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 20,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_compare_ops_enabled = {
-	.info = { .name = "compare_ops_enabled", .size = 4, .metatype = 0 },
+	.info = { .name = "compare_ops_enabled", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_sampler_create_info_t_use_normalized_coordinates = {
-	.info = { .name = "use_normalized_coordinates", .size = 4, .metatype = 0 },
+	.info = { .name = "use_normalized_coordinates", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 28,
 };
 
 constexpr type_info_RHI_sampler_create_info_t DEFAULT_RHI_sampler_create_info_t = {
-	.info = { .name = "RHI_sampler_create_info_t", .size = 32, .metatype = 1 },
+	.info = { .name = "RHI_sampler_create_info_t", .size = 32, .metatype = 7 },
 	.member_count = 8,
 	.member_pointer = DEFAULT_RHI_sampler_create_info_t.member_array,
 	.members = {
@@ -2876,13 +2890,13 @@ constexpr type_info_RHI_sampler_create_info_t DEFAULT_RHI_sampler_create_info_t 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_create_info_t_sampler_info = {
-	.info = { .name = "sampler_info", .size = 32, .metatype = 0 },
+	.info = { .name = "sampler_info", .size = 32, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_sampler_create_info_t.info,
 	.offset = 32,
 };
 
 constexpr type_info_RHI_image_create_info_t DEFAULT_RHI_image_create_info_t = {
-	.info = { .name = "RHI_image_create_info_t", .size = 64, .metatype = 1 },
+	.info = { .name = "RHI_image_create_info_t", .size = 64, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_RHI_image_create_info_t.member_array,
 	.members = {
@@ -2896,25 +2910,25 @@ constexpr type_info_RHI_image_create_info_t DEFAULT_RHI_image_create_info_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_t_create_info = {
-	.info = { .name = "create_info", .size = 64, .metatype = 0 },
+	.info = { .name = "create_info", .size = 64, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_image_create_info_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_backend_image_t_is_valid = {
-	.info = { .name = "is_valid", .size = 1, .metatype = 0 },
+	.info = { .name = "is_valid", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_backend_image_t_handle = {
-	.info = { .name = "handle", .size = 8, .metatype = 0 },
+	.info = { .name = "handle", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_void.info },
 	.type_info = &DEFAULT_void.info,
 	.offset = 8,
 };
 
 constexpr type_info_backend_image_t DEFAULT_backend_image_t = {
-	.info = { .name = "backend_image_t", .size = 16, .metatype = 1 },
+	.info = { .name = "backend_image_t", .size = 16, .metatype = 7 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_backend_image_t.member_array,
 	.members = {
@@ -2924,13 +2938,13 @@ constexpr type_info_backend_image_t DEFAULT_backend_image_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_image_t_backend_image = {
-	.info = { .name = "backend_image", .size = 16, .metatype = 0 },
+	.info = { .name = "backend_image", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_backend_image_t.info,
 	.offset = 72,
 };
 
 constexpr type_info_RHI_image_t DEFAULT_RHI_image_t = {
-	.info = { .name = "RHI_image_t", .size = 88, .metatype = 1 },
+	.info = { .name = "RHI_image_t", .size = 88, .metatype = 7 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_RHI_image_t.member_array,
 	.members = {
@@ -2941,13 +2955,13 @@ constexpr type_info_RHI_image_t DEFAULT_RHI_image_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_texture2D_t_gpu_data = {
-	.info = { .name = "gpu_data", .size = 88, .metatype = 0 },
+	.info = { .name = "gpu_data", .size = 88, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_image_t.info,
 	.offset = 40,
 };
 
 constexpr type_info_texture2D_t DEFAULT_texture2D_t = {
-	.info = { .name = "texture2D_t", .size = 128, .metatype = 1 },
+	.info = { .name = "texture2D_t", .size = 128, .metatype = 7 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_texture2D_t.member_array,
 	.members = {
@@ -2958,79 +2972,79 @@ constexpr type_info_texture2D_t DEFAULT_texture2D_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_texture = {
-	.info = { .name = "texture", .size = 128, .metatype = 0 },
+	.info = { .name = "texture", .size = 128, .metatype = 7 },
 	.type_info = &DEFAULT_texture2D_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_bitmap_data = {
-	.info = { .name = "bitmap_data", .size = 8, .metatype = 0 },
+	.info = { .name = "bitmap_data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_bitmap_t.info },
 	.type_info = &DEFAULT_bitmap_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_ID = {
-	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.info = { .name = "ID", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
-constexpr type_info_s32 DEFAULT_s32 = { .info = { .name = "s32", .size = 4, .metatype = 0 } };
+constexpr type_info_s32 DEFAULT_s32 = { .info = { .name = "s32", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_merge_counter = {
-	.info = { .name = "merge_counter", .size = 4, .metatype = 0 },
+	.info = { .name = "merge_counter", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_textures_to_merge = {
-	.info = { .name = "textures_to_merge", .size = 0, .metatype = 0 },
+	.info = { .name = "textures_to_merge", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_packed_subtextures = {
-	.info = { .name = "packed_subtextures", .size = 0, .metatype = 0 },
+	.info = { .name = "packed_subtextures", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_packed_subtexture_count = {
-	.info = { .name = "packed_subtexture_count", .size = 4, .metatype = 0 },
+	.info = { .name = "packed_subtexture_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_is_valid = {
-	.info = { .name = "is_valid", .size = 4, .metatype = 0 },
+	.info = { .name = "is_valid", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_cursor_x = {
-	.info = { .name = "atlas_cursor_x", .size = 4, .metatype = 0 },
+	.info = { .name = "atlas_cursor_x", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_cursor_y = {
-	.info = { .name = "atlas_cursor_y", .size = 4, .metatype = 0 },
+	.info = { .name = "atlas_cursor_y", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_tallest_y = {
-	.info = { .name = "tallest_y", .size = 4, .metatype = 0 },
+	.info = { .name = "tallest_y", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_t_atlas_size = {
-	.info = { .name = "atlas_size", .size = 4, .metatype = 0 },
+	.info = { .name = "atlas_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_texture_atlas_t DEFAULT_texture_atlas_t = {
-	.info = { .name = "texture_atlas_t", .size = 1, .metatype = 1 },
+	.info = { .name = "texture_atlas_t", .size = 1, .metatype = 7 },
 	.member_count = 12,
 	.member_pointer = DEFAULT_texture_atlas_t.member_array,
 	.members = {
@@ -3050,19 +3064,19 @@ constexpr type_info_texture_atlas_t DEFAULT_texture_atlas_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_atlas = {
-	.info = { .name = "atlas", .size = 8, .metatype = 0 },
+	.info = { .name = "atlas", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_texture_atlas_t.info },
 	.type_info = &DEFAULT_texture_atlas_t.info,
 	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_subtexture_data_t_packed_asset = {
-	.info = { .name = "packed_asset", .size = 24, .metatype = 0 },
+	.info = { .name = "packed_asset", .size = 24, .metatype = 7 },
 	.type_info = &DEFAULT_asset_handle_t.info,
 	.offset = 48,
 };
 
 constexpr type_info_subtexture_data_t DEFAULT_subtexture_data_t = {
-	.info = { .name = "subtexture_data_t", .size = 72, .metatype = 1 },
+	.info = { .name = "subtexture_data_t", .size = 72, .metatype = 7 },
 	.member_count = 8,
 	.member_pointer = DEFAULT_subtexture_data_t.member_array,
 	.members = {
@@ -3078,55 +3092,55 @@ constexpr type_info_subtexture_data_t DEFAULT_subtexture_data_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_subtexture_data = {
-	.info = { .name = "subtexture_data", .size = 8, .metatype = 0 },
+	.info = { .name = "subtexture_data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_subtexture_data_t.info },
 	.type_info = &DEFAULT_subtexture_data_t.info,
 	.offset = 120,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_is_initialized = {
-	.info = { .name = "is_initialized", .size = 1, .metatype = 0 },
+	.info = { .name = "is_initialized", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_memory_arena_t_is_initialized = {
-	.info = { .name = "is_initialized", .size = 4, .metatype = 0 },
+	.info = { .name = "is_initialized", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_memory_arena_t_base = {
-	.info = { .name = "base", .size = 8, .metatype = 0 },
+	.info = { .name = "base", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_byte.info },
 	.type_info = &DEFAULT_byte.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_memory_arena_t_used = {
-	.info = { .name = "used", .size = 8, .metatype = 0 },
+	.info = { .name = "used", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_memory_arena_t_block_size = {
-	.info = { .name = "block_size", .size = 8, .metatype = 0 },
+	.info = { .name = "block_size", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_memory_arena_t_block_counter = {
-	.info = { .name = "block_counter", .size = 4, .metatype = 0 },
+	.info = { .name = "block_counter", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 32,
 };
 
 constexpr type_info_member_t DEFAULT_member_memory_arena_t_scratch_arena_count = {
-	.info = { .name = "scratch_arena_count", .size = 4, .metatype = 0 },
+	.info = { .name = "scratch_arena_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 36,
 };
 
 constexpr type_info_memory_arena_t DEFAULT_memory_arena_t = {
-	.info = { .name = "memory_arena_t", .size = 40, .metatype = 1 },
+	.info = { .name = "memory_arena_t", .size = 40, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_memory_arena_t.member_array,
 	.members = {
@@ -3140,87 +3154,87 @@ constexpr type_info_memory_arena_t DEFAULT_memory_arena_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_manager_arena = {
-	.info = { .name = "manager_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "manager_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_freetype_handle = {
-	.info = { .name = "freetype_handle", .size = 4, .metatype = 0 },
+	.info = { .name = "freetype_handle", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_int.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_is_initialized = {
-	.info = { .name = "is_initialized", .size = 1, .metatype = 0 },
+	.info = { .name = "is_initialized", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_ID = {
-	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.info = { .name = "ID", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
-constexpr type_info_volatile_u32 DEFAULT_volatile_u32 = { .info = { .name = "volatile_u32", .size = 4, .metatype = 0 } };
+constexpr type_info_volatile_u32 DEFAULT_volatile_u32 = { .info = { .name = "volatile_u32", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_current_package_generation = {
-	.info = { .name = "current_package_generation", .size = 4, .metatype = 0 },
+	.info = { .name = "current_package_generation", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_volatile_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_init_arena = {
-	.info = { .name = "init_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "init_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_load_status = {
-	.info = { .name = "load_status", .size = 4, .metatype = 0 },
+	.info = { .name = "load_status", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_asset_slot_load_status_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_file_info = {
-	.info = { .name = "file_info", .size = 72, .metatype = 0 },
+	.info = { .name = "file_info", .size = 72, .metatype = 7 },
 	.type_info = &DEFAULT_file_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_raw_file_data = {
-	.info = { .name = "raw_file_data", .size = 16, .metatype = 0 },
+	.info = { .name = "raw_file_data", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_magic_value = {
-	.info = { .name = "magic_value", .size = 4, .metatype = 0 },
+	.info = { .name = "magic_value", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_version = {
-	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.info = { .name = "version", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_flags = {
-	.info = { .name = "flags", .size = 4, .metatype = 0 },
+	.info = { .name = "flags", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_jfd_file_header_t_entry_count = {
-	.info = { .name = "entry_count", .size = 4, .metatype = 0 },
+	.info = { .name = "entry_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 12,
 };
 
 constexpr type_info_jfd_file_header_t DEFAULT_jfd_file_header_t = {
-	.info = { .name = "jfd_file_header_t", .size = 16, .metatype = 1 },
+	.info = { .name = "jfd_file_header_t", .size = 16, .metatype = 7 },
 	.member_count = 4,
 	.member_pointer = DEFAULT_jfd_file_header_t.member_array,
 	.members = {
@@ -3232,41 +3246,41 @@ constexpr type_info_jfd_file_header_t DEFAULT_jfd_file_header_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_header = {
-	.info = { .name = "header", .size = 8, .metatype = 0 },
+	.info = { .name = "header", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_jfd_file_header_t.info },
 	.type_info = &DEFAULT_jfd_file_header_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_package_entries = {
-	.info = { .name = "package_entries", .size = 8, .metatype = 0 },
+	.info = { .name = "package_entries", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_jfd_package_entry_t.info },
 	.type_info = &DEFAULT_jfd_package_entry_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_package_entry_count = {
-	.info = { .name = "package_entry_count", .size = 4, .metatype = 0 },
+	.info = { .name = "package_entry_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_entry_hash = {
-	.info = { .name = "entry_hash", .size = 0, .metatype = 0 },
+	.info = { .name = "entry_hash", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_loaded_assets = {
-	.info = { .name = "loaded_assets", .size = 0, .metatype = 0 },
+	.info = { .name = "loaded_assets", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_file_data_t_header_data = {
-	.info = { .name = "header_data", .size = 8, .metatype = 0 },
+	.info = { .name = "header_data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_jfd_file_header_t.info },
 	.type_info = &DEFAULT_jfd_file_header_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_asset_file_data_t DEFAULT_asset_file_data_t = {
-	.info = { .name = "asset_file_data_t", .size = 1, .metatype = 1 },
+	.info = { .name = "asset_file_data_t", .size = 1, .metatype = 7 },
 	.member_count = 13,
 	.member_pointer = DEFAULT_asset_file_data_t.member_array,
 	.members = {
@@ -3286,61 +3300,89 @@ constexpr type_info_asset_file_data_t DEFAULT_asset_file_data_t = {
 	},
 };
 
+constexpr unsigned long DEFAULT_dimensions_asset_manager_t_asset_files[] = { 32, };
+constexpr type_info_array_t DEFAULT_array_asset_manager_t_asset_files = {
+	.array_type = &DEFAULT_asset_file_data_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_asset_manager_t_asset_files,
+};
+
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_files = {
-	.info = { .name = "asset_files", .size = 32, .metatype = 0 },
+	.info = { .name = "asset_files", .size = 32, .metatype = 2, .array = &DEFAULT_array_asset_manager_t_asset_files },
 	.type_info = &DEFAULT_asset_file_data_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_name_to_file = {
-	.info = { .name = "asset_name_to_file", .size = 0, .metatype = 0 },
+	.info = { .name = "asset_name_to_file", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_loaded_file_count = {
-	.info = { .name = "loaded_file_count", .size = 4, .metatype = 0 },
+	.info = { .name = "loaded_file_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
+constexpr unsigned long DEFAULT_dimensions_asset_manager_t_asset_load_queue[] = { 256, };
+constexpr type_info_array_t DEFAULT_array_asset_manager_t_asset_load_queue = {
+	.array_type = &DEFAULT_asset_slot_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_asset_manager_t_asset_load_queue,
+};
+
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_load_queue = {
-	.info = { .name = "asset_load_queue", .size = 2048, .metatype = 0 },
+	.info = { .name = "asset_load_queue", .size = 2048, .metatype = 2, .array = &DEFAULT_array_asset_manager_t_asset_load_queue },
 	.type_info = &DEFAULT_asset_slot_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_load_queue_size = {
-	.info = { .name = "load_queue_size", .size = 4, .metatype = 0 },
+	.info = { .name = "load_queue_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
+constexpr unsigned long DEFAULT_dimensions_asset_manager_t_asset_unload_queue[] = { 256, };
+constexpr type_info_array_t DEFAULT_array_asset_manager_t_asset_unload_queue = {
+	.array_type = &DEFAULT_asset_slot_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_asset_manager_t_asset_unload_queue,
+};
+
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_unload_queue = {
-	.info = { .name = "asset_unload_queue", .size = 2048, .metatype = 0 },
+	.info = { .name = "asset_unload_queue", .size = 2048, .metatype = 2, .array = &DEFAULT_array_asset_manager_t_asset_unload_queue },
 	.type_info = &DEFAULT_asset_slot_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_unload_queue_size = {
-	.info = { .name = "unload_queue_size", .size = 4, .metatype = 0 },
+	.info = { .name = "unload_queue_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
+constexpr unsigned long DEFAULT_dimensions_texture_atlas_registry_t_atlases[] = { 128, };
+constexpr type_info_array_t DEFAULT_array_texture_atlas_registry_t_atlases = {
+	.array_type = &DEFAULT_texture_atlas_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_texture_atlas_registry_t_atlases,
+};
+
 constexpr type_info_member_t DEFAULT_member_texture_atlas_registry_t_atlases = {
-	.info = { .name = "atlases", .size = 128, .metatype = 0 },
+	.info = { .name = "atlases", .size = 128, .metatype = 2, .array = &DEFAULT_array_texture_atlas_registry_t_atlases },
 	.type_info = &DEFAULT_texture_atlas_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_texture_atlas_registry_t_current_atlas_count = {
-	.info = { .name = "current_atlas_count", .size = 4, .metatype = 0 },
+	.info = { .name = "current_atlas_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_texture_atlas_registry_t DEFAULT_texture_atlas_registry_t = {
-	.info = { .name = "texture_atlas_registry_t", .size = 1, .metatype = 1 },
+	.info = { .name = "texture_atlas_registry_t", .size = 1, .metatype = 7 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_texture_atlas_registry_t.member_array,
 	.members = {
@@ -3350,21 +3392,21 @@ constexpr type_info_texture_atlas_registry_t DEFAULT_texture_atlas_registry_t = 
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_atlas_registry = {
-	.info = { .name = "atlas_registry", .size = 1, .metatype = 0 },
+	.info = { .name = "atlas_registry", .size = 1, .metatype = 7 },
 	.type_info = &DEFAULT_texture_atlas_registry_t.info,
 	.offset = 0,
 };
 
-constexpr type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t = { .info = { .name = "sys_mutex_handle_t", .size = 8, .metatype = 0 } };
+constexpr type_info_sys_mutex_handle_t DEFAULT_sys_mutex_handle_t = { .info = { .name = "sys_mutex_handle_t", .size = 8, .metatype = 1 } };
 
 constexpr type_info_member_t DEFAULT_member_sys_mutex_t_handle = {
-	.info = { .name = "handle", .size = 8, .metatype = 0 },
+	.info = { .name = "handle", .size = 8, .metatype = 1 },
 	.type_info = &DEFAULT_sys_mutex_handle_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_sys_mutex_t DEFAULT_sys_mutex_t = {
-	.info = { .name = "sys_mutex_t", .size = 8, .metatype = 1 },
+	.info = { .name = "sys_mutex_t", .size = 8, .metatype = 7 },
 	.member_count = 1,
 	.member_pointer = DEFAULT_sys_mutex_t.member_array,
 	.members = {
@@ -3373,61 +3415,61 @@ constexpr type_info_sys_mutex_t DEFAULT_sys_mutex_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_t_mutex = {
-	.info = { .name = "mutex", .size = 8, .metatype = 0 },
+	.info = { .name = "mutex", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_sys_mutex_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_t_capacity = {
-	.info = { .name = "capacity", .size = 8, .metatype = 0 },
+	.info = { .name = "capacity", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 8,
 };
 
-constexpr type_info_u8 DEFAULT_u8 = { .info = { .name = "u8", .size = 1, .metatype = 0 } };
+constexpr type_info_u8 DEFAULT_u8 = { .info = { .name = "u8", .size = 1, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_t_base = {
-	.info = { .name = "base", .size = 8, .metatype = 0 },
+	.info = { .name = "base", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_u8.info },
 	.type_info = &DEFAULT_u8.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_block_id = {
-	.info = { .name = "block_id", .size = 4, .metatype = 0 },
+	.info = { .name = "block_id", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_is_allocated = {
-	.info = { .name = "is_allocated", .size = 1, .metatype = 0 },
+	.info = { .name = "is_allocated", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_block_size = {
-	.info = { .name = "block_size", .size = 8, .metatype = 0 },
+	.info = { .name = "block_size", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_allocation_tag = {
-	.info = { .name = "allocation_tag", .size = 8, .metatype = 0 },
+	.info = { .name = "allocation_tag", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_next_block = {
-	.info = { .name = "next_block", .size = 8, .metatype = 0 },
+	.info = { .name = "next_block", .size = 8, .metatype = 1 },
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_block_t_prev_block = {
-	.info = { .name = "prev_block", .size = 8, .metatype = 0 },
+	.info = { .name = "prev_block", .size = 8, .metatype = 1 },
 	.offset = 32,
 };
 
 constexpr type_info_zone_allocator_block_t DEFAULT_zone_allocator_block_t = {
-	.info = { .name = "zone_allocator_block_t", .size = 40, .metatype = 1 },
+	.info = { .name = "zone_allocator_block_t", .size = 40, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_zone_allocator_block_t.member_array,
 	.members = {
@@ -3441,19 +3483,19 @@ constexpr type_info_zone_allocator_block_t DEFAULT_zone_allocator_block_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_t_first_block = {
-	.info = { .name = "first_block", .size = 40, .metatype = 0 },
+	.info = { .name = "first_block", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_zone_allocator_block_t.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_zone_allocator_t_cursor = {
-	.info = { .name = "cursor", .size = 8, .metatype = 0 },
+	.info = { .name = "cursor", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_zone_allocator_block_t.info },
 	.type_info = &DEFAULT_zone_allocator_block_t.info,
 	.offset = 64,
 };
 
 constexpr type_info_zone_allocator_t DEFAULT_zone_allocator_t = {
-	.info = { .name = "zone_allocator_t", .size = 72, .metatype = 1 },
+	.info = { .name = "zone_allocator_t", .size = 72, .metatype = 7 },
 	.member_count = 5,
 	.member_pointer = DEFAULT_zone_allocator_t.member_array,
 	.members = {
@@ -3466,47 +3508,47 @@ constexpr type_info_zone_allocator_t DEFAULT_zone_allocator_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_allocator = {
-	.info = { .name = "asset_allocator", .size = 8, .metatype = 0 },
+	.info = { .name = "asset_allocator", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_zone_allocator_t.info },
 	.type_info = &DEFAULT_zone_allocator_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_catalog_t_ID = {
-	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.info = { .name = "ID", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_catalog_t_catalog_type = {
-	.info = { .name = "catalog_type", .size = 4, .metatype = 0 },
+	.info = { .name = "catalog_type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_asset_type_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_catalog_t_asset_manager = {
-	.info = { .name = "asset_manager", .size = 8, .metatype = 0 },
+	.info = { .name = "asset_manager", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_manager_t.info },
 	.type_info = &DEFAULT_asset_manager_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_catalog_t_default_asset = {
-	.info = { .name = "default_asset", .size = 24, .metatype = 0 },
+	.info = { .name = "default_asset", .size = 24, .metatype = 7 },
 	.type_info = &DEFAULT_asset_handle_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_catalog_t_asset_lookup = {
-	.info = { .name = "asset_lookup", .size = 0, .metatype = 0 },
+	.info = { .name = "asset_lookup", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_catalog_t_loaded_assets = {
-	.info = { .name = "loaded_assets", .size = 0, .metatype = 0 },
+	.info = { .name = "loaded_assets", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_asset_catalog_t DEFAULT_asset_catalog_t = {
-	.info = { .name = "asset_catalog_t", .size = 1, .metatype = 1 },
+	.info = { .name = "asset_catalog_t", .size = 1, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_asset_catalog_t.member_array,
 	.members = {
@@ -3519,73 +3561,80 @@ constexpr type_info_asset_catalog_t DEFAULT_asset_catalog_t = {
 	},
 };
 
+constexpr unsigned long DEFAULT_dimensions_asset_manager_t_asset_catalogs[] = { 6, };
+constexpr type_info_array_t DEFAULT_array_asset_manager_t_asset_catalogs = {
+	.array_type = &DEFAULT_asset_catalog_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_asset_manager_t_asset_catalogs,
+};
+
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_asset_catalogs = {
-	.info = { .name = "asset_catalogs", .size = 6, .metatype = 0 },
+	.info = { .name = "asset_catalogs", .size = 6, .metatype = 2, .array = &DEFAULT_array_asset_manager_t_asset_catalogs },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_texture_catalog = {
-	.info = { .name = "texture_catalog", .size = 8, .metatype = 0 },
+	.info = { .name = "texture_catalog", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_catalog_t.info },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_shader_catalog = {
-	.info = { .name = "shader_catalog", .size = 8, .metatype = 0 },
+	.info = { .name = "shader_catalog", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_catalog_t.info },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_material_catalog = {
-	.info = { .name = "material_catalog", .size = 8, .metatype = 0 },
+	.info = { .name = "material_catalog", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_catalog_t.info },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_font_catalog = {
-	.info = { .name = "font_catalog", .size = 8, .metatype = 0 },
+	.info = { .name = "font_catalog", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_catalog_t.info },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_sound_catalog = {
-	.info = { .name = "sound_catalog", .size = 8, .metatype = 0 },
+	.info = { .name = "sound_catalog", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_catalog_t.info },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_is_dirty = {
-	.info = { .name = "is_dirty", .size = 4, .metatype = 0 },
+	.info = { .name = "is_dirty", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_is_full = {
-	.info = { .name = "is_full", .size = 4, .metatype = 0 },
+	.info = { .name = "is_full", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_font_arena = {
-	.info = { .name = "font_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "font_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_font_face = {
-	.info = { .name = "font_face", .size = 4, .metatype = 0 },
+	.info = { .name = "font_face", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_int.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_t_varients = {
-	.info = { .name = "varients", .size = 0, .metatype = 0 },
+	.info = { .name = "varients", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_dynamic_render_font_t DEFAULT_dynamic_render_font_t = {
-	.info = { .name = "dynamic_render_font_t", .size = 1, .metatype = 1 },
+	.info = { .name = "dynamic_render_font_t", .size = 1, .metatype = 7 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_dynamic_render_font_t.member_array,
 	.members = {
@@ -3596,93 +3645,93 @@ constexpr type_info_dynamic_render_font_t DEFAULT_dynamic_render_font_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_parent_font = {
-	.info = { .name = "parent_font", .size = 8, .metatype = 0 },
+	.info = { .name = "parent_font", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_dynamic_render_font_t.info },
 	.type_info = &DEFAULT_dynamic_render_font_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_font_size = {
-	.info = { .name = "font_size", .size = 4, .metatype = 0 },
+	.info = { .name = "font_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
-constexpr type_info_float64 DEFAULT_float64 = { .info = { .name = "float64", .size = 8, .metatype = 0 } };
+constexpr type_info_float64 DEFAULT_float64 = { .info = { .name = "float64", .size = 8, .metatype = 4 } };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_size_to_pixels = {
-	.info = { .name = "size_to_pixels", .size = 8, .metatype = 0 },
+	.info = { .name = "size_to_pixels", .size = 8, .metatype = 4 },
 	.type_info = &DEFAULT_float64.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_line_spacing = {
-	.info = { .name = "line_spacing", .size = 8, .metatype = 0 },
+	.info = { .name = "line_spacing", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_s64.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_max_ascender = {
-	.info = { .name = "max_ascender", .size = 8, .metatype = 0 },
+	.info = { .name = "max_ascender", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_s64.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_max_descender = {
-	.info = { .name = "max_descender", .size = 8, .metatype = 0 },
+	.info = { .name = "max_descender", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_s64.info,
 	.offset = 32,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_y_center_offset = {
-	.info = { .name = "y_center_offset", .size = 4, .metatype = 0 },
+	.info = { .name = "y_center_offset", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_typical_ascender = {
-	.info = { .name = "typical_ascender", .size = 4, .metatype = 0 },
+	.info = { .name = "typical_ascender", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 44,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_typical_descender = {
-	.info = { .name = "typical_descender", .size = 4, .metatype = 0 },
+	.info = { .name = "typical_descender", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 48,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_em_width = {
-	.info = { .name = "em_width", .size = 4, .metatype = 0 },
+	.info = { .name = "em_width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 52,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_default_unknown_character = {
-	.info = { .name = "default_unknown_character", .size = 4, .metatype = 0 },
+	.info = { .name = "default_unknown_character", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 56,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_default_utf32_unknown_character = {
-	.info = { .name = "default_utf32_unknown_character", .size = 4, .metatype = 0 },
+	.info = { .name = "default_utf32_unknown_character", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 60,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_parent_font = {
-	.info = { .name = "parent_font", .size = 8, .metatype = 0 },
+	.info = { .name = "parent_font", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_dynamic_render_font_t.info },
 	.type_info = &DEFAULT_dynamic_render_font_t.info,
 	.offset = 64,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_varient_t_first_page = {
-	.info = { .name = "first_page", .size = 8, .metatype = 0 },
+	.info = { .name = "first_page", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_dynamic_render_font_page_t.info },
 	.type_info = &DEFAULT_dynamic_render_font_page_t.info,
 	.offset = 72,
 };
 
 constexpr type_info_dynamic_render_font_varient_t DEFAULT_dynamic_render_font_varient_t = {
-	.info = { .name = "dynamic_render_font_varient_t", .size = 80, .metatype = 1 },
+	.info = { .name = "dynamic_render_font_varient_t", .size = 80, .metatype = 7 },
 	.member_count = 13,
 	.member_pointer = DEFAULT_dynamic_render_font_varient_t.member_array,
 	.members = {
@@ -3703,108 +3752,108 @@ constexpr type_info_dynamic_render_font_varient_t DEFAULT_dynamic_render_font_va
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_varient = {
-	.info = { .name = "varient", .size = 8, .metatype = 0 },
+	.info = { .name = "varient", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_dynamic_render_font_varient_t.info },
 	.type_info = &DEFAULT_dynamic_render_font_varient_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_font_atlas = {
-	.info = { .name = "font_atlas", .size = 8, .metatype = 0 },
+	.info = { .name = "font_atlas", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_texture_atlas_t.info },
 	.type_info = &DEFAULT_texture_atlas_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_glyphs = {
-	.info = { .name = "glyphs", .size = 0, .metatype = 0 },
+	.info = { .name = "glyphs", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_loaded_glyph_count = {
-	.info = { .name = "loaded_glyph_count", .size = 4, .metatype = 0 },
+	.info = { .name = "loaded_glyph_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_utf32_codepoint = {
-	.info = { .name = "utf32_codepoint", .size = 4, .metatype = 0 },
+	.info = { .name = "utf32_codepoint", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_is_valid = {
-	.info = { .name = "is_valid", .size = 1, .metatype = 0 },
+	.info = { .name = "is_valid", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_is_fetched = {
-	.info = { .name = "is_fetched", .size = 1, .metatype = 0 },
+	.info = { .name = "is_fetched", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 1,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_advance = {
-	.info = { .name = "advance", .size = 4, .metatype = 0 },
+	.info = { .name = "advance", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_ascent = {
-	.info = { .name = "ascent", .size = 4, .metatype = 0 },
+	.info = { .name = "ascent", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_width = {
-	.info = { .name = "width", .size = 4, .metatype = 0 },
+	.info = { .name = "width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 12,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_height = {
-	.info = { .name = "height", .size = 4, .metatype = 0 },
+	.info = { .name = "height", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_offset_x = {
-	.info = { .name = "offset_x", .size = 4, .metatype = 0 },
+	.info = { .name = "offset_x", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 20,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_offset_y = {
-	.info = { .name = "offset_y", .size = 4, .metatype = 0 },
+	.info = { .name = "offset_y", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_atlas_offset = {
-	.info = { .name = "atlas_offset", .size = 8, .metatype = 0 },
+	.info = { .name = "atlas_offset", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 28,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_atlas_size = {
-	.info = { .name = "atlas_size", .size = 8, .metatype = 0 },
+	.info = { .name = "atlas_size", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 36,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_owner_atlas = {
-	.info = { .name = "owner_atlas", .size = 8, .metatype = 0 },
+	.info = { .name = "owner_atlas", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_texture_atlas_t.info },
 	.type_info = &DEFAULT_texture_atlas_t.info,
 	.offset = 48,
 };
 
 constexpr type_info_member_t DEFAULT_member_glyph_metric_t_synthetic_texture_handle = {
-	.info = { .name = "synthetic_texture_handle", .size = 24, .metatype = 0 },
+	.info = { .name = "synthetic_texture_handle", .size = 24, .metatype = 7 },
 	.type_info = &DEFAULT_asset_handle_t.info,
 	.offset = 56,
 };
 
 constexpr type_info_glyph_metric_t DEFAULT_glyph_metric_t = {
-	.info = { .name = "glyph_metric_t", .size = 80, .metatype = 1 },
+	.info = { .name = "glyph_metric_t", .size = 80, .metatype = 7 },
 	.member_count = 12,
 	.member_pointer = DEFAULT_glyph_metric_t.member_array,
 	.members = {
@@ -3824,37 +3873,37 @@ constexpr type_info_glyph_metric_t DEFAULT_glyph_metric_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_metrics = {
-	.info = { .name = "metrics", .size = 8, .metatype = 0 },
+	.info = { .name = "metrics", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_glyph_metric_t.info },
 	.type_info = &DEFAULT_glyph_metric_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_glyph_width = {
-	.info = { .name = "glyph_width", .size = 4, .metatype = 0 },
+	.info = { .name = "glyph_width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_glyph_height = {
-	.info = { .name = "glyph_height", .size = 4, .metatype = 0 },
+	.info = { .name = "glyph_height", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 20,
 };
 
 constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_cursor_x = {
-	.info = { .name = "cursor_x", .size = 4, .metatype = 0 },
+	.info = { .name = "cursor_x", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_temporary_glyph_t_cursor_y = {
-	.info = { .name = "cursor_y", .size = 4, .metatype = 0 },
+	.info = { .name = "cursor_y", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 28,
 };
 
 constexpr type_info_temporary_glyph_t DEFAULT_temporary_glyph_t = {
-	.info = { .name = "temporary_glyph_t", .size = 32, .metatype = 1 },
+	.info = { .name = "temporary_glyph_t", .size = 32, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_temporary_glyph_t.member_array,
 	.members = {
@@ -3867,44 +3916,51 @@ constexpr type_info_temporary_glyph_t DEFAULT_temporary_glyph_t = {
 	},
 };
 
+constexpr unsigned long DEFAULT_dimensions_dynamic_render_font_page_t_temporary_glyphs[] = { 1000, };
+constexpr type_info_array_t DEFAULT_array_dynamic_render_font_page_t_temporary_glyphs = {
+	.array_type = &DEFAULT_temporary_glyph_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_dynamic_render_font_page_t_temporary_glyphs,
+};
+
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_temporary_glyphs = {
-	.info = { .name = "temporary_glyphs", .size = 32000, .metatype = 0 },
+	.info = { .name = "temporary_glyphs", .size = 32000, .metatype = 2, .array = &DEFAULT_array_dynamic_render_font_page_t_temporary_glyphs },
 	.type_info = &DEFAULT_temporary_glyph_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_temporary_glyph_count = {
-	.info = { .name = "temporary_glyph_count", .size = 4, .metatype = 0 },
+	.info = { .name = "temporary_glyph_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_x = {
-	.info = { .name = "atlas_cursor_x", .size = 4, .metatype = 0 },
+	.info = { .name = "atlas_cursor_x", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_atlas_cursor_y = {
-	.info = { .name = "atlas_cursor_y", .size = 4, .metatype = 0 },
+	.info = { .name = "atlas_cursor_y", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_tallest_y = {
-	.info = { .name = "tallest_y", .size = 4, .metatype = 0 },
+	.info = { .name = "tallest_y", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_dynamic_render_font_page_t_next_page = {
-	.info = { .name = "next_page", .size = 8, .metatype = 0 },
+	.info = { .name = "next_page", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_dynamic_render_font_page_t.info },
 	.type_info = &DEFAULT_dynamic_render_font_page_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_dynamic_render_font_page_t DEFAULT_dynamic_render_font_page_t = {
-	.info = { .name = "dynamic_render_font_page_t", .size = 1, .metatype = 1 },
+	.info = { .name = "dynamic_render_font_page_t", .size = 1, .metatype = 7 },
 	.member_count = 13,
 	.member_pointer = DEFAULT_dynamic_render_font_page_t.member_array,
 	.members = {
@@ -3924,20 +3980,27 @@ constexpr type_info_dynamic_render_font_page_t DEFAULT_dynamic_render_font_page_
 	},
 };
 
+constexpr unsigned long DEFAULT_dimensions_font_manager_t_pages_to_update[] = { 10, };
+constexpr type_info_array_t DEFAULT_array_font_manager_t_pages_to_update = {
+	.array_type = &DEFAULT_dynamic_render_font_page_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_font_manager_t_pages_to_update,
+};
+
 constexpr type_info_member_t DEFAULT_member_font_manager_t_pages_to_update = {
-	.info = { .name = "pages_to_update", .size = 80, .metatype = 0 },
+	.info = { .name = "pages_to_update", .size = 80, .metatype = 2, .array = &DEFAULT_array_font_manager_t_pages_to_update },
 	.type_info = &DEFAULT_dynamic_render_font_page_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_font_manager_t_pages_queued = {
-	.info = { .name = "pages_queued", .size = 4, .metatype = 0 },
+	.info = { .name = "pages_queued", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 80,
 };
 
 constexpr type_info_font_manager_t DEFAULT_font_manager_t = {
-	.info = { .name = "font_manager_t", .size = 88, .metatype = 1 },
+	.info = { .name = "font_manager_t", .size = 88, .metatype = 7 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_font_manager_t.member_array,
 	.members = {
@@ -3947,69 +4010,69 @@ constexpr type_info_font_manager_t DEFAULT_font_manager_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_font_manager = {
-	.info = { .name = "font_manager", .size = 88, .metatype = 0 },
+	.info = { .name = "font_manager", .size = 88, .metatype = 7 },
 	.type_info = &DEFAULT_font_manager_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_SDL_Window DEFAULT_SDL_Window = {
-	.info = { .name = "SDL_Window", .size = 0, .metatype = 1 },
+	.info = { .name = "SDL_Window", .size = 0, .metatype = 7 },
 	.member_count = 0,
 	.member_pointer = nullptr,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_window = {
-	.info = { .name = "window", .size = 8, .metatype = 0 },
+	.info = { .name = "window", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_SDL_Window.info },
 	.type_info = &DEFAULT_SDL_Window.info,
 	.offset = 0,
 };
 
-constexpr type_info_backend_render_context_t DEFAULT_backend_render_context_t = { .info = { .name = "backend_render_context_t", .size = 4, .metatype = 0 } };
+constexpr type_info_backend_render_context_t DEFAULT_backend_render_context_t = { .info = { .name = "backend_render_context_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_backend_render_context = {
-	.info = { .name = "backend_render_context", .size = 8, .metatype = 0 },
+	.info = { .name = "backend_render_context", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_backend_render_context_t.info },
 	.type_info = &DEFAULT_backend_render_context_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_RHI_arena = {
-	.info = { .name = "RHI_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "RHI_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_transient_arena = {
-	.info = { .name = "transient_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "transient_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_is_initialized = {
-	.info = { .name = "is_initialized", .size = 1, .metatype = 0 },
+	.info = { .name = "is_initialized", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_RHI_context = {
-	.info = { .name = "RHI_context", .size = 8, .metatype = 0 },
+	.info = { .name = "RHI_context", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_context_t.info },
 	.type_info = &DEFAULT_RHI_context_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_transient_arena = {
-	.info = { .name = "transient_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "transient_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_arena = {
-	.info = { .name = "command_arena", .size = 40, .metatype = 0 },
+	.info = { .name = "command_arena", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_memory_arena_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_INVALID = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4017,7 +4080,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4025,7 +4088,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4033,7 +4096,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4041,7 +4104,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4049,7 +4112,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_END_RENDERPASS = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_END_RENDERPASS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_END_RENDERPASS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4057,7 +4120,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4065,7 +4128,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4073,7 +4136,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4081,7 +4144,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4089,7 +4152,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4097,7 +4160,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_SHADER = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_SHADER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_SHADER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4105,7 +4168,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4113,7 +4176,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4121,7 +4184,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4129,7 +4192,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_SCISSOR = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_SCISSOR", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_SCISSOR", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4137,7 +4200,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4145,7 +4208,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4153,7 +4216,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4161,7 +4224,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4169,7 +4232,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DRAW", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DRAW", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4177,7 +4240,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4185,7 +4248,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4193,7 +4256,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4201,7 +4264,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4209,7 +4272,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAND_TYPE_COUNT = {
-	.info = { .name = "RHI_RENDER_COMMAND_TYPE_COUNT", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_TYPE_COUNT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4217,7 +4280,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_type_t_RHI_RENDER_COMMAN
 };
 
 constexpr type_info_RHI_command_type_t DEFAULT_RHI_command_type_t = {
-	.info = { .name = "RHI_command_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_command_type_t", .size = 4, .metatype = 8 },
 	.member_count = 26,
 	.member_pointer = DEFAULT_RHI_command_type_t.member_array,
 	.members = {
@@ -4251,27 +4314,27 @@ constexpr type_info_RHI_command_type_t DEFAULT_RHI_command_type_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_command_type = {
-	.info = { .name = "command_type", .size = 4, .metatype = 0 },
+	.info = { .name = "command_type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_type_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_line_number = {
-	.info = { .name = "line_number", .size = 4, .metatype = 0 },
+	.info = { .name = "line_number", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 4,
 };
 
-constexpr type_info_const_char DEFAULT_const_char = { .info = { .name = "const_char", .size = 1, .metatype = 0 } };
+constexpr type_info_const_char DEFAULT_const_char = { .info = { .name = "const_char", .size = 1, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_header_t_filename = {
-	.info = { .name = "filename", .size = 8, .metatype = 0 },
+	.info = { .name = "filename", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_const_char.info },
 	.type_info = &DEFAULT_const_char.info,
 	.offset = 8,
 };
 
 constexpr type_info_RHI_command_header_t DEFAULT_RHI_command_header_t = {
-	.info = { .name = "RHI_command_header_t", .size = 16, .metatype = 1 },
+	.info = { .name = "RHI_command_header_t", .size = 16, .metatype = 7 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_RHI_command_header_t.member_array,
 	.members = {
@@ -4282,19 +4345,19 @@ constexpr type_info_RHI_command_header_t DEFAULT_RHI_command_header_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_t_header = {
-	.info = { .name = "header", .size = 16, .metatype = 0 },
+	.info = { .name = "header", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_command_header_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_t_data = {
-	.info = { .name = "data", .size = 8, .metatype = 0 },
+	.info = { .name = "data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_void.info },
 	.type_info = &DEFAULT_void.info,
 	.offset = 16,
 };
 
 constexpr type_info_RHI_command_t DEFAULT_RHI_command_t = {
-	.info = { .name = "RHI_command_t", .size = 24, .metatype = 1 },
+	.info = { .name = "RHI_command_t", .size = 24, .metatype = 7 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_RHI_command_t.member_array,
 	.members = {
@@ -4304,60 +4367,60 @@ constexpr type_info_RHI_command_t DEFAULT_RHI_command_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_commands = {
-	.info = { .name = "commands", .size = 8, .metatype = 0 },
+	.info = { .name = "commands", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_command_t.info },
 	.type_info = &DEFAULT_RHI_command_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_count = {
-	.info = { .name = "command_count", .size = 4, .metatype = 0 },
+	.info = { .name = "command_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_draw_instance_command_count = {
-	.info = { .name = "draw_instance_command_count", .size = 4, .metatype = 0 },
+	.info = { .name = "draw_instance_command_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bind_shader_command_count = {
-	.info = { .name = "bind_shader_command_count", .size = 4, .metatype = 0 },
+	.info = { .name = "bind_shader_command_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bind_render_target_command_count = {
-	.info = { .name = "bind_render_target_command_count", .size = 4, .metatype = 0 },
+	.info = { .name = "bind_render_target_command_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bind_material_command_count = {
-	.info = { .name = "bind_material_command_count", .size = 4, .metatype = 0 },
+	.info = { .name = "bind_material_command_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_render_state = {
-	.info = { .name = "active_render_state", .size = 60, .metatype = 0 },
+	.info = { .name = "active_render_state", .size = 60, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_pipeline_state_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_vertex_buffers = {
-	.info = { .name = "active_vertex_buffers", .size = 0, .metatype = 0 },
+	.info = { .name = "active_vertex_buffers", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_vertex_buffer_count = {
-	.info = { .name = "vertex_buffer_count", .size = 4, .metatype = 0 },
+	.info = { .name = "vertex_buffer_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INVALID = {
-	.info = { .name = "RHI_RENDER_BUFFER_TYPE_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_BUFFER_TYPE_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4365,7 +4428,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER = {
-	.info = { .name = "RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4373,7 +4436,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER = {
-	.info = { .name = "RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4381,7 +4444,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_type_t_RHI_RENDER_
 };
 
 constexpr type_info_RHI_render_buffer_type_t DEFAULT_RHI_render_buffer_type_t = {
-	.info = { .name = "RHI_render_buffer_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_render_buffer_type_t", .size = 4, .metatype = 8 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_RHI_render_buffer_type_t.member_array,
 	.members = {
@@ -4392,13 +4455,13 @@ constexpr type_info_RHI_render_buffer_type_t DEFAULT_RHI_render_buffer_type_t = 
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_type = {
-	.info = { .name = "type", .size = 4, .metatype = 0 },
+	.info = { .name = "type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_type_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED = {
-	.info = { .name = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_memory_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4406,7 +4469,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY = {
-	.info = { .name = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_memory_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4414,7 +4477,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_memory_type_t_RHI_
 };
 
 constexpr type_info_RHI_render_buffer_memory_type_t DEFAULT_RHI_render_buffer_memory_type_t = {
-	.info = { .name = "RHI_render_buffer_memory_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_render_buffer_memory_type_t", .size = 4, .metatype = 8 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_RHI_render_buffer_memory_type_t.member_array,
 	.members = {
@@ -4424,63 +4487,63 @@ constexpr type_info_RHI_render_buffer_memory_type_t DEFAULT_RHI_render_buffer_me
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_allocation_type = {
-	.info = { .name = "allocation_type", .size = 4, .metatype = 0 },
+	.info = { .name = "allocation_type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_render_buffer_memory_type_t.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_constant_buffer_hash_ID = {
-	.info = { .name = "constant_buffer_hash_ID", .size = 8, .metatype = 0 },
+	.info = { .name = "constant_buffer_hash_ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_ID = {
-	.info = { .name = "buffer_ID", .size = 8, .metatype = 0 },
+	.info = { .name = "buffer_ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_capacity = {
-	.info = { .name = "buffer_capacity", .size = 4, .metatype = 0 },
+	.info = { .name = "buffer_capacity", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 24,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_element_size = {
-	.info = { .name = "buffer_element_size", .size = 4, .metatype = 0 },
+	.info = { .name = "buffer_element_size", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 28,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_elements_used = {
-	.info = { .name = "buffer_elements_used", .size = 4, .metatype = 0 },
+	.info = { .name = "buffer_elements_used", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 32,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_working_offset = {
-	.info = { .name = "working_offset", .size = 4, .metatype = 0 },
+	.info = { .name = "working_offset", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 36,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_mapped_data = {
-	.info = { .name = "mapped_data", .size = 8, .metatype = 0 },
+	.info = { .name = "mapped_data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_byte.info },
 	.type_info = &DEFAULT_byte.info,
 	.offset = 40,
 };
 
-constexpr type_info_backend_buffer_t DEFAULT_backend_buffer_t = { .info = { .name = "backend_buffer_t", .size = 4, .metatype = 0 } };
+constexpr type_info_backend_buffer_t DEFAULT_backend_buffer_t = { .info = { .name = "backend_buffer_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_render_buffer_t_buffer_info = {
-	.info = { .name = "buffer_info", .size = 4, .metatype = 0 },
+	.info = { .name = "buffer_info", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_backend_buffer_t.info,
 	.offset = 48,
 };
 
 constexpr type_info_RHI_render_buffer_t DEFAULT_RHI_render_buffer_t = {
-	.info = { .name = "RHI_render_buffer_t", .size = 56, .metatype = 1 },
+	.info = { .name = "RHI_render_buffer_t", .size = 56, .metatype = 7 },
 	.member_count = 10,
 	.member_pointer = DEFAULT_RHI_render_buffer_t.member_array,
 	.members = {
@@ -4498,43 +4561,43 @@ constexpr type_info_RHI_render_buffer_t DEFAULT_RHI_render_buffer_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_buffer_data = {
-	.info = { .name = "buffer_data", .size = 56, .metatype = 0 },
+	.info = { .name = "buffer_data", .size = 56, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_render_buffer_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_index_data = {
-	.info = { .name = "index_data", .size = 8, .metatype = 0 },
+	.info = { .name = "index_data", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_byte.info },
 	.type_info = &DEFAULT_byte.info,
 	.offset = 56,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_max_indices = {
-	.info = { .name = "max_indices", .size = 4, .metatype = 0 },
+	.info = { .name = "max_indices", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 64,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_index_count = {
-	.info = { .name = "index_count", .size = 4, .metatype = 0 },
+	.info = { .name = "index_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 68,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_index_offset = {
-	.info = { .name = "index_offset", .size = 4, .metatype = 0 },
+	.info = { .name = "index_offset", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 72,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_index_buffer_t_instance_offset = {
-	.info = { .name = "instance_offset", .size = 4, .metatype = 0 },
+	.info = { .name = "instance_offset", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 76,
 };
 
 constexpr type_info_RHI_index_buffer_t DEFAULT_RHI_index_buffer_t = {
-	.info = { .name = "RHI_index_buffer_t", .size = 80, .metatype = 1 },
+	.info = { .name = "RHI_index_buffer_t", .size = 80, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_RHI_index_buffer_t.member_array,
 	.members = {
@@ -4548,37 +4611,37 @@ constexpr type_info_RHI_index_buffer_t DEFAULT_RHI_index_buffer_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_index_buffer = {
-	.info = { .name = "active_index_buffer", .size = 8, .metatype = 0 },
+	.info = { .name = "active_index_buffer", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_index_buffer_t.info },
 	.type_info = &DEFAULT_RHI_index_buffer_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_scissor_command = {
-	.info = { .name = "active_scissor_command", .size = 8, .metatype = 0 },
+	.info = { .name = "active_scissor_command", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_command_t.info },
 	.type_info = &DEFAULT_RHI_command_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_viewport_command = {
-	.info = { .name = "active_viewport_command", .size = 8, .metatype = 0 },
+	.info = { .name = "active_viewport_command", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_command_t.info },
 	.type_info = &DEFAULT_RHI_command_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_shader_program = {
-	.info = { .name = "active_shader_program", .size = 8, .metatype = 0 },
+	.info = { .name = "active_shader_program", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_handle_t.info },
 	.type_info = &DEFAULT_asset_handle_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_ID = {
-	.info = { .name = "ID", .size = 4, .metatype = 0 },
+	.info = { .name = "ID", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Invalid = {
-	.info = { .name = "BMF_Invalid", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_Invalid", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4586,7 +4649,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Invalid = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_R8 = {
-	.info = { .name = "BMF_R8", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_R8", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4594,7 +4657,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_R8 = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_B8 = {
-	.info = { .name = "BMF_B8", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_B8", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4602,7 +4665,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_B8 = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_G8 = {
-	.info = { .name = "BMF_G8", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_G8", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4610,7 +4673,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_G8 = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGBA32_SRGB = {
-	.info = { .name = "BMF_RGBA32_SRGB", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_RGBA32_SRGB", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4618,7 +4681,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGBA32_SRGB = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGBA32_UNORM = {
-	.info = { .name = "BMF_RGBA32_UNORM", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_RGBA32_UNORM", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4626,7 +4689,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGBA32_UNORM = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_BGRA32_UNORM = {
-	.info = { .name = "BMF_BGRA32_UNORM", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_BGRA32_UNORM", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4634,7 +4697,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_BGRA32_UNORM = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGB24_UNORM = {
-	.info = { .name = "BMF_RGB24_UNORM", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_RGB24_UNORM", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4642,7 +4705,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGB24_UNORM = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGB24_SRGB = {
-	.info = { .name = "BMF_RGB24_SRGB", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_RGB24_SRGB", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4650,7 +4713,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_RGB24_SRGB = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D24_SFLOAT_S8 = {
-	.info = { .name = "BMF_D24_SFLOAT_S8", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_D24_SFLOAT_S8", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4658,7 +4721,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D24_SFLOAT_S8 = 
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT_S8_UINT = {
-	.info = { .name = "BMF_D32_SFLOAT_S8_UINT", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_D32_SFLOAT_S8_UINT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4666,7 +4729,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT_S8_UI
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT = {
-	.info = { .name = "BMF_D32_SFLOAT", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_D32_SFLOAT", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4674,7 +4737,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_D32_SFLOAT = {
 };
 
 constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Count = {
-	.info = { .name = "BMF_Count", .size = 0, .metatype = 0 },
+	.info = { .name = "BMF_Count", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4682,7 +4745,7 @@ constexpr type_info_member_t DEFAULT_member_bitmap_format_t_BMF_Count = {
 };
 
 constexpr type_info_bitmap_format_t DEFAULT_bitmap_format_t = {
-	.info = { .name = "bitmap_format_t", .size = 4, .metatype = 2 },
+	.info = { .name = "bitmap_format_t", .size = 4, .metatype = 8 },
 	.member_count = 13,
 	.member_pointer = DEFAULT_bitmap_format_t.member_array,
 	.members = {
@@ -4702,14 +4765,21 @@ constexpr type_info_bitmap_format_t DEFAULT_bitmap_format_t = {
 	},
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_renderpass_key_t_attachment_formats[] = { 10, };
+constexpr type_info_array_t DEFAULT_array_RHI_renderpass_key_t_attachment_formats = {
+	.array_type = &DEFAULT_bitmap_format_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_renderpass_key_t_attachment_formats,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_key_t_attachment_formats = {
-	.info = { .name = "attachment_formats", .size = 40, .metatype = 0 },
+	.info = { .name = "attachment_formats", .size = 40, .metatype = 2, .array = &DEFAULT_array_RHI_renderpass_key_t_attachment_formats },
 	.type_info = &DEFAULT_bitmap_format_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_RHI_renderpass_key_t DEFAULT_RHI_renderpass_key_t = {
-	.info = { .name = "RHI_renderpass_key_t", .size = 40, .metatype = 1 },
+	.info = { .name = "RHI_renderpass_key_t", .size = 40, .metatype = 7 },
 	.member_count = 1,
 	.member_pointer = DEFAULT_RHI_renderpass_key_t.member_array,
 	.members = {
@@ -4718,37 +4788,37 @@ constexpr type_info_RHI_renderpass_key_t DEFAULT_RHI_renderpass_key_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_renderpass_key = {
-	.info = { .name = "renderpass_key", .size = 40, .metatype = 0 },
+	.info = { .name = "renderpass_key", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_renderpass_key_t.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_render_width = {
-	.info = { .name = "render_width", .size = 4, .metatype = 0 },
+	.info = { .name = "render_width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_render_height = {
-	.info = { .name = "render_height", .size = 4, .metatype = 0 },
+	.info = { .name = "render_height", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_color_attachment_count = {
-	.info = { .name = "color_attachment_count", .size = 4, .metatype = 0 },
+	.info = { .name = "color_attachment_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_resize_with_window = {
-	.info = { .name = "resize_with_window", .size = 1, .metatype = 0 },
+	.info = { .name = "resize_with_window", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 12,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID = {
-	.info = { .name = "RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4756,7 +4826,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_R
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4764,7 +4834,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_R
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4772,7 +4842,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_R
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4780,7 +4850,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_access_t_R
 };
 
 constexpr type_info_RHI_renderpass_attachment_access_t DEFAULT_RHI_renderpass_attachment_access_t = {
-	.info = { .name = "RHI_renderpass_attachment_access_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_renderpass_attachment_access_t", .size = 4, .metatype = 8 },
 	.member_count = 4,
 	.member_pointer = DEFAULT_RHI_renderpass_attachment_access_t.member_array,
 	.members = {
@@ -4792,13 +4862,13 @@ constexpr type_info_RHI_renderpass_attachment_access_t DEFAULT_RHI_renderpass_at
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_access = {
-	.info = { .name = "access", .size = 4, .metatype = 0 },
+	.info = { .name = "access", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_access_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4806,7 +4876,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_opera
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4814,7 +4884,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_opera
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_operation_t_RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4822,7 +4892,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_load_opera
 };
 
 constexpr type_info_RHI_renderpass_attachment_load_operation_t DEFAULT_RHI_renderpass_attachment_load_operation_t = {
-	.info = { .name = "RHI_renderpass_attachment_load_operation_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_renderpass_attachment_load_operation_t", .size = 4, .metatype = 8 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_RHI_renderpass_attachment_load_operation_t.member_array,
 	.members = {
@@ -4833,13 +4903,13 @@ constexpr type_info_RHI_renderpass_attachment_load_operation_t DEFAULT_RHI_rende
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_load_operation = {
-	.info = { .name = "load_operation", .size = 4, .metatype = 0 },
+	.info = { .name = "load_operation", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_load_operation_t.info,
 	.offset = 4,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4847,7 +4917,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_oper
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4855,7 +4925,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_oper
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_operation_t_RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE = {
-	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -4863,7 +4933,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_store_oper
 };
 
 constexpr type_info_RHI_renderpass_attachment_store_operation_t DEFAULT_RHI_renderpass_attachment_store_operation_t = {
-	.info = { .name = "RHI_renderpass_attachment_store_operation_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_renderpass_attachment_store_operation_t", .size = 4, .metatype = 8 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_RHI_renderpass_attachment_store_operation_t.member_array,
 	.members = {
@@ -4874,61 +4944,68 @@ constexpr type_info_RHI_renderpass_attachment_store_operation_t DEFAULT_RHI_rend
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_store_operation = {
-	.info = { .name = "store_operation", .size = 4, .metatype = 0 },
+	.info = { .name = "store_operation", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_store_operation_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_image = {
-	.info = { .name = "image", .size = 8, .metatype = 0 },
+	.info = { .name = "image", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_image_t.info },
 	.type_info = &DEFAULT_RHI_image_t.info,
 	.offset = 16,
 };
 
 constexpr type_info_float4 DEFAULT_float4 = {
-	.info = { .name = "float4", .size = 1, .metatype = 1 },
+	.info = { .name = "float4", .size = 1, .metatype = 7 },
 	.member_count = 0,
 	.member_pointer = nullptr,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_float_color = {
-	.info = { .name = "float_color", .size = 1, .metatype = 0 },
+	.info = { .name = "float_color", .size = 1, .metatype = 7 },
 	.type_info = &DEFAULT_float4.info,
 	.offset = 0,
 };
 
 constexpr type_info_ivec4_t DEFAULT_ivec4_t = {
-	.info = { .name = "ivec4_t", .size = 1, .metatype = 1 },
+	.info = { .name = "ivec4_t", .size = 1, .metatype = 7 },
 	.member_count = 0,
 	.member_pointer = nullptr,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_int_color = {
-	.info = { .name = "int_color", .size = 1, .metatype = 0 },
+	.info = { .name = "int_color", .size = 1, .metatype = 7 },
 	.type_info = &DEFAULT_ivec4_t.info,
 	.offset = 0,
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_clear_value_t_uint_color[] = { 4, };
+constexpr type_info_array_t DEFAULT_array_RHI_clear_value_t_uint_color = {
+	.array_type = &DEFAULT_u32.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_clear_value_t_uint_color,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_uint_color = {
-	.info = { .name = "uint_color", .size = 16, .metatype = 0 },
+	.info = { .name = "uint_color", .size = 16, .metatype = 2, .array = &DEFAULT_array_RHI_clear_value_t_uint_color },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_depth = {
-	.info = { .name = "depth", .size = 4, .metatype = 0 },
+	.info = { .name = "depth", .size = 4, .metatype = 4 },
 	.type_info = &DEFAULT_float32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_clear_value_t_stencil = {
-	.info = { .name = "stencil", .size = 4, .metatype = 0 },
+	.info = { .name = "stencil", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 4,
 };
 
 constexpr type_info_RHI_clear_value_t DEFAULT_RHI_clear_value_t = {
-	.info = { .name = "RHI_clear_value_t", .size = 16, .metatype = 1 },
+	.info = { .name = "RHI_clear_value_t", .size = 16, .metatype = 7 },
 	.member_count = 5,
 	.member_pointer = DEFAULT_RHI_clear_value_t.member_array,
 	.members = {
@@ -4941,13 +5018,13 @@ constexpr type_info_RHI_clear_value_t DEFAULT_RHI_clear_value_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_attachment_t_clear_value = {
-	.info = { .name = "clear_value", .size = 16, .metatype = 0 },
+	.info = { .name = "clear_value", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_clear_value_t.info,
 	.offset = 24,
 };
 
 constexpr type_info_RHI_renderpass_attachment_t DEFAULT_RHI_renderpass_attachment_t = {
-	.info = { .name = "RHI_renderpass_attachment_t", .size = 40, .metatype = 1 },
+	.info = { .name = "RHI_renderpass_attachment_t", .size = 40, .metatype = 7 },
 	.member_count = 5,
 	.member_pointer = DEFAULT_RHI_renderpass_attachment_t.member_array,
 	.members = {
@@ -4959,20 +5036,27 @@ constexpr type_info_RHI_renderpass_attachment_t DEFAULT_RHI_renderpass_attachmen
 	},
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_renderpass_desc_t_color_attachments[] = { 10, };
+constexpr type_info_array_t DEFAULT_array_RHI_renderpass_desc_t_color_attachments = {
+	.array_type = &DEFAULT_RHI_renderpass_attachment_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_renderpass_desc_t_color_attachments,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_color_attachments = {
-	.info = { .name = "color_attachments", .size = 400, .metatype = 0 },
+	.info = { .name = "color_attachments", .size = 400, .metatype = 2, .array = &DEFAULT_array_RHI_renderpass_desc_t_color_attachments },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_desc_t_depth_stencil_attachment = {
-	.info = { .name = "depth_stencil_attachment", .size = 40, .metatype = 0 },
+	.info = { .name = "depth_stencil_attachment", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
 	.offset = 416,
 };
 
 constexpr type_info_RHI_renderpass_desc_t DEFAULT_RHI_renderpass_desc_t = {
-	.info = { .name = "RHI_renderpass_desc_t", .size = 456, .metatype = 1 },
+	.info = { .name = "RHI_renderpass_desc_t", .size = 456, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_RHI_renderpass_desc_t.member_array,
 	.members = {
@@ -4986,83 +5070,97 @@ constexpr type_info_RHI_renderpass_desc_t DEFAULT_RHI_renderpass_desc_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_create_info = {
-	.info = { .name = "create_info", .size = 456, .metatype = 0 },
+	.info = { .name = "create_info", .size = 456, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_renderpass_desc_t.info,
 	.offset = 48,
 };
 
-constexpr type_info_backend_renderpass_handle_t DEFAULT_backend_renderpass_handle_t = { .info = { .name = "backend_renderpass_handle_t", .size = 4, .metatype = 0 } };
+constexpr type_info_backend_renderpass_handle_t DEFAULT_backend_renderpass_handle_t = { .info = { .name = "backend_renderpass_handle_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_renderpass_handle = {
-	.info = { .name = "renderpass_handle", .size = 4, .metatype = 0 },
+	.info = { .name = "renderpass_handle", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_backend_renderpass_handle_t.info,
 	.offset = 504,
 };
 
-constexpr type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_handle_t = { .info = { .name = "backend_framebuffer_handle_t", .size = 4, .metatype = 0 } };
+constexpr type_info_backend_framebuffer_handle_t DEFAULT_backend_framebuffer_handle_t = { .info = { .name = "backend_framebuffer_handle_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_framebuffer_handle = {
-	.info = { .name = "framebuffer_handle", .size = 4, .metatype = 0 },
+	.info = { .name = "framebuffer_handle", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_backend_framebuffer_handle_t.info,
 	.offset = 508,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_depth_stencil_attachment = {
-	.info = { .name = "depth_stencil_attachment", .size = 40, .metatype = 0 },
+	.info = { .name = "depth_stencil_attachment", .size = 40, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
 	.offset = 512,
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_renderpass_t_color_attachments[] = { 10, };
+constexpr type_info_array_t DEFAULT_array_RHI_renderpass_t_color_attachments = {
+	.array_type = &DEFAULT_RHI_renderpass_attachment_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_renderpass_t_color_attachments,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_color_attachments = {
-	.info = { .name = "color_attachments", .size = 400, .metatype = 0 },
+	.info = { .name = "color_attachments", .size = 400, .metatype = 2, .array = &DEFAULT_array_RHI_renderpass_t_color_attachments },
 	.type_info = &DEFAULT_RHI_renderpass_attachment_t.info,
 	.offset = 552,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_color_attachment_count = {
-	.info = { .name = "color_attachment_count", .size = 4, .metatype = 0 },
+	.info = { .name = "color_attachment_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 952,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_total_attachment_count = {
-	.info = { .name = "total_attachment_count", .size = 4, .metatype = 0 },
+	.info = { .name = "total_attachment_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 956,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_render_width = {
-	.info = { .name = "render_width", .size = 4, .metatype = 0 },
+	.info = { .name = "render_width", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 960,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_render_height = {
-	.info = { .name = "render_height", .size = 4, .metatype = 0 },
+	.info = { .name = "render_height", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 964,
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_renderpass_t_attachment_clear_values[] = { 10, };
+constexpr type_info_array_t DEFAULT_array_RHI_renderpass_t_attachment_clear_values = {
+	.array_type = &DEFAULT_RHI_clear_value_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_renderpass_t_attachment_clear_values,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_attachment_clear_values = {
-	.info = { .name = "attachment_clear_values", .size = 160, .metatype = 0 },
+	.info = { .name = "attachment_clear_values", .size = 160, .metatype = 2, .array = &DEFAULT_array_RHI_renderpass_t_attachment_clear_values },
 	.type_info = &DEFAULT_RHI_clear_value_t.info,
 	.offset = 968,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_has_depth_stencil_attachment = {
-	.info = { .name = "has_depth_stencil_attachment", .size = 1, .metatype = 0 },
+	.info = { .name = "has_depth_stencil_attachment", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 1128,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_renderpass_t_resize_with_window = {
-	.info = { .name = "resize_with_window", .size = 1, .metatype = 0 },
+	.info = { .name = "resize_with_window", .size = 1, .metatype = 3 },
 	.type_info = &DEFAULT_bool8.info,
 	.offset = 1129,
 };
 
 constexpr type_info_RHI_renderpass_t DEFAULT_RHI_renderpass_t = {
-	.info = { .name = "RHI_renderpass_t", .size = 1136, .metatype = 1 },
+	.info = { .name = "RHI_renderpass_t", .size = 1136, .metatype = 7 },
 	.member_count = 14,
 	.member_pointer = DEFAULT_RHI_renderpass_t.member_array,
 	.members = {
@@ -5084,43 +5182,57 @@ constexpr type_info_RHI_renderpass_t DEFAULT_RHI_renderpass_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_active_renderpass = {
-	.info = { .name = "active_renderpass", .size = 8, .metatype = 0 },
+	.info = { .name = "active_renderpass", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_renderpass_t.info },
 	.type_info = &DEFAULT_RHI_renderpass_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_presenting = {
-	.info = { .name = "presenting", .size = 4, .metatype = 0 },
+	.info = { .name = "presenting", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_bool32.info,
 	.offset = 0,
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_command_list_t_image_shader_params[] = { 16, };
+constexpr type_info_array_t DEFAULT_array_RHI_command_list_t_image_shader_params = {
+	.array_type = &DEFAULT_RHI_image_t.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_command_list_t_image_shader_params,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_image_shader_params = {
-	.info = { .name = "image_shader_params", .size = 128, .metatype = 0 },
+	.info = { .name = "image_shader_params", .size = 128, .metatype = 2, .array = &DEFAULT_array_RHI_command_list_t_image_shader_params },
 	.type_info = &DEFAULT_RHI_image_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_image_count = {
-	.info = { .name = "image_count", .size = 4, .metatype = 0 },
+	.info = { .name = "image_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
+constexpr unsigned long DEFAULT_dimensions_RHI_command_list_t_image_ids_to_bind[] = { 16, };
+constexpr type_info_array_t DEFAULT_array_RHI_command_list_t_image_ids_to_bind = {
+	.array_type = &DEFAULT_u32.info,
+	.dimension_count = 1,
+	.dimensions = DEFAULT_dimensions_RHI_command_list_t_image_ids_to_bind,
+};
+
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_image_ids_to_bind = {
-	.info = { .name = "image_ids_to_bind", .size = 64, .metatype = 0 },
+	.info = { .name = "image_ids_to_bind", .size = 64, .metatype = 2, .array = &DEFAULT_array_RHI_command_list_t_image_ids_to_bind },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_bound_image_count = {
-	.info = { .name = "bound_image_count", .size = 4, .metatype = 0 },
+	.info = { .name = "bound_image_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS = {
-	.info = { .name = "RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_list_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -5128,7 +5240,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_C
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE = {
-	.info = { .name = "RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE", .size = 0, .metatype = 0 },
+	.info = { .name = "RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_list_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -5136,7 +5248,7 @@ constexpr type_info_member_t DEFAULT_member_RHI_command_list_type_t_RHI_RENDER_C
 };
 
 constexpr type_info_RHI_command_list_type_t DEFAULT_RHI_command_list_type_t = {
-	.info = { .name = "RHI_command_list_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "RHI_command_list_type_t", .size = 4, .metatype = 8 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_RHI_command_list_type_t.member_array,
 	.members = {
@@ -5146,21 +5258,21 @@ constexpr type_info_RHI_command_list_type_t DEFAULT_RHI_command_list_type_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_command_list_type = {
-	.info = { .name = "command_list_type", .size = 4, .metatype = 0 },
+	.info = { .name = "command_list_type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_RHI_command_list_type_t.info,
 	.offset = 0,
 };
 
-constexpr type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t = { .info = { .name = "backend_command_buffer_t", .size = 4, .metatype = 0 } };
+constexpr type_info_backend_command_buffer_t DEFAULT_backend_command_buffer_t = { .info = { .name = "backend_command_buffer_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_list_t_backend_command_buffer = {
-	.info = { .name = "backend_command_buffer", .size = 4, .metatype = 0 },
+	.info = { .name = "backend_command_buffer", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_backend_command_buffer_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_RHI_command_list_t DEFAULT_RHI_command_list_t = {
-	.info = { .name = "RHI_command_list_t", .size = 1, .metatype = 1 },
+	.info = { .name = "RHI_command_list_t", .size = 1, .metatype = 7 },
 	.member_count = 25,
 	.member_pointer = DEFAULT_RHI_command_list_t.member_array,
 	.members = {
@@ -5193,91 +5305,91 @@ constexpr type_info_RHI_command_list_t DEFAULT_RHI_command_list_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_command_lists = {
-	.info = { .name = "command_lists", .size = 8, .metatype = 0 },
+	.info = { .name = "command_lists", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_command_list_t.info },
 	.type_info = &DEFAULT_RHI_command_list_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_command_list_count = {
-	.info = { .name = "command_list_count", .size = 4, .metatype = 0 },
+	.info = { .name = "command_list_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_constant_buffer_hash = {
-	.info = { .name = "constant_buffer_hash", .size = 0, .metatype = 0 },
+	.info = { .name = "constant_buffer_hash", .size = 0, .metatype = 7 },
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_used_constant_buffers = {
-	.info = { .name = "used_constant_buffers", .size = 4, .metatype = 0 },
+	.info = { .name = "used_constant_buffers", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_render_instances = {
-	.info = { .name = "total_render_instances", .size = 4, .metatype = 0 },
+	.info = { .name = "total_render_instances", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_materials = {
-	.info = { .name = "total_materials", .size = 4, .metatype = 0 },
+	.info = { .name = "total_materials", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_shaders = {
-	.info = { .name = "total_shaders", .size = 4, .metatype = 0 },
+	.info = { .name = "total_shaders", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_total_buffers = {
-	.info = { .name = "total_buffers", .size = 4, .metatype = 0 },
+	.info = { .name = "total_buffers", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_window_size = {
-	.info = { .name = "window_size", .size = 8, .metatype = 0 },
+	.info = { .name = "window_size", .size = 8, .metatype = 7 },
 	.type_info = &DEFAULT_float2.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_current_window_size_generation = {
-	.info = { .name = "current_window_size_generation", .size = 4, .metatype = 0 },
+	.info = { .name = "current_window_size_generation", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_last_window_size_generation = {
-	.info = { .name = "last_window_size_generation", .size = 4, .metatype = 0 },
+	.info = { .name = "last_window_size_generation", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_renderpasses = {
-	.info = { .name = "renderpasses", .size = 0, .metatype = 0 },
+	.info = { .name = "renderpasses", .size = 0, .metatype = 7 },
 	.offset = 0,
 	.value_type = 2,
 	.value = { .int64_value = 100 },
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_renderpass_count = {
-	.info = { .name = "renderpass_count", .size = 4, .metatype = 0 },
+	.info = { .name = "renderpass_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_command_present_frame_t_presentation_source = {
-	.info = { .name = "presentation_source", .size = 8, .metatype = 0 },
+	.info = { .name = "presentation_source", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_image_t.info },
 	.type_info = &DEFAULT_RHI_image_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_RHI_command_present_frame_t DEFAULT_RHI_command_present_frame_t = {
-	.info = { .name = "RHI_command_present_frame_t", .size = 8, .metatype = 1 },
+	.info = { .name = "RHI_command_present_frame_t", .size = 8, .metatype = 7 },
 	.member_count = 1,
 	.member_pointer = DEFAULT_RHI_command_present_frame_t.member_array,
 	.members = {
@@ -5286,13 +5398,13 @@ constexpr type_info_RHI_command_present_frame_t DEFAULT_RHI_command_present_fram
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_context_t_present_command = {
-	.info = { .name = "present_command", .size = 8, .metatype = 0 },
+	.info = { .name = "present_command", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_command_present_frame_t.info },
 	.type_info = &DEFAULT_RHI_command_present_frame_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_RHI_context_t DEFAULT_RHI_context_t = {
-	.info = { .name = "RHI_context_t", .size = 1, .metatype = 1 },
+	.info = { .name = "RHI_context_t", .size = 1, .metatype = 7 },
 	.member_count = 18,
 	.member_pointer = DEFAULT_RHI_context_t.member_array,
 	.members = {
@@ -5318,13 +5430,13 @@ constexpr type_info_RHI_context_t DEFAULT_RHI_context_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_manager_t_RHI_context = {
-	.info = { .name = "RHI_context", .size = 8, .metatype = 0 },
+	.info = { .name = "RHI_context", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_context_t.info },
 	.type_info = &DEFAULT_RHI_context_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_asset_manager_t DEFAULT_asset_manager_t = {
-	.info = { .name = "asset_manager_t", .size = 1, .metatype = 1 },
+	.info = { .name = "asset_manager_t", .size = 1, .metatype = 7 },
 	.member_count = 20,
 	.member_pointer = DEFAULT_asset_manager_t.member_array,
 	.members = {
@@ -5352,37 +5464,37 @@ constexpr type_info_asset_manager_t DEFAULT_asset_manager_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_asset_manager = {
-	.info = { .name = "asset_manager", .size = 8, .metatype = 0 },
+	.info = { .name = "asset_manager", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_manager_t.info },
 	.type_info = &DEFAULT_asset_manager_t.info,
 	.offset = 128,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_catalog = {
-	.info = { .name = "catalog", .size = 8, .metatype = 0 },
+	.info = { .name = "catalog", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_catalog_t.info },
 	.type_info = &DEFAULT_asset_catalog_t.info,
 	.offset = 136,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_package_generation = {
-	.info = { .name = "package_generation", .size = 4, .metatype = 0 },
+	.info = { .name = "package_generation", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_volatile_u32.info,
 	.offset = 144,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_loaded_asset_index = {
-	.info = { .name = "loaded_asset_index", .size = 4, .metatype = 0 },
+	.info = { .name = "loaded_asset_index", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_volatile_u32.info,
 	.offset = 148,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_slot_t_owner_asset_file_index = {
-	.info = { .name = "owner_asset_file_index", .size = 4, .metatype = 0 },
+	.info = { .name = "owner_asset_file_index", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_s32.info,
 	.offset = 152,
 };
 
 constexpr type_info_asset_slot_t DEFAULT_asset_slot_t = {
-	.info = { .name = "asset_slot_t", .size = 160, .metatype = 1 },
+	.info = { .name = "asset_slot_t", .size = 160, .metatype = 7 },
 	.member_count = 13,
 	.member_pointer = DEFAULT_asset_slot_t.member_array,
 	.members = {
@@ -5403,33 +5515,33 @@ constexpr type_info_asset_slot_t DEFAULT_asset_slot_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_handle_t_slot = {
-	.info = { .name = "slot", .size = 8, .metatype = 0 },
+	.info = { .name = "slot", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_asset_slot_t.info },
 	.type_info = &DEFAULT_asset_slot_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_handle_t_texture = {
-	.info = { .name = "texture", .size = 8, .metatype = 0 },
+	.info = { .name = "texture", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_texture2D_t.info },
 	.type_info = &DEFAULT_texture2D_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_RHI_shader_t_ID = {
-	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.info = { .name = "ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 0,
 };
 
-constexpr type_info_backend_shader_t DEFAULT_backend_shader_t = { .info = { .name = "backend_shader_t", .size = 4, .metatype = 0 } };
+constexpr type_info_backend_shader_t DEFAULT_backend_shader_t = { .info = { .name = "backend_shader_t", .size = 4, .metatype = 3 } };
 
 constexpr type_info_member_t DEFAULT_member_RHI_shader_t_shader_data = {
-	.info = { .name = "shader_data", .size = 4, .metatype = 0 },
+	.info = { .name = "shader_data", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_backend_shader_t.info,
 	.offset = 8,
 };
 
 constexpr type_info_RHI_shader_t DEFAULT_RHI_shader_t = {
-	.info = { .name = "RHI_shader_t", .size = 16, .metatype = 1 },
+	.info = { .name = "RHI_shader_t", .size = 16, .metatype = 7 },
 	.member_count = 2,
 	.member_pointer = DEFAULT_RHI_shader_t.member_array,
 	.members = {
@@ -5439,13 +5551,13 @@ constexpr type_info_RHI_shader_t DEFAULT_RHI_shader_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_handle_t_shader = {
-	.info = { .name = "shader", .size = 8, .metatype = 0 },
+	.info = { .name = "shader", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_RHI_shader_t.info },
 	.type_info = &DEFAULT_RHI_shader_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Invalid = {
-	.info = { .name = "SMT_Invalid", .size = 0, .metatype = 0 },
+	.info = { .name = "SMT_Invalid", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_stored_material_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -5453,7 +5565,7 @@ constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Invalid =
 };
 
 constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Instance = {
-	.info = { .name = "SMT_Instance", .size = 0, .metatype = 0 },
+	.info = { .name = "SMT_Instance", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_stored_material_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -5461,7 +5573,7 @@ constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Instance 
 };
 
 constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Archetype = {
-	.info = { .name = "SMT_Archetype", .size = 0, .metatype = 0 },
+	.info = { .name = "SMT_Archetype", .size = 0, .metatype = 8 },
 	.type_info = &DEFAULT_stored_material_type_t.info,
 	.offset = 0,
 	.value_type = 3,
@@ -5469,7 +5581,7 @@ constexpr type_info_member_t DEFAULT_member_stored_material_type_t_SMT_Archetype
 };
 
 constexpr type_info_stored_material_type_t DEFAULT_stored_material_type_t = {
-	.info = { .name = "stored_material_type_t", .size = 4, .metatype = 2 },
+	.info = { .name = "stored_material_type_t", .size = 4, .metatype = 8 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_stored_material_type_t.member_array,
 	.members = {
@@ -5480,61 +5592,61 @@ constexpr type_info_stored_material_type_t DEFAULT_stored_material_type_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_material_data_t_material_type = {
-	.info = { .name = "material_type", .size = 4, .metatype = 0 },
+	.info = { .name = "material_type", .size = 4, .metatype = 8 },
 	.type_info = &DEFAULT_stored_material_type_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_data_t_archetype = {
-	.info = { .name = "archetype", .size = 184, .metatype = 0 },
+	.info = { .name = "archetype", .size = 184, .metatype = 7 },
 	.type_info = &DEFAULT_material_archetype_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_ID = {
-	.info = { .name = "ID", .size = 8, .metatype = 0 },
+	.info = { .name = "ID", .size = 8, .metatype = 3 },
 	.type_info = &DEFAULT_u64.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_version = {
-	.info = { .name = "version", .size = 4, .metatype = 0 },
+	.info = { .name = "version", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 8,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_name = {
-	.info = { .name = "name", .size = 16, .metatype = 0 },
+	.info = { .name = "name", .size = 16, .metatype = 7 },
 	.type_info = &DEFAULT_string_t.info,
 	.offset = 16,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_renderer_effect_flags = {
-	.info = { .name = "renderer_effect_flags", .size = 4, .metatype = 0 },
+	.info = { .name = "renderer_effect_flags", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 32,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_shader_uniform_count = {
-	.info = { .name = "shader_uniform_count", .size = 4, .metatype = 0 },
+	.info = { .name = "shader_uniform_count", .size = 4, .metatype = 3 },
 	.type_info = &DEFAULT_u32.info,
 	.offset = 36,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_pipeline_state = {
-	.info = { .name = "pipeline_state", .size = 60, .metatype = 0 },
+	.info = { .name = "pipeline_state", .size = 60, .metatype = 7 },
 	.type_info = &DEFAULT_RHI_pipeline_state_t.info,
 	.offset = 40,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_instance_t_archetype = {
-	.info = { .name = "archetype", .size = 8, .metatype = 0 },
+	.info = { .name = "archetype", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_material_archetype_t.info },
 	.type_info = &DEFAULT_material_archetype_t.info,
 	.offset = 104,
 };
 
 constexpr type_info_material_instance_t DEFAULT_material_instance_t = {
-	.info = { .name = "material_instance_t", .size = 112, .metatype = 1 },
+	.info = { .name = "material_instance_t", .size = 112, .metatype = 7 },
 	.member_count = 7,
 	.member_pointer = DEFAULT_material_instance_t.member_array,
 	.members = {
@@ -5549,13 +5661,13 @@ constexpr type_info_material_instance_t DEFAULT_material_instance_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_material_data_t_instance = {
-	.info = { .name = "instance", .size = 112, .metatype = 0 },
+	.info = { .name = "instance", .size = 112, .metatype = 7 },
 	.type_info = &DEFAULT_material_instance_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_material_data_t DEFAULT_material_data_t = {
-	.info = { .name = "material_data_t", .size = 192, .metatype = 1 },
+	.info = { .name = "material_data_t", .size = 192, .metatype = 7 },
 	.member_count = 3,
 	.member_pointer = DEFAULT_material_data_t.member_array,
 	.members = {
@@ -5566,19 +5678,19 @@ constexpr type_info_material_data_t DEFAULT_material_data_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_handle_t_material_info = {
-	.info = { .name = "material_info", .size = 8, .metatype = 0 },
+	.info = { .name = "material_info", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_material_data_t.info },
 	.type_info = &DEFAULT_material_data_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_member_t DEFAULT_member_asset_handle_t_dynamic_render_font = {
-	.info = { .name = "dynamic_render_font", .size = 8, .metatype = 0 },
+	.info = { .name = "dynamic_render_font", .size = 8, .metatype = 1, .pointer_to = &DEFAULT_dynamic_render_font_t.info },
 	.type_info = &DEFAULT_dynamic_render_font_t.info,
 	.offset = 0,
 };
 
 constexpr type_info_asset_handle_t DEFAULT_asset_handle_t = {
-	.info = { .name = "asset_handle_t", .size = 24, .metatype = 1 },
+	.info = { .name = "asset_handle_t", .size = 24, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_asset_handle_t.member_array,
 	.members = {
@@ -5592,19 +5704,19 @@ constexpr type_info_asset_handle_t DEFAULT_asset_handle_t = {
 };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_shader_handle = {
-	.info = { .name = "shader_handle", .size = 24, .metatype = 0 },
+	.info = { .name = "shader_handle", .size = 24, .metatype = 7 },
 	.type_info = &DEFAULT_asset_handle_t.info,
 	.offset = 48,
 };
 
 constexpr type_info_member_t DEFAULT_member_material_archetype_t_base_instance = {
-	.info = { .name = "base_instance", .size = 112, .metatype = 0 },
+	.info = { .name = "base_instance", .size = 112, .metatype = 7 },
 	.type_info = &DEFAULT_material_instance_t.info,
 	.offset = 72,
 };
 
 constexpr type_info_material_archetype_t DEFAULT_material_archetype_t = {
-	.info = { .name = "material_archetype_t", .size = 184, .metatype = 1 },
+	.info = { .name = "material_archetype_t", .size = 184, .metatype = 7 },
 	.member_count = 6,
 	.member_pointer = DEFAULT_material_archetype_t.member_array,
 	.members = {

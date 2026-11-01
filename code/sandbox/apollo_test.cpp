@@ -8,6 +8,7 @@
 
 #define APOLLO_IMPLEMENTATION 1
 #include "../code_generator/apollo/apollo.h"
+#include "../code_generator/apollo/apollo_runtime.h"
 
 static apollo_hash_table_t<string_t, bool8, 2048> dictionary_table;
 static apollo_hash_table_t<string_t, bool8, 2048> definition_table;
@@ -42,6 +43,34 @@ unwrap_type(CXType type)
     }
 
     return(type);
+}
+
+internal_api s32
+get_metatype(CXType type)
+{
+    switch(clang_getCanonicalType(type).kind)
+    {
+        case CXType_Void:              return(APOLLO_METATYPE_VOID);
+        case CXType_Bool:              return(APOLLO_METATYPE_BOOL);
+
+        case CXType_Float:
+        case CXType_Double:
+        case CXType_LongDouble:        return(APOLLO_METATYPE_FLOAT);
+
+        case CXType_Pointer:
+        case CXType_LValueReference:
+        case CXType_RValueReference:   return(APOLLO_METATYPE_POINTER);
+
+        case CXType_ConstantArray:
+        case CXType_IncompleteArray:   return(APOLLO_METATYPE_ARRAY);
+
+        case CXType_Record:            return(APOLLO_METATYPE_STRUCTURE);
+        case CXType_Enum:              return(APOLLO_METATYPE_ENUM);
+
+        case CXType_FunctionProto:
+        case CXType_FunctionNoProto:   return(APOLLO_METATYPE_PROCEDURE);
+        default:                       return(APOLLO_METATYPE_INTEGER);
+    }
 }
 
 // NOTE(Sleepster): Keep the spelling the source used, but drop pointer/array
@@ -341,15 +370,47 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                     create_declaration_type_data(declarations, member_typename);
 
                     code_decl_t *member_type = Apollo::get_declaration_info(member_typename);
+                    string_t member_type_identifier = {};
+                    if(member_type)
+                    {
+                        member_type_identifier = get_type_identifier(member_type);
+                    }
                     s32 member_size = member.size < 0 ? 0 : member.size;
 
-                    c_string_builder_sprintf(&definition_builder, "constexpr type_info_member_t DEFAULT_member_%.*s_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d },\n",
+                    if(member.array_info.dimension_count > 0 && member_type)
+                    {
+                        c_string_builder_sprintf(&definition_builder, "constexpr unsigned long DEFAULT_dimensions_%.*s_%.*s[] = {",
+                                                 fprint_string(identifier), fprint_string(member.identifier));
+                        for(code_decl_array_info_t *dimension = member.array_info.first_dimension;
+                            dimension;
+                            dimension = dimension->next_dimension)
+                        {
+                            c_string_builder_sprintf(&definition_builder, " %d,", dimension->array_size);
+                        }
+                        c_string_builder_sprintf(&definition_builder, " };\n");
+                        c_string_builder_sprintf(&definition_builder, "constexpr type_info_array_t DEFAULT_array_%.*s_%.*s = {\n\t.array_type = &DEFAULT_%.*s.info,\n\t.dimension_count = %d,\n\t.dimensions = DEFAULT_dimensions_%.*s_%.*s,\n};\n\n",
+                                                 fprint_string(identifier), fprint_string(member.identifier),
+                                                 fprint_string(member_type_identifier), member.array_info.dimension_count,
+                                                 fprint_string(identifier), fprint_string(member.identifier));
+                    }
+
+                    c_string_builder_sprintf(&definition_builder, "constexpr type_info_member_t DEFAULT_member_%.*s_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d",
                                              fprint_string(identifier), fprint_string(member.identifier),
-                                             fprint_string(member.identifier), member_size, member.metatype);
+                                             fprint_string(member.identifier), member_size, get_metatype(member.code_type));
+                    if(member.pointer_depth > 0 && member_type)
+                    {
+                        c_string_builder_sprintf(&definition_builder, ", .pointer_to = &DEFAULT_%.*s.info",
+                                                 fprint_string(member_type_identifier));
+                    }
+                    if(member.array_info.dimension_count > 0 && member_type)
+                    {
+                        c_string_builder_sprintf(&definition_builder, ", .array = &DEFAULT_array_%.*s_%.*s",
+                                                 fprint_string(identifier), fprint_string(member.identifier));
+                    }
+                    c_string_builder_sprintf(&definition_builder, " },\n");
 
                     if(member_type)
                     {
-                        string_t member_type_identifier = get_type_identifier(member_type);
                         c_string_builder_sprintf(&definition_builder, "\t.type_info = &DEFAULT_%.*s.info,\n",
                                                  fprint_string(member_type_identifier));
                     }
@@ -401,7 +462,7 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
 
                 c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d },\n\t.%s = %d,\n",
                                          fprint_string(identifier), fprint_string(identifier),
-                                         fprint_string(identifier), size, type_declaration->metatype,
+                                         fprint_string(identifier), size, get_metatype(type_declaration->code_type),
                                          member_count_name, member_count);
 
                 if(member_count > 0)
@@ -431,7 +492,7 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
             {
                 c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = { .info = { .name = \"%.*s\", .size = %d, .metatype = %d } };\n\n",
                                          fprint_string(identifier), fprint_string(identifier),
-                                         fprint_string(identifier), size, type_declaration->metatype);
+                                         fprint_string(identifier), size, get_metatype(type_declaration->code_type));
             }
 
             c_string_builder_sprintf(&type_table_builder, "\t&DEFAULT_%.*s.info,\n", fprint_string(identifier));

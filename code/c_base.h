@@ -291,14 +291,14 @@ template <typename T> struct remove_value_reference_t<const volatile T>     { us
 
 template <typename T>
 internal_api constexpr T&&
-c_forward(typename remove_value_reference_t<T>::type &value)
+c_forward(typename remove_value_reference_t<T>::internal_type &value)
 {
     return((T&&)value);
 }
 
 template <typename T> 
 T&&
-c_forward(typename remove_value_reference_t<T>::type &&value)
+c_forward(typename remove_value_reference_t<T>::internal_type &&value)
 {
     return((T&&)value);
 }

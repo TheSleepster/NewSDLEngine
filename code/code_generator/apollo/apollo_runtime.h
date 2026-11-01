@@ -36,11 +36,22 @@ enum metatype_t
     APOLLO_METATYPE_PROCEDURE,
 };
 
+struct type_info_array_t;
+
 struct type_info_t
 {
-    const char    *name;
-    const unsigned long size;
-    const unsigned long metatype;
+    const char              *name;
+    const unsigned long      size;
+    const unsigned long      metatype;
+    const type_info_t       *pointer_to;
+    const type_info_array_t *array;
+};
+
+struct type_info_array_t
+{
+    const type_info_t   *array_type;
+    const unsigned long  dimension_count;
+    const unsigned long *dimensions;
 };
 
 struct type_info_member_t
