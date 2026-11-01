@@ -73,6 +73,35 @@ get_metatype(CXType type)
     }
 }
 
+internal_api bool8
+get_is_signed(CXType type)
+{
+    type = clang_getCanonicalType(type);
+    if(type.kind == CXType_Enum)
+    {
+        return(get_is_signed(clang_getEnumDeclIntegerType(clang_getTypeDeclaration(type))));
+    }
+
+    switch(type.kind)
+    {
+        case CXType_Bool:
+        case CXType_Char_S:
+        case CXType_Char16:
+        case CXType_Char32:
+        case CXType_SChar:
+        case CXType_WChar:
+        case CXType_Short:
+        case CXType_Int:
+        case CXType_Long:
+        case CXType_LongLong:
+        case CXType_Int128:
+        case CXType_Float:
+        case CXType_Double:
+        case CXType_LongDouble: return(true);
+        default:                return(false);
+    }
+}
+
 // NOTE(Sleepster): Keep the spelling the source used, but drop pointer/array
 // syntax because the member itself already records that.
 internal_api string_t
@@ -393,9 +422,10 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                                                  fprint_string(identifier), fprint_string(member.identifier));
                     }
 
-                    c_string_builder_sprintf(&definition_builder, "constexpr type_info_member_t DEFAULT_member_%.*s_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d",
+                    c_string_builder_sprintf(&definition_builder, "constexpr type_info_member_t DEFAULT_member_%.*s_%.*s = {\n\t.info = { .name = \"%.*s\", .is_signed = %s, .size = %d, .metatype = %d",
                                              fprint_string(identifier), fprint_string(member.identifier),
-                                             fprint_string(member.identifier), member_size, get_metatype(member.code_type));
+                                             fprint_string(member.identifier), get_is_signed(member.code_type) ? "true" : "false",
+                                             member_size, get_metatype(member.code_type));
                     if(member.pointer_depth > 0 && member_type)
                     {
                         c_string_builder_sprintf(&definition_builder, ", .pointer_to = &DEFAULT_%.*s.info",
@@ -459,9 +489,10 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
                                              fprint_string(identifier), fprint_string(member.identifier));
                 }
 
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n\t.info = { .name = \"%.*s\", .size = %d, .metatype = %d },\n\t.%s = %d,\n",
+                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = {\n\t.info = { .name = \"%.*s\", .is_signed = %s, .size = %d, .metatype = %d },\n\t.%s = %d,\n",
                                          fprint_string(identifier), fprint_string(identifier),
-                                         fprint_string(identifier), size, get_metatype(type_declaration->code_type),
+                                         fprint_string(identifier), get_is_signed(type_declaration->code_type) ? "true" : "false",
+                                         size, get_metatype(type_declaration->code_type),
                                          member_count_name, member_count);
 
                 if(member_count > 0)
@@ -489,9 +520,10 @@ create_declaration_type_data(apollo_code_decl_list_t *declarations, string_t typ
             }
             else
             {
-                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = { .info = { .name = \"%.*s\", .size = %d, .metatype = %d } };\n\n",
+                c_string_builder_sprintf(&definition_builder, "constexpr type_info_%.*s DEFAULT_%.*s = { .info = { .name = \"%.*s\", .is_signed = %s, .size = %d, .metatype = %d } };\n\n",
                                          fprint_string(identifier), fprint_string(identifier),
-                                         fprint_string(identifier), size, get_metatype(type_declaration->code_type));
+                                         fprint_string(identifier), get_is_signed(type_declaration->code_type) ? "true" : "false",
+                                         size, get_metatype(type_declaration->code_type));
             }
 
             c_string_builder_sprintf(&type_table_builder, "\t&DEFAULT_%.*s.info,\n", fprint_string(identifier));
