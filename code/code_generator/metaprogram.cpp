@@ -1161,8 +1161,9 @@ typedef struct type_info_data_mapping
     const type_info_struct_t *type_info_ptr;
 }type_info_data_mapping_t;
 )");
-    string_t builder_string = c_string_builder_get_current_string(type_enum_builder);
+    string_t builder_string = c_string_builder_copy_builder_string(type_enum_builder);
     fprintf(stdout, "%.*s\n", (s32)builder_string.count, C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 
     // NOTE(Sleepster): Generate the type_info_t for the data structures 
     if(ast->structure_count > 0)
@@ -1850,8 +1851,9 @@ exit:
 
     c_string_builder_sprintf(struct_info_builder, "#endif\n");
     
-    builder_string = c_string_builder_get_current_string(struct_info_builder);
+    builder_string = c_string_builder_copy_builder_string(struct_info_builder);
     fprintf(stdout, "%.*s\n", (s32)builder_string.count, C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 }
 
 void
@@ -2113,11 +2115,11 @@ main(void)
     state.type_table = c_dynarray_create(registry_type_t);
     c_hash_table_init(&state.macro_hash, 1097);
 
-    c_string_builder_init(&state.type_enum_builder,         MB(20));
-    c_string_builder_init(&state.type_table_builder,        MB(20));
-    c_string_builder_init(&state.struct_info_builder,       MB(20));
-    c_string_builder_init(&state.struct_static_def_builder, MB(20));
-    c_string_builder_init(&state.type_member_enum_builder,  MB(20));
+    c_string_builder_init(&state.type_enum_builder);
+    c_string_builder_init(&state.type_table_builder);
+    c_string_builder_init(&state.struct_info_builder);
+    c_string_builder_init(&state.struct_static_def_builder);
+    c_string_builder_init(&state.type_member_enum_builder);
 
     defer(c_string_builder_deinit(&state.type_enum_builder));
     defer(c_string_builder_deinit(&state.type_table_builder));

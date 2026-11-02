@@ -223,8 +223,7 @@ c_string_format(string_t format, Arguments &&...arguments)
 
         // NOTE(Sleepster): write the data out. 
         c_string_format_values(&format, &builder, arguments...);
-
-        result = c_string_builder_copy_builder_string(&builder);
+        result = c_string_builder_copy_builder_string(&builder, ALLOCATOR_TAG_STRINGS);
     }
     else
     {

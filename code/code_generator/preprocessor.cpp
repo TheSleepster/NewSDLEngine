@@ -219,9 +219,9 @@ parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
 
     u32 member_count = 0;
 
-    c_string_builder_init(&local_type_info_builder, MB(10));
-    c_string_builder_init(&local_const_definition_builder, MB(10));
-    c_string_builder_init(&struct_member_builder, MB(10));
+    c_string_builder_init(&local_type_info_builder);
+    c_string_builder_init(&local_const_definition_builder);
+    c_string_builder_init(&struct_member_builder);
 
     // NOTE(Sleepster): Peeking too see if it's an anonymous structure. If it is, just put it inline
     token_data_t struct_name_token = c_tokenizer_peek_token(tokenized_data);
@@ -347,8 +347,9 @@ parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
                 };
                 c_string_builder_append_data(&local_const_definition_builder, test_string);
 
-                string_t member_string = c_string_builder_get_current_string(&struct_member_builder);
+                string_t member_string = c_string_builder_copy_builder_string(&struct_member_builder);
                 c_string_builder_append_data(&local_const_definition_builder, member_string);
+                c_free_alloc(member_string.data);
 
                 c_string_builder_append_data(&local_const_definition_builder, STR("\t}\n};\n\n"));
                 c_string_builder_append_data(&local_type_info_builder, STR("\t}members;\n};\n\n"));
@@ -360,11 +361,13 @@ parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
         }
     }
 end: 
-    string_t type_info_builder_string = c_string_builder_get_current_string(&local_type_info_builder);
+    string_t type_info_builder_string = c_string_builder_copy_builder_string(&local_type_info_builder);
     c_string_builder_append_data(&state.struct_info_builder, type_info_builder_string);
+    c_free_alloc(type_info_builder_string.data);
 
-    string_t const_def_builder_string = c_string_builder_get_current_string(&local_const_definition_builder);
+    string_t const_def_builder_string = c_string_builder_copy_builder_string(&local_const_definition_builder);
     c_string_builder_append_data(&state.struct_const_definition_builder, const_def_builder_string);
+    c_free_alloc(const_def_builder_string.data);
 
     c_string_builder_deinit(&local_const_definition_builder);
     c_string_builder_deinit(&local_type_info_builder);
@@ -379,9 +382,9 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
     string_builder_t enum_definition_builder;
     string_builder_t enum_member_builder;
 
-    c_string_builder_init(&enum_info_builder, MB(20));
-    c_string_builder_init(&enum_definition_builder, MB(20));
-    c_string_builder_init(&enum_member_builder, MB(20));
+    c_string_builder_init(&enum_info_builder);
+    c_string_builder_init(&enum_definition_builder);
+    c_string_builder_init(&enum_member_builder);
 
     defer(c_string_builder_deinit(&enum_member_builder));
     defer(c_string_builder_deinit(&enum_definition_builder));
@@ -466,8 +469,9 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
                 };
                 c_string_builder_append_data(&enum_definition_builder, test_string);
 
-                string_t member_string = c_string_builder_get_current_string(&enum_member_builder);
+                string_t member_string = c_string_builder_copy_builder_string(&enum_member_builder);
                 c_string_builder_append_data(&enum_definition_builder, member_string);
+                c_free_alloc(member_string.data);
 
                 c_string_builder_append_data(&enum_definition_builder, STR("\t}\n};\n\n"));
                 c_string_builder_append_data(&enum_info_builder, STR("\t}members;\n};\n\n"));
@@ -481,11 +485,13 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
         }
     }
 end:
-    string_t builder_string = c_string_builder_get_current_string(&enum_info_builder);
+    string_t builder_string = c_string_builder_copy_builder_string(&enum_info_builder);
     c_string_builder_append_data(&state.enum_info_builder, builder_string);
+    c_free_alloc(builder_string.data);
 
-    builder_string = c_string_builder_get_current_string(&enum_definition_builder);
+    builder_string = c_string_builder_copy_builder_string(&enum_definition_builder);
     c_string_builder_append_data(&state.enum_definition_builder, builder_string);
+    c_free_alloc(builder_string.data);
 }
 
 VISIT_FILES(generate_file_metadata)
@@ -559,11 +565,11 @@ main(int argc, char **argv)
 {
     c_global_context_init();
 
-    c_string_builder_init(&state.type_enum_builder,               MB(200));
-    c_string_builder_init(&state.struct_const_definition_builder, MB(200));
-    c_string_builder_init(&state.struct_info_builder,             MB(200));
-    c_string_builder_init(&state.enum_info_builder,               MB(200));
-    c_string_builder_init(&state.enum_definition_builder,         MB(200));
+    c_string_builder_init(&state.type_enum_builder);
+    c_string_builder_init(&state.struct_const_definition_builder);
+    c_string_builder_init(&state.struct_info_builder);
+    c_string_builder_init(&state.enum_info_builder);
+    c_string_builder_init(&state.enum_definition_builder);
     state.type_ids = c_dynarray_create(u64);
 
     c_string_builder_append_data(&state.type_enum_builder, STR("// THIS IS GENERATED BY THE PREPROCESSOR\n// THIS IS THE RTTI FOR THE ENTIRE PROGRAM\n\n"));
@@ -628,23 +634,28 @@ end:
     
     c_string_builder_append_data(&state.type_enum_builder, STR("};\n"));
 
-    string_t builder_string = c_string_builder_get_current_string(&state.type_enum_builder);
+    string_t builder_string = c_string_builder_copy_builder_string(&state.type_enum_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 
-    builder_string = c_string_builder_get_current_string(&state.struct_info_builder);
+    builder_string = c_string_builder_copy_builder_string(&state.struct_info_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 
-    builder_string = c_string_builder_get_current_string(&state.enum_info_builder);
+    builder_string = c_string_builder_copy_builder_string(&state.enum_info_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 
-    builder_string = c_string_builder_get_current_string(&state.enum_definition_builder);
+    builder_string = c_string_builder_copy_builder_string(&state.enum_definition_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 
     c_string_builder_append_data(&state.struct_const_definition_builder, STR("#pragma pack(pop)\n\n"));
     c_string_builder_append_data(&state.struct_const_definition_builder, STR("#endif // GENERATED_PROGRAM_TYPES_H\n"));
 
-    builder_string = c_string_builder_get_current_string(&state.struct_const_definition_builder);
+    builder_string = c_string_builder_copy_builder_string(&state.struct_const_definition_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
+    c_free_alloc(builder_string.data);
 
 
     return(0);

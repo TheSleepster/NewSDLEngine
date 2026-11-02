@@ -368,6 +368,7 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
     if(lexer->current_stream->line_number == lexer->secondary_stream->line_number)
     {
         string_builder_t temp_builder = {};
+        defer(c_string_builder_deinit(&temp_builder));
 
         // NOTE(Sleepster): If the macro takes arguments 
         token = lexer_get_next_token(lexer);
@@ -461,7 +462,9 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
         lexer_pop_bookmark(lexer);
 
         // NOTE(Sleepster): Create the token stream's token buffer
-        macro_info->expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_copy_builder_string(&temp_builder));
+        string_t expansion_string = c_string_builder_copy_builder_string(&temp_builder, ALLOCATOR_TAG_STATIC);
+        macro_info->expansion_string = c_string_make_copy(&permanent_arena, expansion_string);
+        c_free_alloc(expansion_string.data);
         lexer_init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
 
         lexer_push_token_stream(lexer, &macro_info->expansion_token_stream);
@@ -2798,7 +2801,7 @@ get_attribute_list(char *name)
 )"));
     c_string_builder_append_data(&file_builder, STR("#endif\n"));
 
-    string_t string = c_string_builder_copy_builder_string(&file_builder);
+    string_t string = c_string_builder_copy_builder_string(&file_builder, ALLOCATOR_TAG_STATIC);
     if(output_path != null)
     {
         string_t output_filepath = STR(output_path);
@@ -2807,6 +2810,7 @@ get_attribute_list(char *name)
 
         c_file_write_string(&new_file, string);
     }
+    c_free_alloc(string.data);
 }
 
 int

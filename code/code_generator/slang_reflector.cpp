@@ -97,7 +97,7 @@ remove_shader_structure_attributes(string_t *shader_data)
         }
     }
 
-    string_t result = c_string_builder_copy_builder_string(&transient_builder);
+    string_t result = c_string_builder_copy_builder_string(&transient_builder, ALLOCATOR_TAG_TEMP);
     return(result);
 }
 
@@ -238,6 +238,7 @@ VISIT_FILES(shader_file_callback)
 
         file_t new_file = c_file_open(output_file, true, true);
         c_string_builder_dump_to_file(&module->new_file_builder, &new_file);
+        c_string_builder_deinit(&module->new_file_builder);
 
         log_info("Wrote file: '%.*s' out...\n", output_file.count, C_STR(output_file));
     }
@@ -501,6 +502,7 @@ typedef u32    uint;
 
         file_t new_meta_file = c_file_open(output_file, true, true);
         c_string_builder_dump_to_file(&header_builder, &new_meta_file);
+        c_string_builder_deinit(&header_builder);
         log_info("Generated C header file: '%.*s' for .slh file: '%.*s'...\n",
                  output_file.count, C_STR(output_file),
                  filename.count,    C_STR(filename));

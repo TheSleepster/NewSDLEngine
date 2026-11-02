@@ -64,7 +64,7 @@ asset_packer_write_file(void)
     c_string_builder_append_value(&packer_state.header, (void*)&FLAGS_DWORD,      sizeof(u32));
     c_string_builder_append_value(&packer_state.header, (void*)&OFFSET_TO_TOC,    sizeof(u32));
 
-    c_string_builder_dump_to_file(&packer_state.asset_file_handle, &packer_state.header);
+    c_string_builder_dump_to_file(&packer_state.header, &packer_state.asset_file_handle);
 
     u64 package_data_segment_size = 0;
     for(u32 packer_entry_index = 0;
@@ -126,7 +126,7 @@ asset_packer_write_file(void)
         c_string_builder_append_value(&packer_state.table_of_contents, &entry->data_offset_from_start_of_file, sizeof(u64));
     }
 
-    c_string_builder_dump_to_file(&packer_state.asset_file_handle, &packer_state.table_of_contents);
+    c_string_builder_dump_to_file(&packer_state.table_of_contents, &packer_state.asset_file_handle);
     packer_state.entry_count = packer_state.next_entry_to_write;
 }
 
@@ -201,9 +201,9 @@ main(int argc, char **argv)
     packer_state.output_dir        = STR("../res");
     packer_state.file_extension    = STR(".wad");
 
-    c_string_builder_init(&packer_state.header,            MB(500));
-    c_string_builder_init(&packer_state.data,              MB(500));
-    c_string_builder_init(&packer_state.table_of_contents, MB(500));
+    c_string_builder_init(&packer_state.header);
+    c_string_builder_init(&packer_state.data);
+    c_string_builder_init(&packer_state.table_of_contents);
 
     packer_state.output_dir = c_string_concat(&packer_state.packer_arena, packer_state.output_dir, STR("/"));
 

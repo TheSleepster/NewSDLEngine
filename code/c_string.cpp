@@ -646,10 +646,11 @@ c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 cha
 ENGINE_API void
 c_string_builder_init(string_builder_t *builder)
 {
-    builder->first_buffer.data       = builder->intial_memory;
-    builder->first_buffer.capacity   = DEFAULT_STRING_BUILDER_CAPACITY;
-    builder->first_buffer.bytes_used = 0;
-    builder->current_buffer = &builder->first_buffer;
+    builder->first_buffer.data        = builder->intial_memory;
+    builder->first_buffer.capacity    = DEFAULT_STRING_BUILDER_CAPACITY;
+    builder->first_buffer.bytes_used  = 0;
+    builder->first_buffer.next_buffer = null;
+    builder->current_buffer           = &builder->first_buffer;
 
     builder->is_initialized = true;
 }
@@ -663,45 +664,36 @@ c_string_builder_deinit(string_builder_t *builder)
             current_buffer;
             current_buffer = current_buffer->next_buffer)
         {
-            c_free_alloc(current_buffer->data);
+            c_free_alloc(current_buffer);
         }
     }
 
+    builder->first_buffer.next_buffer = null;
     builder->is_initialized = false;
 }
 
 internal_api string_builder_buffer_t *
 c_string_builder_get_valid_buffer(string_builder_t *builder, s32 new_size)
 {
-    string_builder_buffer_t *result = null;
     if(!builder->is_initialized)
     {
         c_string_builder_init(builder);
     }
 
-    string_builder_buffer_t *last_buffer = null;
-    for(string_builder_buffer_t *current_buffer = &builder->first_buffer;
-        current_buffer;
-        current_buffer = current_buffer->next_buffer)
+    string_builder_buffer_t *result = builder->current_buffer;
+    if((result->bytes_used + new_size) > result->capacity)
     {
-        last_buffer = current_buffer;
-        if((current_buffer->bytes_used + new_size) < current_buffer->capacity)
-        {
-            result = current_buffer;
-            break;
-        }
-    }
+        s32 capacity = Max((s32)DEFAULT_STRING_BUILDER_CAPACITY, new_size);
+        byte *data = (byte*)c_alloc(capacity + sizeof(string_builder_buffer_t), ALLOCATOR_TAG_STRINGS);
 
-    if(!result)
-    {
-        byte *data = (byte*)c_alloc(DEFAULT_STRING_BUILDER_CAPACITY + sizeof(string_builder_buffer_t), ALLOCATOR_TAG_STRINGS);
-        result = (string_builder_buffer_t *)data;
+        result->next_buffer = (string_builder_buffer_t *)data;
+        result               = result->next_buffer;
+        result->bytes_used   = 0;
+        result->capacity     = capacity;
+        result->data         = data + sizeof(string_builder_buffer_t);
+        result->next_buffer  = null;
 
-        result->data     = data + sizeof(string_builder_buffer_t);
-        result->capacity = DEFAULT_STRING_BUILDER_CAPACITY;
-        
         builder->current_buffer = result;
-        last_buffer->next_buffer = result;
     }
 
     return(result);
@@ -713,12 +705,12 @@ c_string_builder_append_data(string_builder_t *builder, string_t string)
     string_builder_buffer_t *current_buffer = c_string_builder_get_valid_buffer(builder, string.count);
     Assert(current_buffer);
 
-    memcpy(current_buffer->data, string.data, string.count);
+    memcpy(current_buffer->data + current_buffer->bytes_used, string.data, string.count);
     current_buffer->bytes_used += string.count;
 }
 
 ENGINE_API string_t
-c_string_builder_copy_builder_string(string_builder_t *builder)
+c_string_builder_copy_builder_string(string_builder_t *builder, s32 allocation_tag)
 {
     string_t result = {};
 
@@ -730,7 +722,7 @@ c_string_builder_copy_builder_string(string_builder_t *builder)
         string_size += current_buffer->bytes_used;
     }
 
-    byte *string_data = (byte*)c_alloc(string_size, ALLOCATOR_TAG_STRINGS);
+    byte *string_data = (byte*)c_alloc(string_size + 1, allocation_tag);
     result.data  = string_data;
     result.count = string_size;
 
@@ -743,6 +735,7 @@ c_string_builder_copy_builder_string(string_builder_t *builder)
         current_offset += current_buffer->bytes_used;
     }
 
+    string_data[string_size] = '\0';
     return(result);
 }
 
@@ -763,7 +756,7 @@ c_string_builder_reset(string_builder_t *builder)
 ENGINE_API void
 c_string_builder_dump_to_file(string_builder_t *builder, file_t *file)
 {
-    string_t builder_string = c_string_builder_copy_builder_string(builder);
+    string_t builder_string = c_string_builder_copy_builder_string(builder, ALLOCATOR_TAG_CACHE);
     defer(c_free_alloc(builder_string.data));
 
     c_file_write_string(file, builder_string);
@@ -779,7 +772,7 @@ c_string_builder_flush_to_file(string_builder_t *builder, file_t *file)
 ENGINE_API void
 c_string_builder_append_builder(string_builder_t *A, string_builder_t *B)
 {
-    string_t builder_string = c_string_builder_copy_builder_string(B);
+    string_t builder_string = c_string_builder_copy_builder_string(B, ALLOCATOR_TAG_CACHE);
     defer(c_free_alloc(builder_string.data));
 
     c_string_builder_append_data(A, builder_string);
