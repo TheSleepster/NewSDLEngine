@@ -121,8 +121,13 @@ c_string_format_primitive(string_t *source, string_builder_t *destination, const
 
 template <typename T>
 void
-c_string_format_structure(void)
+c_string_format_structure(string_t *source, string_builder_t *destination, const type_info_t *info, T &argument)
 {
+    const type_info_struct_t *structure = static_cast<type_info_struct_t*>(info);
+    (void)source;
+    (void)destination;
+    (void)argument;
+    (void)structure;
 }
 
 template <typename T>
@@ -137,7 +142,7 @@ c_string_format_value(string_t *source, string_builder_t *destination, T &argume
         default: { result += c_string_format_primitive(source, destination, type_info, argument); }break;
         case APOLLO_METATYPE_STRUCTURE:
         {
-            InvalidCodePath;
+            c_string_format_structure(source, destination, type_info, argument);
         }break;
         case APOLLO_METATYPE_ENUM:
         {

@@ -464,9 +464,9 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
         // NOTE(Sleepster): Create the token stream's token buffer
         string_t expansion_string = c_string_builder_copy_builder_string(&temp_builder, ALLOCATOR_TAG_STATIC);
         macro_info->expansion_string = c_string_make_copy(&permanent_arena, expansion_string);
-        c_free_alloc(expansion_string.data);
-        lexer_init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
+        defer(c_free_alloc(expansion_string.data));
 
+        lexer_init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
         lexer_push_token_stream(lexer, &macro_info->expansion_token_stream);
 
         u32 token_count = 0;
