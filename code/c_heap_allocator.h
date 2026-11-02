@@ -44,6 +44,8 @@ thread_local s32 this_thread_index = -1;
     X(ALLOCATOR_TAG_GAME_RENDERER, "ALLOCATOR_TAG_GAME_RENDERER", game_renderer) \
     X(ALLOCATOR_TAG_DEBUG, "ALLOCATOR_TAG_DEBUG", DEBUG) \
     X(ALLOCATOR_TAG_GAME, "ALLOCATOR_TAG_GAME", game) \
+    X(ALLOCATOR_TAG_STRINGS, "ALLOCATOR_TAG_STRINGS", strings) \
+    X(ALLOCATOR_TAG_PADDING, "ALLOCATOR_TAG_PADDING", padding)
 
 enum memory_allocator_tag_t
 {

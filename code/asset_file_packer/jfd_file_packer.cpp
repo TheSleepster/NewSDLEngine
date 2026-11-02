@@ -166,9 +166,6 @@ main(int arg_count, char **args)
 
     packer_state.builder_arena  = c_arena_create(GB(1), ALLOCATOR_TAG_STATIC);
     packer_state.packages_arena = c_arena_create(GB(6), ALLOCATOR_TAG_STATIC);
-    c_string_builder_init(&packer_state.builder, MB(500));
-    c_string_builder_init(&packer_state.header_builder, GB(6));
-
     if(arg_count < 2)
     {
         byte *buffer = c_arena_push_array(&packer_state.builder_arena, byte, 1024);
@@ -209,7 +206,7 @@ main(int arg_count, char **args)
         header.entry_count = packer_state.asset_next_entry_to_write;
 
         c_string_builder_append_value(&packer_state.header_builder, (void*)&header, sizeof(header));
-        c_string_builder_flush_to_file(&packer_state.output_file, &packer_state.header_builder);
+        c_string_builder_flush_to_file(&packer_state.header_builder, &packer_state.output_file);
 
         // NOTE(Sleepster): Write out asset blocks 
         for(u32 asset_entry_index = 0;
@@ -247,7 +244,7 @@ main(int arg_count, char **args)
             c_string_builder_append_data(&packer_state.builder, asset_info->fullpath);
             c_string_builder_append_data(&packer_state.builder, asset_info->asset_data);
         }
-        c_string_builder_flush_to_file(&packer_state.output_file, &packer_state.builder);
+        c_string_builder_flush_to_file(&packer_state.builder, &packer_state.output_file);
     }
     else
     {

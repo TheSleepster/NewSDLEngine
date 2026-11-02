@@ -643,153 +643,152 @@ c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 cha
 // STRING BUILDER
 ///////////////////
 
-// NOTE(Sleepster): We don't just eat the whole arena immediately even though conceptually that seems like a good idea. 
-//                  The problem is that by doing this we essentially tell mmap to map ALL the virtual memory into 
-//                  our system memory, making memset slow and almost bricking our pc 
-internal_api string_builder_buffer_t*
-c_string_builder_create_and_attach_buffer(string_builder_t *builder, u64 block_size)
-{
-    string_builder_buffer_t *result = c_arena_push_struct(&builder->arena, string_builder_buffer_t);
-    Assert(result);
-
-    result->buffer_size = block_size;
-    result->next_buffer = null;
-    result->buffer_data = c_arena_push_size(&builder->arena, u64(block_size * 0.25f));
-    if(builder->current_buffer)
-    {
-        builder->current_buffer->next_buffer = result;
-    }
-    else
-    {
-        builder->current_buffer = result;
-    } 
-
-    builder->total_allocated += block_size;
-    return(result);
-}
-
-// NOTE(Sleepster): I trust you won't call this while the builder is actually initialized.... 
 ENGINE_API void
-c_string_builder_init(string_builder_t *builder, u64 buffer_block_size)
+c_string_builder_init(string_builder_t *builder)
 {
-    ZeroStruct(*builder);
-    const u64 padding_bytes = 128;
-    const u64 arena_block_size = Align16(buffer_block_size + ((sizeof(string_builder_buffer_t) * 2) + padding_bytes));
+    builder->first_buffer.data       = builder->intial_memory;
+    builder->first_buffer.capacity   = DEFAULT_STRING_BUILDER_CAPACITY;
+    builder->first_buffer.bytes_used = 0;
+    builder->current_buffer = &builder->first_buffer;
 
-    builder->arena                     =  c_arena_create(arena_block_size, ALLOCATOR_TAG_STATIC);
-    builder->default_buffer_block_size =  buffer_block_size;
-    builder->first_buffer              =  c_string_builder_create_and_attach_buffer(builder, buffer_block_size);
-    builder->current_buffer            =  builder->first_buffer;
-    builder->is_initialized            =  true;
+    builder->is_initialized = true;
 }
 
 ENGINE_API void
 c_string_builder_deinit(string_builder_t *builder)
 {
-    c_arena_destroy(&builder->arena);
+    if(builder->first_buffer.next_buffer)
+    {
+        for(string_builder_buffer_t *current_buffer = builder->first_buffer.next_buffer;
+            current_buffer;
+            current_buffer = current_buffer->next_buffer)
+        {
+            c_free_alloc(current_buffer->data);
+        }
+    }
+
     builder->is_initialized = false;
 }
 
-internal_api void
-c_string_builder_advance_buffer(string_builder_t *builder)
+internal_api string_builder_buffer_t *
+c_string_builder_get_valid_buffer(string_builder_t *builder, s32 new_size)
 {
-    string_builder_buffer_t *next_buffer = builder->current_buffer->next_buffer;
-    if(!next_buffer)
+    string_builder_buffer_t *result = null;
+    if(!builder->is_initialized)
     {
-        next_buffer = c_string_builder_create_and_attach_buffer(builder, builder->default_buffer_block_size);
+        c_string_builder_init(builder);
     }
-    builder->current_buffer = next_buffer;
+
+    string_builder_buffer_t *last_buffer = null;
+    for(string_builder_buffer_t *current_buffer = &builder->first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
+    {
+        last_buffer = current_buffer;
+        if((current_buffer->bytes_used + new_size) < current_buffer->capacity)
+        {
+            result = current_buffer;
+            break;
+        }
+    }
+
+    if(!result)
+    {
+        byte *data = (byte*)c_alloc(DEFAULT_STRING_BUILDER_CAPACITY + sizeof(string_builder_buffer_t), ALLOCATOR_TAG_STRINGS);
+        result = (string_builder_buffer_t *)data;
+
+        result->data     = data + sizeof(string_builder_buffer_t);
+        result->capacity = DEFAULT_STRING_BUILDER_CAPACITY;
+        
+        builder->current_buffer = result;
+        last_buffer->next_buffer = result;
+    }
+
+    return(result);
 }
 
 ENGINE_API void
-c_string_builder_append_data(string_builder_t *builder, string_t data)
+c_string_builder_append_data(string_builder_t *builder, string_t string)
 {
-    Assert(data.count <= builder->default_buffer_block_size);
+    string_builder_buffer_t *current_buffer = c_string_builder_get_valid_buffer(builder, string.count);
+    Assert(current_buffer);
 
-    string_builder_buffer_t *current_buffer = builder->current_buffer;
-    if(current_buffer->bytes_used + data.count > current_buffer->buffer_size)
+    memcpy(current_buffer->data, string.data, string.count);
+    current_buffer->bytes_used += string.count;
+}
+
+ENGINE_API string_t
+c_string_builder_copy_builder_string(string_builder_t *builder)
+{
+    string_t result = {};
+
+    s32 string_size = 0;
+    for(string_builder_buffer_t *current_buffer = &builder->first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
     {
-        c_string_builder_advance_buffer(builder);
-        Assert(current_buffer->next_buffer);
-        Assert(current_buffer->buffer_data);
+        string_size += current_buffer->bytes_used;
     }
 
-    byte *buffer_data = current_buffer->buffer_data + current_buffer->bytes_used;
-    memcpy(buffer_data, data.data, data.count);
+    byte *string_data = (byte*)c_alloc(string_size, ALLOCATOR_TAG_STRINGS);
+    result.data  = string_data;
+    result.count = string_size;
 
-    current_buffer->bytes_used += data.count;
-    builder->bytes_used += data.count;
+    s32 current_offset = 0;
+    for(string_builder_buffer_t *current_buffer = &builder->first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
+    {
+        memcpy(result.data + current_offset, current_buffer->data, current_buffer->bytes_used);
+        current_offset += current_buffer->bytes_used;
+    }
+
+    return(result);
 }
 
 ENGINE_API void
 c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size)
 {
-    string_t value_string = {
-        .data  = (byte*)value,
-        .count = value_size
-    };
-
+    string_t value_string = {(byte*)value, value_size};
     c_string_builder_append_data(builder, value_string);
 }
 
-ENGINE_API string_t
-c_string_builder_get_current_string(string_builder_t *builder)
-{
-    string_t result = {};
-    for(string_builder_buffer_t *current_buffer = builder->first_buffer;
-        current_buffer != null;
-        current_buffer = current_buffer->next_buffer)
-    {
-        string_t buffer_string = c_string_create_with_length(current_buffer->buffer_data, current_buffer->bytes_used);
-        result = c_string_concat(&builder->arena, result, buffer_string);
-    }
-
-    return(result);
-}
-
-ENGINE_API bool8
-c_string_builder_dump_to_file(file_t *file, string_builder_t *builder)
-{
-    bool8 result = false;
-    string_t builder_string = c_string_builder_get_current_string(builder);
-    result = c_file_write_string(file, builder_string);
-
-    return(result);
-}
-
-ENGINE_API void 
+ENGINE_API void
 c_string_builder_reset(string_builder_t *builder)
 {
-    c_arena_reset(&builder->arena);
-
-    builder->bytes_used      = 0;
-    builder->total_allocated = 0;
-    builder->current_buffer  = null;
-    builder->current_buffer  = c_string_builder_create_and_attach_buffer(builder, builder->default_buffer_block_size);
+    c_string_builder_deinit(builder);
+    c_string_builder_init(builder);
 }
 
-ENGINE_API bool8 
-c_string_builder_flush_to_file(file_t *file, string_builder_t *builder)
+ENGINE_API void
+c_string_builder_dump_to_file(string_builder_t *builder, file_t *file)
 {
-    bool8 result = c_string_builder_dump_to_file(file, builder);
-    c_string_builder_reset(builder);
+    string_t builder_string = c_string_builder_copy_builder_string(builder);
+    defer(c_free_alloc(builder_string.data));
 
-    return(result);
+    c_file_write_string(file, builder_string);
 }
 
-// NOTE(Sleepster): Might wanna flip these. 
+ENGINE_API void
+c_string_builder_flush_to_file(string_builder_t *builder, file_t *file)
+{
+    c_string_builder_dump_to_file(builder, file);
+    c_string_builder_reset(builder);
+}
+
 ENGINE_API void
 c_string_builder_append_builder(string_builder_t *A, string_builder_t *B)
 {
-    string_t builder_string = c_string_builder_get_current_string(B);
+    string_t builder_string = c_string_builder_copy_builder_string(B);
+    defer(c_free_alloc(builder_string.data));
+
     c_string_builder_append_data(A, builder_string);
 }
 
 ENGINE_API void
 c_string_builder_sprintf(string_builder_t *builder, const char *string, ...)
 {
-    char buffer[32000];
-    ZeroMemory(buffer, sizeof(buffer));
+    char buffer[32000] = {};
 
     va_list arg_ptr;
     va_start(arg_ptr, string);

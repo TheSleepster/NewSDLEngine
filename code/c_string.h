@@ -98,44 +98,39 @@ STR(const char *c_string)
 // STRING BUILDER
 ///////////////////////////////////////////
 
-#define DEFAULT_STRING_BUILDER_BUFFER_SIZE (2048)
+constexpr u32 DEFAULT_STRING_BUILDER_CAPACITY = 4096;
 
-typedef struct string_builder_buffer 
+struct string_builder_buffer_t 
 {
-    byte *buffer_data;
-    s64   bytes_used;
-    s64   buffer_size;
+    s32   bytes_used;
+    s32   capacity;
+    byte *data;
 
-    struct string_builder_buffer *next_buffer;
-}string_builder_buffer_t;
+    string_builder_buffer_t *next_buffer;
+};
 
-// NOTE(Sleepster): We just use a memory arena here since everything within this builder will live and die together... 
-typedef struct string_builder
+struct string_builder_t 
 {
-    bool8                        is_initialized;
-    memory_arena_t               arena;
+    bool8 is_initialized;
+    byte intial_memory[DEFAULT_STRING_BUILDER_CAPACITY];
 
-    string_builder_buffer_t     *first_buffer;
-    string_builder_buffer_t     *current_buffer;
-    s64                          default_buffer_block_size;
-
-    s64                          bytes_used;
-    s64                          total_allocated;
-}string_builder_t;
+    string_builder_buffer_t  first_buffer;
+    string_builder_buffer_t *current_buffer;
+};
 
 ENGINE_API void     c_string_builder_init(string_builder_t *builder, u64 buffer_block_size);
 ENGINE_API void     c_string_builder_deinit(string_builder_t *builder);
 ENGINE_API void     c_string_builder_append_data(string_builder_t *builder, string_t data);
 ENGINE_API void     c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size);
-ENGINE_API string_t c_string_builder_get_current_string(string_builder_t *builder);
+ENGINE_API string_t c_string_builder_copy_builder_string(string_builder_t *builder);
 ENGINE_API void     c_string_builder_reset(string_builder_t *builder);
 ENGINE_API void     c_string_builder_append_builder(string_builder_t *A, string_builder_t *B);
 ENGINE_API void     c_string_builder_sprintf(string_builder_t *builder, const char *string, ...);
 
 // NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
 //                  FLUSH writes out the data, and completely resets the state of the builder
-ENGINE_API bool8 c_string_builder_dump_to_file(file_t *file, string_builder_t *builder);
-ENGINE_API bool8 c_string_builder_flush_to_file(file_t *file, string_builder_t *builder);
+ENGINE_API void c_string_builder_dump_to_file(string_builder_t *builder, file_t *file);
+ENGINE_API void c_string_builder_flush_to_file(file_t *file, string_builder_t *builder);
 
 #endif // C_STRING_H
 

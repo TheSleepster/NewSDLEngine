@@ -190,8 +190,5 @@ print(string_t message, Args... arguments)
     (void)argument_count;
 
     string_builder_t builder = {};
-    c_string_builder_init(&builder, KB(100));
-    defer(c_string_builder_deinit(&builder));
-
     output_type_data(message, &builder, arguments...);
 }

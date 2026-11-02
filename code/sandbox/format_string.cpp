@@ -13,10 +13,9 @@
 
 template <typename T>
 internal_api s32
-c_string_format_primitive(string_t *string, const type_info_t *info, T &value)
+c_string_format_primitive(string_t *source, string_builder_t *destination, const type_info_t *info, T &value)
 {
-    (void)string;
-
+    (void)source;
     // NOTE(Sleepster): Not entirely correct because a number like "10" passed as an integer
     // will only be 2 bytes, not four. But this is just testing code.
     char buffer[9] = {};
@@ -32,22 +31,50 @@ c_string_format_primitive(string_t *string, const type_info_t *info, T &value)
             // NOTE(Sleepster): Char 
             if(element_size == 1)
             {
-                result += snprintf(buffer, sizeof(buffer), "%c", (char)value);
+                if(info->is_signed)
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%hhd", (char)value);
+                }
+                else
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%hhu", (byte)value);
+                }
             }
             // NOTE(Sleepster): Short 
             else if(element_size == 2)
             {
-                result += snprintf(buffer, sizeof(buffer), "%hd", (s16)value);
+                if(info->is_signed)
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%hd", (s16)value);
+                }
+                else
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%hu", (u16)value);
+                }
             }
             // NOTE(Sleepster): Int 
             else if(element_size == 4)
             {
-                result += snprintf(buffer, sizeof(buffer), "%d", (s32)value);
+                if(info->is_signed)
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%d", (s32)value);
+                }
+                else
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%u", (u32)value);
+                }
             }
             // NOTE(Sleepster): Long 
             else if(element_size == 8)
             {
-                result += snprintf(buffer, sizeof(buffer), "%ld", (s64)value);
+                if(info->is_signed)
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%ld", (s64)value);
+                }
+                else
+                {
+                    result += snprintf(buffer, sizeof(buffer), "%lu", (u64)value);
+                }
             }
             else 
             {
@@ -81,6 +108,14 @@ c_string_format_primitive(string_t *string, const type_info_t *info, T &value)
         }break;
     }
 
+    if(destination)
+    {
+        string_t buffer_string = {.data = (byte*)buffer, .count = result};
+        c_string_builder_append_data(destination, buffer_string);
+
+        source->data += 1;
+    }
+
     return(result);
 }
 
@@ -92,14 +127,14 @@ c_string_format_structure(void)
 
 template <typename T>
 internal_api s32 
-c_string_format_value(string_t *final_string, T &argument)
+c_string_format_value(string_t *source, string_builder_t *destination, T &argument)
 {
     s32 result = 0;
 
     const type_info_t *type_info = Apollo::type_info<T>();
     switch(type_info->metatype)
     {
-        default: { InvalidCodePath; }break;
+        default: { result += c_string_format_primitive(source, destination, type_info, argument); }break;
         case APOLLO_METATYPE_STRUCTURE:
         {
             InvalidCodePath;
@@ -114,7 +149,7 @@ c_string_format_value(string_t *final_string, T &argument)
             if(referenced_type->metatype != APOLLO_METATYPE_STRUCTURE &&
                referenced_type->metatype != APOLLO_METATYPE_ENUM)
             {
-                result += c_string_format_primitive(final_string, referenced_type, argument);
+                result += c_string_format_primitive(source, destination, referenced_type, argument);
             }
         }break;
         case APOLLO_METATYPE_ARRAY:
@@ -135,7 +170,7 @@ c_string_format_value(string_t *final_string, T &argument)
                         ++array_index)
                     {
                         T &element = argument_array[array_index];
-                        result += c_string_format_primitive(final_string, underlying_type, element);
+                        result += c_string_format_primitive(source, destination, underlying_type, element);
                     }
                 }
             }
@@ -150,18 +185,29 @@ c_string_format_value(string_t *final_string, T &argument)
 }
 
 internal_api s32
-c_string_format_values(string_t *final_string)
+c_string_format_values(string_t *source, string_builder_t *destination)
 {
-    (void)final_string;
+    (void)source;
+    (void)destination;
     return(0);
 }
 
 template <typename T, typename... Rest>
 internal_api s32
-c_string_format_values(string_t *final_string, T &argument, Rest &...rest)
+c_string_format_values(string_t *source, string_builder_t *destination, T &argument, Rest &...rest)
 {
-    return(c_string_format_value(final_string, argument) +
-           c_string_format_values(final_string, rest...));
+    s32 format_input = c_string_find_first_char_from_left(*source, '%');
+    if(format_input > -1 && destination)
+    {
+        string_t to_append = *source;
+        to_append.count = format_input;
+        c_string_builder_append_data(destination, to_append);
+
+        source->data += format_input;
+    }
+
+    return(c_string_format_value(source, destination, argument) +
+           c_string_format_values(source, destination, rest...));
 }
 
 template<typename... Arguments>
@@ -173,12 +219,12 @@ c_string_format(string_t format, Arguments &&...arguments)
     s32 format_input = c_string_find_first_char_from_left(format, '%');
     if(format_input != -1)
     {
-        // NOTE(Sleepster): Count the bytes needed for the final string 
-        s32 bytes_to_write = c_string_format_values(null, arguments...);
-        result.count += bytes_to_write;
+        string_builder_t builder = {};
 
-        // NOTE(Sleepster): Allocate the memory needed for the final string
         // NOTE(Sleepster): write the data out. 
+        c_string_format_values(&format, &builder, arguments...);
+
+        result = c_string_builder_copy_builder_string(&builder);
     }
     else
     {
@@ -191,10 +237,11 @@ c_string_format(string_t format, Arguments &&...arguments)
 int
 main(void)
 {
+    c_global_context_init();
+
     printf("Hello, World!\n");
-    c_string_format(STR("%, %, %"), 4, 1.0f, 1.0f);
-#if 0 
-#endif
+    string_t string = c_string_format(STR("%, %, %"), 4, 1.0f, 1.0f);
+    (void)string;
 
     return(0);
 }
