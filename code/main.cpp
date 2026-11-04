@@ -494,7 +494,7 @@ render_immediate_debug_collider(game_state_t *game_state, render_group_vertex_st
     vec2_t render_position = entity->bounding_box.min;
     if(game_state->game_mode == GAME_MODE_EDIT_MODE)
     {
-        render_position = entity->render_position;
+        render_position = entity->editor_position;
     }
 
     vec4_t color = vec4(0.5f, 0.0f, 0.0f, 0.2f);

@@ -123,11 +123,13 @@ template <typename T>
 void
 c_string_format_structure(string_t *source, string_builder_t *destination, const type_info_t *info, T &argument)
 {
-    const type_info_struct_t *structure = static_cast<type_info_struct_t*>(info);
+    const type_info_struct_t *structure = (const type_info_struct_t *)info;
     (void)source;
     (void)destination;
     (void)argument;
     (void)structure;
+
+    InvalidCodePath;
 }
 
 template <typename T>

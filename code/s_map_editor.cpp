@@ -421,10 +421,12 @@ EDITOR CONTROLS:
  MANIPULATE MODE:
      LEFT MOUSE (Clicked) = "Select Hovered Entity" (X)
      LEFT MOUSE (Held)    = "Box Select" (X)
-     CTRL + LEFT MOUSE    = "Deselect Selected Entity"
-     ALT  + LEFT MOUSE    = "Drag Group"
+     CTRL + LEFT MOUSE    = "Deselect Selected Entity" (X)
      CTRL + C             = "Copy Item"
      CTRL + V             = "Paste Item"
+
+     HOLD LEFT MOUSE      = "Drag Selected Entities" (only works when dragging OVER a selected_entity)
+     CTRL + HELD LEFT     = "Snap To Grid"
  
  PAINT MODE:
      LEFT MOUSE          = "Paint Tiles" (X)
@@ -812,44 +814,61 @@ s_editor_update_state(game_state_t *game_state, ui_state_t *main_ui, map_editor_
         }
     }
 
-    // NOTE(Sleepster): Display information about the selected entity if there is only one entity selected.     
-    if(editor->selected_entity_count == 1)
+    if(editor->selected_entity_count != 0)
     {
-        entity_t *selected_entity = editor->selected_entities[0];
-        ui_signal_t entity_panel = ui_widget_panel(main_ui,
-                                                   STR("Entity Information Panel"),
-                                                   vec2_multiply(gc->RHI_context->window_size, vec2(-0.5, 0.5)), 
-                                                   vec2(20, 20), 
-                                                   vec2(10.0f, 20.0f), 
-                                                   vec4(10, 10, 20, 20), 
-                                                   vec4(0.4, 0.4, 0.4, 0.6),
-                                                   0);
-        if(rect2_point_in_rect(entity_panel.widget->state->widget_rect, main_ui->mouse_position))
+        // NOTE(Sleepster): Display information about the selected entity if there is only one entity selected.     
+        if(editor->selected_entity_count == 1)
         {
-            main_ui->input_focused = true;
+            entity_t *selected_entity = editor->selected_entities[0];
+            ui_signal_t entity_panel = ui_widget_panel(main_ui,
+                                                       STR("Entity Information Panel"),
+                                                       vec2_multiply(gc->RHI_context->window_size, vec2(-0.5, 0.5)), 
+                                                       vec2(20, 20), 
+                                                       vec2(10.0f, 20.0f), 
+                                                       vec4(10, 10, 20, 20), 
+                                                       vec4(0.4, 0.4, 0.4, 0.6),
+                                                       0);
+            if(rect2_point_in_rect(entity_panel.widget->state->widget_rect, main_ui->mouse_position))
+            {
+                main_ui->input_focused = true;
+            }
+            else
+            {
+                main_ui->input_focused = false;
+            }
+
+            ui_column(main_ui, entity_panel.widget)
+            {
+                // TODO(Sleepster): Have information about the entity properly displayed here and allow it to become modifiable. 
+                ui_widget_set_default_font_size(main_ui, 30);
+                const type_info_t *archetype_data = Apollo::type_info("entity_archetype_t");
+                const type_info_member_t *current_archetype = Apollo::get_member(archetype_data, selected_entity->archetype);
+
+                byte *buffer = c_arena_push_size(&gc->temp_arena, 2048);
+                s32 buffer_count = snprintf((char*)buffer, 2048, "entity_archetype_t: %s", current_archetype->info.name);
+                string_t written_string = {
+                    .data  = buffer,
+                    .count = buffer_count
+                };
+
+                ui_widget_text(main_ui, written_string);
+
+                char *buffer_ptr = (char*)buffer + buffer_count;
+                s32 old_buffer_count = buffer_count;
+                buffer_count += snprintf(buffer_ptr, 
+                                         2048 - buffer_count, 
+                                         "Entity Position: X: %f, Y: %f", 
+                                         selected_entity->editor_position.x, selected_entity->editor_position.y);
+                written_string = {
+                    .data  = (byte*)buffer_ptr,
+                    .count = old_buffer_count 
+                };
+                ui_widget_text(main_ui, written_string);
+            }
         }
-        else
+
+        // NOTE(Sleepster): Moving entities with mouse 
         {
-            main_ui->input_focused = false;
-        }
-
-        ui_column(main_ui, entity_panel.widget)
-        {
-            // TODO(Sleepster): Have information about the entity properly displayed here and allow it to become modifiable. 
-            ui_widget_set_default_font_size(main_ui, 30);
-            const type_info_t *archetype_data = Apollo::type_info("entity_archetype_t");
-            const type_info_member_t *current_archetype = Apollo::get_member(archetype_data, selected_entity->archetype);
-
-            byte *buffer = c_arena_push_size(&gc->temp_arena, 2048);
-            s32 buffer_count = snprintf((char*)buffer, 2048, "%s", current_archetype->info.name);
-
-            string_t archetype_string = {
-                .data  = buffer,
-                .count = buffer_count
-            };
-
-            ui_widget_text(main_ui, STR("Entity Archetype:"));
-            ui_widget_text(main_ui, archetype_string);
         }
     }
 }
